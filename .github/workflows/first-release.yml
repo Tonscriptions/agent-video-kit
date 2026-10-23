@@ -1,0 +1,37 @@
+name: Publish first verified Agent Video Kit release
+
+on:
+  push:
+    tags:
+      - v0.1.0-alpha.1
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: agent-video-kit-first-release
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out the exact release tag
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: refs/tags/v0.1.0-alpha.1
+          persist-credentials: false
+          sparse-checkout: |
+            scripts/publish_first_release.py
+            docs/releases/v0.1.0-alpha.1/artifacts
+          sparse-checkout-cone-mode: false
+      - name: Validate and publish the reviewed native artifacts
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $releaseCommit = git rev-parse HEAD
+          python scripts/publish_first_release.py --artifacts docs/releases/v0.1.0-alpha.1/artifacts --tag v0.1.0-alpha.1 --commit $releaseCommit --publish
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

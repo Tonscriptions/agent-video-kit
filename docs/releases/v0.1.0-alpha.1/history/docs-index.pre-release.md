@@ -1,0 +1,894 @@
+> Historical snapshot before the first release / 首版发布前历史快照。
+> Evidence counts retain their original dates and scope. Historical links may reflect older layouts.
+
+# AI广告剪辑文档中心
+
+- [V112：连续浮点 1D LUT 与组合 shaper 实测](../../../validation/连续浮点1D-LUT与组合shaper实测_2026-10-23.md)
+- [1D/组合 shaper 参数与格式契约](../../../specs/连续浮点1D-LUT与组合shaper契约_v0.1_2026-10-23.md)
+
+<!-- R111-FLOAT-COLOR-KEYER-DIAGNOSTICS -->
+R111 最终共同浮点调色/模糊/锐化/抠像与 HTML 准备诊断：源码 实际 8 项，66.297 秒，0 跳过；离线安装 实际 804 项，3870.651 秒，0 跳过；完整 实际 2897 项，6886.667 秒，0 跳过。旧 V103 2,537 项失败及未执行的中间全量保留，不以分项累加为完成率。自然素材、HDR、长片与剪映全部等价仍未验收。
+[编号证据、原片与限制](../../../validation/浮点调色抠像合并验收与诊断恢复_2026-10-23.md)。
+<!-- /R111-FLOAT-COLOR-KEYER-DIAGNOSTICS -->
+
+<!-- R17-OPENFILM-REUSE-RECOVERY -->
+OpenFilm 当前 13 类拆用建议、有限重试观察、Node 原始失败和工量见 [R17 复核](../../../OpenFilm当前复用建议与导出恢复增量_2026-10-22.md)。本轮为研究，不新增产品/模型/媒体验收。
+
+本次为基于已发布 V102 的独立研究更新，产品 311 输入保持不变；V103 的 2,537 项完整回归出现 1 失败、1 错误，后续候选未发布。旧等待发布流程的失败已保留，不计为本轮产品功能通过。[发布恢复依据](../../../validation/evidence/openfilm-reuse-20261022-r17/publication-recovery-r2/basis.json)。
+
+<!-- /R17-OPENFILM-REUSE-RECOVERY -->
+
+<!-- V102-CONTINUOUS-FLOAT-RGB-CURVES -->
+### V102 连续浮点RGB曲线与作者控制点
+
+显式 `float32-native-v1` 工程的正式render和预览共用连续RGB曲线。空间natural/PCHIP、独立通道、后置总曲线与作者控制点关键帧直接浮点求值，无整数曲线表。默认后端迁移、其余浮点算子及完整剪映功能仍未完成。
+
+| 编号 | 功能性核验 | 实际内容与范围 | 证据 |
+|---|---|---|---|
+| FC102-01 | 共同内核 | 新增float_curves及40项测试，父LUT候选309→311输入、5条产品路径改变；正式render、区间预览与PNG16共用有序效果链 | [接口契约](../../../specs/连续浮点RGB曲线与后置总曲线契约_v0.1_2026-10-22.md) |
+| FC102-02 | 连续曲线 | natural三对角求解、PCHIP保形插值；独立稠密矩阵与Hermite基函数对照。1..256固定点、常量端点延伸、曲线输出夹0..1；不是8/16位网格 | [实际200项相关回归](../../../validation/evidence/float-curves-20261022-lab/native-r3/verification.json) |
+| FC102-03 | RGB与总曲线 | all仅给未独立声明通道提供默认；旧master别名指all；post_master为独立后置总曲线；动态通道从静态all分叉后独立 | [控制点与顺序断言](../../../validation/evidence/float-curves-20261022-lab/native-r3/unittest.log) |
+| FC102-04 | 作者时钟 | all/R/G/B/post_master的点x/y和强度，六种时间插值；Bezier直接求值，四控制值用48次求根；保留超2^53有理tick偏移、作者窗口和嵌套倒放左极限 | [实际执行源码](../../../validation/evidence/float-curves-20261022-lab/native-r3/verification.json) |
+| FC102-05 | 浮点与信号 | 65536级灰阶与相邻Float32保留；明确输入/输出信号，转回线性工作RGB后混强度；alpha位型与隐藏RGB单独核验；强度0逐位复制 | [精度/信号断言](../../../validation/evidence/float-curves-20261022-lab/native-r3/unittest.log) |
+| FC102-06 | 原生对照边界 | natural/PCHIP的真实RGB16单阶段及后置总曲线；分别建模原生格起点、截断和两次量化，每阶段独立误差≤1码；合并原生结果与真实两阶段逐字节相同。连续结果另对照数学基准 | [原生命令/I/O/4组记录](../../../validation/evidence/float-curves-20261022-lab/native-r3/verification.json) |
+| FC102-07 | 有序效果与预算 | 曝光/曲线、LUT/曲线顺序、禁用项、只读输入、分块逐位相同；晚块非法值、取消和工作区拒绝保留输入；预算含保留LUT，不是进程总RSS | [实际断言](../../../validation/evidence/float-curves-20261022-lab/native-r3/unittest.log) |
+| FC102-08 | 公开CLI | 20脚本调用/29检查；2次正式render、3次preview；原创320×180、10fps、2秒各20帧，5段覆盖空间插值、点x/y、后置总曲线、Bezier强度及效果顺序 | [原始命令与输出](../../../validation/evidence/float-curves-20261022-lab/media-r2/verification.json) |
+| FC102-09 | 独立全选区参考 | 作者帧3..16共2,419,200个线性RGB值，最大绝对误差7.45058059692e-09；正式96000及选区67200双声道PCM采样帧相同；PNG16与选区对应作者帧误差≤1码 | [独立执行参考](../../../validation/evidence/float-curves-20261022-lab/media-r2/executed-oracle.py.txt) |
+| FC102-10 | 原视频/GIF | 原创RGB16图形、alpha与正弦音频，CC0；GIF左原片、右真实CLI预览，14×100ms；静看3/10/16共6幅画面，不代替连续播放或试听 | [原片](../../../assets/float-curves-20261022-r2/original-range.mp4) · [实际预览](../../../assets/float-curves-20261022-r2/range.mp4) · [Float32](../../../assets/float-curves-20261022-r2/range.master.nut) · [PNG16](../../../assets/float-curves-20261022-r2/frame.png) · [查看记录](../../../validation/evidence/float-curves-20261022-lab/static-review-r1.json) |
+| FC102-11 | 离线安装 | **400项 /873.416秒 /0跳过**；186份source/wheel/site资源、8个固定离线wheel、NumPy931文件及原许可一致；安装版实际CLI音画、Float32及PNG16与源码版一致。 | [安装收据](../../../validation/evidence/float-curves-20261022-lab/installed-r1/verification.json) · [作者工程](../../../assets/float-curves-20261022-r2/author-project.json) · [权利账](../../../assets/float-curves-20261022-r2/rights-ledger.json) · [CC0](../../../assets/float-curves-20261022-r2/LICENSE.txt) |
+| FC102-12 | 完整回归 | **2495项 /6957.906秒 /0跳过**；311产品输入、8外部夹具和9依赖不变。 200源码、400安装与完整套件分别记录，覆盖重叠不累计成完成率 | [本轮报告](../../../validation/连续浮点RGB曲线与作者控制点实测_2026-10-22.md) |
+| FC102-13 | 保留失败与未验收 | 源码r1实际40项3失败、r2实际200项1失败；真实样例r1因末关键帧缺少公开入口必填插值被拒绝。自然素材、动态增删点、HDR/ICC、实时/长片RSS和完整剪映等价尚未验收 | [失败与精度边界](../../../validation/evidence/float-curves-20261022-lab/failure-analysis-r1.json) |
+
+![原片与真实CLI连续RGB曲线预览](../../../assets/float-curves-20261022-r2/comparison.gif)
+
+<!-- /V102-CONTINUOUS-FLOAT-RGB-CURVES -->
+
+
+<!-- V101-FLOAT-LOCAL-LUT -->
+### V101 浮点本地LUT与有序调色链
+
+显式 `float32-native-v1` 工程的正式render和预览共用本地LUT。完整3D CUBE支持五种插值、明确输入/输出色彩信号与作者关键帧强度；曝光和LUT按作者顺序执行。默认后端迁移、其余浮点效果及完整剪映功能仍未完成。
+
+| 编号 | 功能性核验 | 实际结果与范围 | 证据 |
+|---|---|---|---|
+| FL101-01 | 共同内核 | 新增float_lut、float_effect_chain及37项测试；父候选306输入→309输入，6条产品路径改变；正式render、区间及PNG16共用 | [契约](../../../specs/浮点LUT色彩信号与作者强度契约_v0.1_2026-10-22.md) |
+| FL101-02 | 本地CUBE | red-fastest不可变Float32表；2..256边长、DOMAIN_MIN/MAX、标题/注释；项目内路径或登记ID/SHA，资源变化拒绝；1D shaper及3dl/csp/dat尚未迁入浮点路径 | [37项新增方法](../../../validation/evidence/float-lut-20261022-lab/native-r3/unittest.log) |
+| FL101-03 | 五种插值 | nearest/trilinear/tetrahedral/pyramid/prism；独立多项式与重心线性方程参考；实际原生29宽标量与32宽默认CPU各核验全部五种，含边界/同坐标 | [原生I/O与结果](../../../validation/evidence/float-lut-20261022-lab/native-r3/verification.json) |
+| FL101-04 | 色彩与混合 | 共同线性工作RGB→明确LUT输入信号→查表→明确输出信号→线性工作RGB后混合；alpha独立。DOMAIN先归一化再夹边，不裁剪表输出 | [信号与范围测试](../../../validation/evidence/float-lut-20261022-lab/native-r3/unittest.log) |
+| FL101-05 | 作者强度 | 静态0..1、6种关键帧插值、Bezier overshoot显式夹0..1；作者窗口和嵌套反向保留各自时钟，预览选区不重启动画 | [160项相关回归](../../../validation/evidence/float-lut-20261022-lab/native-r3/verification.json) |
+| FL101-06 | 有序效果 | exposure→LUT与LUT→exposure结果区分，多LUT按序，禁用项跳过；相同本地表共享；未接入效果明确拒绝 | [顺序与作者IR测试](../../../validation/evidence/float-lut-20261022-lab/native-r3/unittest.log) |
+| FL101-07 | 精度与拒绝 | 65536级中性色、负值/超1表输出、极小alpha、强度0逐位保留；分块逐位一致、只读输入、晚块非法值、预算和中途取消均核验 | [实际执行源码](../../../validation/evidence/float-lut-20261022-lab/native-r3/verification.json) |
+| FL101-08 | 真实公开CLI | 20脚本调用/29检查，2次render+3次preview；原片/结果各320×180、10fps、20帧；5段各4帧覆盖五种插值、动态强度和两种效果顺序 | [命令与检查](../../../validation/evidence/float-lut-20261022-lab/media-r1/verification.json) |
+| FL101-09 | 独立像素与声音 | 作者帧3..16的2,419,200个线性RGB值，最大绝对误差0；正式96000、选区67200双声道采样帧逐一一致；PNG16与对应帧误差≤1码 | [独立执行参考](../../../validation/evidence/float-lut-20261022-lab/media-r1/executed-oracle.py.txt) |
+| FL101-10 | 原视频/GIF | 左原片、右实际CLI预览；GIF14×100ms；静态看过作者帧3/10/16的6个画面。五种均做数值核验，未据此声称五种均完成视觉、连续播放或试听验收 | [原片MP4](../../../assets/float-lut-20261022-r1/original-range.mp4) · [结果MP4](../../../assets/float-lut-20261022-r1/range.mp4) · [Float32母参考](../../../assets/float-lut-20261022-r1/range.master.nut) · [PNG16](../../../assets/float-lut-20261022-r1/frame.png) · [查看记录](../../../validation/evidence/float-lut-20261022-lab/static-review-r1.json) |
+| FL101-11 | 权利与安装 | **360项 /914.334秒 /0跳过**；8个固定离线wheel、185份source/wheel/site资源、NumPy931文件一致；安装版实际CLI视频/PCM/Float32/PNG16与源码版一致。 原CUBE、图形/alpha及正弦音频为本次CC0生成，标签用Pillow默认字体；23份源码演示资产单独校验SHA | [原CUBE](../../../assets/float-lut-20261022-r1/original-look.cube) · [作者工程](../../../assets/float-lut-20261022-r1/author-project.json) · [权利账](../../../assets/float-lut-20261022-r1/rights-ledger.json) · [声明](../../../assets/float-lut-20261022-r1/LICENSE.txt) |
+| FL101-12 | 完整回归 | **2455项 /8764.631秒 /0跳过**；309产品输入、8外部夹具和9依赖不变。 160项源码、360项安装及完整套件覆盖重叠，分别记录 | [本轮报告](../../../validation/浮点LUT五种插值与有序调色链实测_2026-10-22.md) |
+| FL101-13 | 失败与限制 | r1实际159项有2失败：更宽坐标改变pyramid分面、夹具误比较修改时间；r2实际160项有1夹具字段错误，均保留。另观察到本机原生29宽tetrahedral加速差异；已分开核验标量及对齐默认路径。自然质量/HDR/实时性/长片总RSS/完整剪映均未验收 | [失败与修正](../../../validation/evidence/float-lut-20261022-lab/failure-analysis-r1.json) |
+
+![原片与真实CLI本地LUT预览](../../../assets/float-lut-20261022-r1/comparison.gif)
+
+<!-- /V101-FLOAT-LOCAL-LUT -->
+
+
+<!-- V100-FLOAT-CROP-PROJECTION -->
+### V100 浮点作者裁剪与单次运镜投影
+
+显式 `float32-native-v1` 工程的正式render和预览共用作者裁剪投影。支持裁剪位置/宽高关键帧和fit/fill/stretch，并把裁剪、适配与位移/缩放/旋转合并为一次浮点采样。默认后端迁移与全剪映功能仍未完成。
+
+| 编号 | 功能性核验 | 实际结果与范围 | 证据 |
+|---|---|---|---|
+| FC100-01 | 共同内核 | NumPy独立实现；源像素单位、归一化单位及width/w、height/h别名；正式render、区间和PNG16预览共用 | [契约](../../../specs/浮点作者裁剪与运镜投影契约_v0.1_2026-10-22.md) |
+| FC100-02 | 三种适配 | fit透明留边、fill保留原始裁剪纹理、stretch独立宽高缩放；半像素中心映射和半开窗口 | [28项新增方法](../../../validation/evidence/float-crop-20261022-lab/native-r2/unittest.log) |
+| FC100-03 | 原生坐标舍入 | 叶片段固定尺寸及仅移动窗口采用ties-to-even舍入；实际FFmpeg planar-float裁剪对照，并单独诊断10个边界值 | [原生边界诊断](../../../validation/evidence/float-crop-20261022-lab/native-rounding-analysis-r1/receipt.json) |
+| FC100-04 | 作者动画 | clip与crop本地轨、6种插值、局部同名覆盖、尺寸overshoot夹限；预览选区不重启原作者tick，嵌套反向时钟分层 | [123项相关回归](../../../validation/evidence/float-crop-20261022-lab/native-r2/verification.json) |
+| FC100-05 | 运镜/透明 | 单次crop-fit-TRS；fill旋转可露出静止视窗外纹理；双线性在预乘RGB/alpha内计算，极小alpha和扩展RGB保留 | [独立逐像素与原生I/O](../../../validation/evidence/float-crop-20261022-lab/native-r2/verification.json) |
+| FC100-06 | 数值/资源错误 | 65536级RGB、分块逐位一致、只读输入；晚块NaN/Inf/非法alpha、预算和中途取消均拒绝并保留输入 | [执行源码](../../../validation/evidence/float-crop-20261022-lab/native-r2/verification.json) |
+| FC100-07 | 真实公开CLI | 20脚本调用/29检查，2次render+3次preview；原片/结果各320×180、10fps、20帧；96000双声道采样帧一致 | [命令与检查](../../../validation/evidence/float-crop-20261022-lab/media-r1/verification.json) |
+| FC100-08 | 独立像素参考 | 作者帧3..16的2,419,200个线性RGB值，独立正向齐次矩阵求解与预乘插值参考最大绝对误差1.49011611938e-08；选区67200双声道采样帧一致 | [实际执行参考](../../../validation/evidence/float-crop-20261022-lab/media-r1/executed-oracle.py.txt) |
+| FC100-09 | 原视频/GIF | 左原片、右实际CLI预览；GIF14×100ms；静态看过作者帧3/10/16的6个画面，未连续播放/试听或接受自然素材质量 | [原片MP4](../../../assets/float-crop-20261022-r1/original-range.mp4) · [结果MP4](../../../assets/float-crop-20261022-r1/range.mp4) · [Float32母参考](../../../assets/float-crop-20261022-r1/range.master.nut) · [PNG16](../../../assets/float-crop-20261022-r1/frame.png) · [查看记录](../../../validation/evidence/float-crop-20261022-lab/static-review-r1.json) |
+| FC100-10 | 权利与安装 | **323项 /1064.478秒 /0跳过**；8个固定离线wheel、183份source/wheel/site资源、NumPy931文件一致；安装版实际CLI视频/PCM/Float32/PNG16与源码版一致。 原输入图形/alpha/正弦音频为本次CC0生成，标签用Pillow默认字体 | [原生输入](../../../assets/float-crop-20261022-r1/original.native.mkv) · [作者工程](../../../assets/float-crop-20261022-r1/author-project.json) · [权利账](../../../assets/float-crop-20261022-r1/rights-ledger.json) · [声明](../../../assets/float-crop-20261022-r1/LICENSE.txt) |
+| FC100-11 | 完整回归 | **2418项 /5301.952秒 /0跳过**；306产品输入、8外部夹具和9依赖不变。 | [本轮报告](../../../validation/浮点作者裁剪与单次运镜投影实测_2026-10-22.md) |
+| FC100-12 | 失败与限制 | r1实际28项有1失败：误把原生仅移动窗口舍入当截断；已修内核并保留原始失败。双线性不等于area/Lanczos或旧整数滤镜逐位一致；自然素材、HDR、实时性、长片总RSS和全剪映均未验收 | [失败与修正](../../../validation/evidence/float-crop-20261022-lab/failure-analysis-r1.json) |
+
+![原片与真实CLI裁剪运镜预览](../../../assets/float-crop-20261022-r1/comparison.gif)
+
+<!-- /V100-FLOAT-CROP-PROJECTION -->
+
+
+<!-- V99-FLOAT-ALPHA-MASKS -->
+### V99 浮点蒙版、曲线路径与羽化
+
+显式 `float32-native-v1` 工程的正式render与预览现在共用蒙版核。支持矩形、圆、椭圆、多边形、采样三次曲线路径，以及蒙版本地关键帧、反选、静态和动画羽化；默认后端迁移及全剪映功能仍未完成。
+
+| 编号 | 功能性核验 | 实际结果与范围 | 证据 |
+|---|---|---|---|
+| FM99-01 | 共同宿主 | 解码/曝光后、仿射前处理alpha；嵌套组在子序列合成后处理；正式render、区间和PNG16预览共用 | [契约](../../../specs/浮点作者蒙版与羽化契约_v0.1_2026-10-22.md) |
+| FM99-02 | 多边形/曲线 | 凹多边形、自相交偶奇填充、逐点动画、线段与三次Bezier控制点动画；最多32候选点/8段，不静默截断 | [21个新增方法](../../../validation/evidence/float-mask-20261022-lab/native-r3/unittest.log) |
+| FM99-03 | 作者关键帧 | clip与mask本地轨道、别名与局部覆盖；六种插值、原作者tick、裁切窗口与嵌套加速均实际核验 | [95项相关回归](../../../validation/evidence/float-mask-20261022-lab/native-r3/verification.json) |
+| FM99-04 | 羽化与透明 | 静态为源alpha乘蒙版后进行alpha-only对称边界盒模糊H/H/V/V；动画为形内距离线性覆盖；反选在乘alpha前 | [独立逐项平均/线段距离与原生alpha16对照](../../../validation/evidence/float-mask-20261022-lab/native-r3/unittest.log) |
+| FM99-05 | 浮点精度与错误 | 65536个alpha值、微小alpha、隐藏RGB/负零/扩展RGB、分块一致；晚块NaN/Inf/越界alpha、预算与中途取消拒绝且输入不变 | [执行源码与原生I/O](../../../validation/evidence/float-mask-20261022-lab/native-r3/verification.json) |
+| FM99-06 | 真实公开CLI | 20个脚本级调用/29项检查；2次render和3次preview；原片/结果各320×180、10fps、20帧；各96000双声道采样帧相同 | [原始命令/检查](../../../validation/evidence/float-mask-20261022-lab/media-r4/verification.json) |
+| FM99-07 | 独立像素基准 | 作者帧3..16共14帧、2,419,200个实际线性RGB值与独立多边形/曲线/羽化/源alpha/sRGB背景合成计算一致，最大误差0；选区67200双声道采样帧一致 | [独立基准](../../../validation/evidence/float-mask-20261022-lab/media-r4/executed-mask-media-oracle.py.txt) |
+| FM99-08 | 原视频/GIF | 下图左原片、右真实CLI预览；14×100ms。静态看过作者帧3/10/16的6个画面；未连续播放、试听或接受自然素材质量 | [原片MP4](../../../assets/float-mask-20261022-r4/original-range.mp4) · [结果MP4](../../../assets/float-mask-20261022-r4/range.mp4) · [浮点母参考](../../../assets/float-mask-20261022-r4/range.master.nut) · [PNG16](../../../assets/float-mask-20261022-r4/frame.png) · [查看记录](../../../validation/evidence/float-mask-20261022-lab/static-review-r1.json) |
+| FM99-09 | 素材/权利 | 本次生成RGB16图形、alpha梯度与正弦波，原输入CC0；工程和权利账保留。标签使用Pillow附带默认字体，不分发字体文件 | [原生输入](../../../assets/float-mask-20261022-r4/original.native.mkv) · [作者工程](../../../assets/float-mask-20261022-r4/author-project.json) · [权利账](../../../assets/float-mask-20261022-r4/rights-ledger.json) · [声明](../../../assets/float-mask-20261022-r4/LICENSE.txt) |
+| FM99-10 | 实际离线安装 | **295项 /1077.141秒 /0跳过**；8个固定离线wheel、182份source/wheel/site资源及NumPy931文件一致；安装版实际CLI音画/Float32/PNG16与源码版相同。 | [本轮报告](../../../validation/浮点蒙版曲线羽化与真实CLI实测_2026-10-22.md) |
+| FM99-11 | 完整回归 | **2390项 /4666.622秒 /0跳过**，304产品输入、8外部夹具和9依赖不变。 | [完整回归状态与范围](../../../validation/浮点蒙版曲线羽化与真实CLI实测_2026-10-22.md) |
+| FM99-12 | 原失败/限制 | 原r1关键帧边界/透明输出夹具、r2理想Y亮度断言、媒体r1缺插值/r2背景信号误设均保留；未据合成图案接受全剪映、HDR、实时性或长片总RSS | [失败与修正](../../../validation/evidence/float-mask-20261022-lab/failure-analysis-r1.json) |
+
+![原片与真实CLI蒙版曲线羽化预览](../../../assets/float-mask-20261022-r4/comparison.gif)
+
+<!-- /V99-FLOAT-ALPHA-MASKS -->
+
+
+<!-- V98-LINEAR-FLOAT-EXPOSURE -->
+### V98 线性 Float32 曝光共同宿主
+
+显式 `settings.pixel_pipeline.engine=float32-native-v1` 工程现在可在共同 FloatTimeline 中执行静态 `exposure`，正式 `render` 与 `preview` 复用同一实现。相关源码回归74项中14项为新增曝光测试，其余60项为既有预览、正式渲染与宿主回归；不将测试数量作为剪映等价证明。
+
+| 编号 | 功能性核验 | 实际结果与边界 | 证据 |
+|---|---|---|---|
+| FE98-01 | 曝光接入 | 线性straight RGB、蒙版/仿射前；嵌套组在子序列合成后执行；启用的未接入效果仍明确拒绝 | [接口契约](../../../specs/线性浮点曝光接入契约_v0.1_2026-10-22.md) |
+| FE98-02 | 65,536级与alpha | +1EV全部65,536灰阶保留；相邻Float32、负值/超一值、隐藏RGB及alpha原位位型、负零身份运算；不引入整数中间层 | [实际源码断言](../../../validation/evidence/float-exposure-20261022-lab/native-r2/unittest.log) |
+| FE98-03 | 原生交叉对照 | 12组真实FFmpeg Float32输入/输出，含分数EV、黑位、接近零分母、黑位大于白位和精确相等；Decimal验证声明的Float32运算边界 | [73次相关套件原生调用](../../../validation/evidence/float-exposure-20261022-lab/native-r2/verification.json) |
+| FE98-04 | 顺序与资源 | 静态链按序执行，禁用项跳过；分块、工作区准入、中途取消、晚块非法alpha/NaN/Inf与溢出均明确失败，输入字节保留 | [74项相关回归](../../../validation/evidence/float-exposure-20261022-lab/native-r2/verification.json) |
+| FE98-05 | 真实公开CLI | 20个脚本级调用、29项检查；2次正式render、3次preview；320×180/10fps/2秒各20帧，完整PCM各96000双声道采样帧相同 | [原始命令/检查](../../../validation/evidence/float-exposure-20261022-lab/media-r1/verification.json) |
+| FE98-06 | 独立曝光像素基准 | 帧3..16共14帧，2,419,200个实际线性RGB值与独立源16位解码/逆OETF/曝光计算一致，最大误差0；单帧PNG16与区间帧11独立OETF对照通过 | [真实媒体生成器](../../../validation/evidence/float-exposure-20261022-lab/media-r1/executed-script.py.txt) |
+| FE98-07 | 原视频/GIF | 下方GIF左原片、右本次真实CLI曝光预览；14×100ms。查看作者帧3/10/16共6幅图，未连续播放、试听或测自然素材/HDR | [原片MP4](../../../assets/float-exposure-20261022-r1/original-range.mp4) · [实际预览MP4](../../../assets/float-exposure-20261022-r1/range.mp4) · [Float32母参考](../../../assets/float-exposure-20261022-r1/range.master.nut) · [PNG16](../../../assets/float-exposure-20261022-r1/frame.png) · [查看记录](../../../validation/evidence/float-exposure-20261022-lab/static-review-r1.json) |
+| FE98-08 | 素材与可复现 | 程序生成RGB16图形与双声道正弦波，CC0；保留原生输入、作者工程、权利账和全部产物SHA | [原生原片](../../../assets/float-exposure-20261022-r1/original.native.mkv) · [作者工程](../../../assets/float-exposure-20261022-r1/author-project.json) · [权利账](../../../assets/float-exposure-20261022-r1/rights-ledger.json) · [CC0声明](../../../assets/float-exposure-20261022-r1/LICENSE.txt) |
+| FE98-09 | 离线安装 | **274 方法 /750.66 秒 /0 跳过**；181 资源 source/wheel/site 相同，8 个固定离线 wheel、NumPy 931 文件及原许可相同；安装版真实音画/Float32/PNG16 SHA 与源码版相同。 | [安装收据](../../../validation/evidence/float-exposure-20261022-lab/installed-r1/verification.json) |
+| FE98-10 | 全套产品回归 | **2369 方法 /6251.995 秒 /0 跳过**；302产品输入、8外部夹具和9依赖一致。 | [当前报告](../../../validation/线性浮点曝光共同宿主与真实CLI实测_2026-10-22.md) |
+| FE98-11 | 保留失败与修正 | 首轮14方法中2个边界子例失败：错误地保留白位减黑位的符号。修正为绝对差后74项相关回归通过，原输入/输出和执行源码均保留 | [首轮失败](../../../validation/evidence/float-exposure-20261022-lab/native-r1/verification.json) · [修正说明](../../../validation/evidence/float-exposure-20261022-lab/native-r1-correction.json) |
+| FE98-12 | 未验收边界 | 仅静态曝光；默认后端迁移、其余浮点算子、自然素材质量、ICC/PQ/HLG/HDR、长片并发总RSS及完整剪映功能仍待完成；MP4观看副本不作理想量化验收 | [功能/验收边界](../../../specs/线性浮点曝光接入契约_v0.1_2026-10-22.md) |
+
+![原片与真实CLI线性Float32曝光预览](../../../assets/float-exposure-20261022-r1/comparison.gif)
+
+<!-- /V98-LINEAR-FLOAT-EXPOSURE -->
+
+
+<!-- V97-CUMULATIVE-NATIVE-FLOAT-DELIVERY -->
+### V94–V97 原片 Float32 渲染、预览与缓存合并交付
+
+显式浮点工程的 `preview frame` / `preview range` 使用标准渲染的原片窗口与 FloatTimeline，保留完整作者帧号。源码相关回归 **57 方法 /532.355 秒 /0 跳过**，包括18项新增预览、22项既有预览及17项标准浮点渲染；不将57项全算作新功能。默认迁移及未接入算子、自然/HDR质量和完整剪映功能仍需继续实现。
+
+| 编号 | 功能性核验 | 实际内容与限制 | 证据 |
+|---|---|---|---|
+| FD97-01 | 共同内核 | 原片SHA与原生PTS窗口、作者IR、变换/混合/基础蒙版及嵌套时钟复用正式浮点宿主；未接算子明确拒绝 | [契约](../../../specs/浮点时间线预览与缓存契约_v0.1_2026-10-22.md) |
+| FD97-02 | PNG16与alpha16 | 真实PNG逐码保留65,536灰阶和全部65,536透明度值；PNG独立16位交付，不当作Float32参考 | [57项实际命令/断言](../../../validation/evidence/float-preview-20261022-lab/native-r2/verification.json) |
+| FD97-03 | Float32区间参考 | `master.nut`为straight BT.709 linear GBRAP Float32；实际保存小于一个RGB16码阶的合成变化；格式对照包含相邻Float32、负值及超一值，作者范围策略另行执行 | [格式逐字节往返](../../../validation/evidence/float-preview-20261022-lab/formats-r1.json) |
+| FD97-04 | 作者视频时钟 | 5秒起点的真实VFR在嵌套倒放选帧中匹配独立区间参考，保留全片帧号；selected sequence canvas不改写全局作者画布 | [源码回归](../../../validation/evidence/float-preview-20261022-lab/native-r2/unittest.log) |
+| FD97-05 | PCM独立端点 | 非整数作者结束保留60001末样本端点；区间样本逐字节匹配；真实样例帧3..16共14帧，67200双声道PCM采样帧相同 | [实际CLI样例](../../../validation/evidence/float-preview-20261022-lab/media-r1/verification.json) |
+| FD97-06 | 线性预乘缩放 | 完整合成后按像素中心双线性缩放，独立2×2透明颜色加权参考通过；不是大比例缩小的面积抗锯齿 | [独立像素测试](../../../validation/evidence/float-preview-20261022-lab/native-r2/verification.json) |
+| FD97-07 | 持久内容缓存 | 作者/实际素材/信号/本地代码/NumPy原生依赖绑定SHA；同大小、恢复mtime的运行时变化仍失效。命中不新建图、provider、probe或编码器；真实第二CLI进程命中 | [真实复用与原始收据](../../../validation/evidence/float-preview-20261022-lab/media-r1/verification.json) |
+| FD97-08 | 只读与失败清理 | dry-run不打开provider或写缓存；真实中途取消及失败编码器清理线程/临时目录；损坏参考拒绝，原导出保留，显式导出可在prune后保留 | [失败边界及原始输出](../../../validation/evidence/float-preview-20261022-lab/native-r2/verification.json) |
+| FD97-09 | 真实公开CLI媒体 | 20个脚本级原生/CLI调用、27检查；2次正式render、3次preview（区间、单帧、复用）；原始/编辑完整片各20帧、2秒、96000双声道采样 | [生成器](../../../validation/evidence/float-preview-20261022-lab/media-r1/executed-script.py.txt) |
+| FD97-10 | 原视频与实际预览 | 原创RGB16输入；下方GIF左为原始CLI输出帧3..16，右为本轮真实CLI预览，共14×100ms；已查看3/10/16共6幅图，未连续播放或试听 | [原始选段](../../../assets/float-preview-20261022-r1/original-range.mp4) · [实际预览MP4](../../../assets/float-preview-20261022-r1/range.mp4) · [Float32参考](../../../assets/float-preview-20261022-r1/range.master.nut) · [PNG16帧11](../../../assets/float-preview-20261022-r1/frame.png) · [查看/GIF时钟](../../../validation/evidence/float-preview-20261022-lab/static-review-r1.json) |
+| FD97-11 | 全新离线安装 | **260 方法 /784.525 秒 /0 跳过**；180 资源 source/wheel/site 相同，8 个离线 wheel；NumPy 931 文件与许可相同。安装版原生 Float32/PCM/PNG16 与开发版真实 CLI 样例相同。 | [安装收据](../../../validation/evidence/float-preview-20261022-lab/installed-r1/verification.json) |
+| FD97-12 | 完整回归 | **2355 方法 /5277.023 秒 /0 跳过**；300产品输入、8外部夹具、9依赖及冻结运行器一致。 | [合并实测报告](../../../validation/原片浮点渲染与预览合并交付实测_2026-10-22.md) |
+| FD97-13 | 保留失败与观看副本边界 | 首轮18项2失败已保留；显式OETF修复观看亮度。原生去alpha使观看副本减损精度，原理想半码探针仍保留失败；不影响独立Float32参考/PNG16的验收，不宣称MP4理想量化 | [失败与分段测量](../../../validation/浮点时间线预览与缓存实测_2026-10-22.md) |
+| FD97-14 | 逐级源码与安装 | 292→296→298→300 输入衔接一致；安装182/203/220/260方法分别有终态，分别绑定176/178/179/180资源；不相加为当前通过数 | [四份原门禁核验](../../../validation/evidence/float-delivery-20261022/prepared-r1.json) |
+| FD97-15 | 正式render、队列与恢复 | 显式`settings.pixel_pipeline.engine=float32-native-v1`进入共享render/queue/resume；原片窗口、视频与原生音频共用作者时钟；默认后端及未接算子继续实施 | [CLI契约](../../../specs/标准CLI浮点渲染接入契约_v0.1_2026-10-22.md) · [CLI原片/输出](../../../validation/标准CLI浮点交付实测_2026-10-22.md) |
+| FD97-16 | 合并验收范围 | 最终快照相对已发布V93/R16改变20产品路径，其中12新增；V95/V96早期快照各自的2320/2337项完整回归未执行，不登记通过 | [交付契约](../../../specs/原片浮点渲染与预览合并交付契约_v0.1_2026-10-22.md) |
+| FD97-17 | 历史等待失败 | 原四个等待进程因前序发布字节断言停止，均在测试启动前；原状态保留，使用新的拥有进程和完整证据目录 | [保留状态与准备记录](../../../validation/evidence/float-delivery-20261022/prepared-r1.json) |
+
+![原始选段与真实CLI浮点时间线预览](../../../assets/float-preview-20261022-r1/comparison.gif)
+
+<!-- /V97-CUMULATIVE-NATIVE-FLOAT-DELIVERY -->
+
+<!-- R16-RESEARCH-INDEX -->
+OpenFilm v0.2.5 的 13 类拆用取舍、规划工时、上游 45 通过/1 条件跳过及边界见 [R16 复核](../../../OpenFilm_0.2.5可拆模块与复用成本评估_2026-10-22.md)。该研究没有新增产品功能或模型结果。
+<!-- /R16-RESEARCH-INDEX -->
+
+<!-- V93-AUTHOR-CLOCK-FLOAT-HOST -->
+V93 新增作者时钟 Float32 帧宿主和只读帧包源。完整原生回归 **2280方法 /13313.967秒 /0跳过**；288产品输入和8外部夹具保持相同。
+
+| 编号 | 已实际执行 | 产品边界 |
+|---|---|---|
+| FTH-01 | CPU/作者时钟/缓存源 46 项专项；33 次实际 FFmpeg 交叉核验 | 库层，未连接默认渲染、音频、预览与缓存 |
+| FTH-02 | 原创 16 位媒体 20 帧，全部像素与独立参考相同；原始/编辑 MP4/GIF 与 16 位无损核验 | SDR 演示，未连续播放/听审、未验收自然素材或 HDR |
+| FTH-03 | 新安装 163 项/0跳过，174资源、931 NumPy文件、216模块来源；安装媒体 Float32 与开发版相同 | 全部效果、统一精度策略与完整剪映对标继续实施 |
+
+[规格](../../../specs/作者时钟浮点帧宿主与缓存源边界_v0.1_2026-10-22.md) · [实际核验/原视频/GIF/失败](../../../validation/作者时钟浮点帧宿主与真实媒体独立实测_2026-10-22.md) · [安装](../../../validation/evidence/float-timeline-20261022-lab/installed-r1/verification.json)。
+<!-- /V93-AUTHOR-CLOCK-FLOAT-HOST -->
+
+<!-- V92-NATIVE-FLOAT-SURFACE -->
+V92新增Agent原生浮点帧包CLI和独立线性光核心。完整原生回归 **2234方法 /7549.898秒 /0跳过**；282产品输入、8外部夹具、17启动时脚本及9依赖文件保持相同。
+
+| 编号 | 已执行 | 当前边界 |
+|---|---|---|
+| F32-01 | 八模块/七测试，86项专项；三原色/五传递函数、原生RGB/YUV/alpha及VFR时钟、仿射、32混合模式 | 相对D65；未做ICC/PQ/HLG/HDR、自然素材或全剪映等价 |
+| F32-02 | 真实CLI15次、34检查；20/20/20/5帧包；两段20帧/10fps/2s MP4/GIF与16-bit回写 | surface为中间数据，电影由独立核心脚本编码 |
+| F32-03 | 新八轮离线安装117项/0跳过，171资源与931 NumPy文件相同，213模块来源核验 | 安装版实际帧包和合成RGBA与开发版相同；默认时间线/预览/缓存未采用浮点核心 |
+
+[规格](../../../specs/浮点表面合成与高精度边界_实验_v0.1_2026-10-22.md) · [实际测试/原片/GIF/失败](../../../validation/浮点表面合成与高精度边界独立实测_2026-10-22.md) · [Agent命令](../../../Agent浮点帧包CLI使用与验收边界_2026-10-22.md) · [安装证据](../../../validation/evidence/color-precision-20261021-lab/installed-r1/verification.json)。OpenFilm R14/R15复用结论保留，不重复计工或计测试。
+
+
+完整回归：[2234方法实际终态](../../../validation/evidence/color-precision-20261021-lab/full-r1.json) · [额外冻结门禁](../../../validation/evidence/color-precision-20261021-lab/complete-gate-r1.json)。
+<!-- /V92-NATIVE-FLOAT-SURFACE -->
+
+<!-- V91-NATIVE-AUDIO-INTERVAL-CLOCK -->
+### V91 源音频内部缺口、重叠与派生缓存
+
+V91 完整原生回归 **2148方法 /4714.461秒 /0跳过**；267产品输入、8外部夹具、16验证脚本和9依赖文件保持相同。源内部缺口/重叠按原生采样时钟处理，原始工程引用保留；合入、17份Skill注册和普通推送以发布审计为准。
+
+| 编号 | 核验内容 | 实际执行结果与边界 | 证据 |
+|---|---|---|---|
+| V91-01 | 原生源时钟 | 解码帧PTS/样本数建整数索引；正缺口补零，后解码帧覆盖重叠；精确采样格保留真实单采样缺口 | [规格](../../../specs/源音频内部时钟与硬缺口缓存_v0.1_2026-10-21.md) |
+| V91-02 | 原实现失败 | 同6原片13项实际11失败/2连续对照通过/0错误/0跳过；原日志和旧实现保留 | [before](../../../validation/evidence/audio-discontinuity-20261021-lab/before-r1.json) |
+| V91-03 | AAC粗时基修复 | 另9原片先5通过/4失败，修复后9份实际解码PCM逐采样相同；粗PTS已丢失的亚tick跳变不能恢复 | [补充前后](../../../validation/evidence/audio-discontinuity-20261021-lab/extra-native-after-r1/verification.json) |
+| V91-04 | 缓存与生命周期 | 源/工具/实现/派生字节SHA绑定，流式管道、损坏拒绝、原子写入、明确list/prune及登记源保护；队列合法空派生仍绑定SHA，原素材非空门禁保留；31专项通过 | [队列修复](../../../validation/evidence/audio-discontinuity-20261021-lab/queue-cache-fix-r1.json) |
+| V91-05 | 全部音频入口 | scalar/reverse/曲线/嵌套、真实R3输入及多机位只读分析通过；R3仅在实际视频覆盖内允许音频EOF静音，超界源句柄拒绝 | [路径12项](../../../validation/evidence/audio-discontinuity-20261021-lab/paths-r2.json) |
+| V91-06 | 原生CLI与所有帧/样本 | 32次CLI＋22条其他原生命令、37检查；forward/reverse各120帧及230400样本/声道，R3为96帧及184320样本/声道 | [实际收据](../../../validation/evidence/audio-discontinuity-20261021-lab/native-r1/verification.json) |
+| V91-07 | 全新八轮离线安装 | 163资源源/wheel/安装字节相同；官方NumPy2.4.2及原生数学前向；27隔离CLI、92方法/338.389s/0跳过，含31队列方法；三组媒体重新运行 | [安装收据](../../../validation/evidence/audio-discontinuity-20261021-lab/installed-r3/verification.json) |
+| V91-08 | 历史专项和失败完整 | 2145全量4个队列失败保留；队列修复只变2输入，旧native/152表面其余265输入相同；更早r2三组另差能力发现及测试，明确分开 | [纪元及完整绑定](../../../validation/evidence/audio-discontinuity-20261021-lab/audit-r2.json) |
+| V91-09 | 原片/失败片/MP4/GIF | 66实际文件、11GIF、37次原生ffprobe，包含新安装重新生成结果；MP4每帧PTS/二进制ID另验，AAC不声明波形无损 | [逐文件SHA](../../../validation/evidence/audio-discontinuity-20261021-lab/media-manifest-r2.json) |
+| V91-10 | 完整回归 | 2148方法 /4714.461秒 /0跳过；专项与隔离各自保留，不累计 | [当前完整](../../../validation/evidence/audio-discontinuity-20261021-lab/full-r2.json)、[原失败](../../../validation/evidence/audio-discontinuity-20261021-lab/full-r1.json) |
+| V91-11 | 文档/Skill/发布 | 4份Skill由固定17父版衍生；发布时重验全部17注册、链接与索引字节，普通推送；OpenFilm R14/R15结论保留 | [完整实测](../../../validation/源音频硬缺口与重叠缓存实测_2026-10-21.md) |
+| V91-12 | 未验收范围 | 仅目检1张PCM诊断PNG；未试听、未连续播放；自然设备异常、任意编解码变化、长片/HDR/RSS、完整AI及剪映等价继续待验 | [目检记录](../../../validation/evidence/audio-discontinuity-20261021-lab/static-review-r1.json) |
+
+[原创含音轨NUT](../../../assets/audio-discontinuity-20261021-lab/native-r1/original.nut) · [原视频MP4（无音轨）](../../../assets/audio-discontinuity-20261021-lab/native-r1/original-video-only.mp4) · [原始GIF](../../../assets/audio-discontinuity-20261021-lab/native-r1/original.gif) · [forward MP4](../../../assets/audio-discontinuity-20261021-lab/native-r1/forward.mp4) · [reverse MP4](../../../assets/audio-discontinuity-20261021-lab/native-r1/reverse.mp4) · [R3 MP4](../../../assets/audio-discontinuity-20261021-lab/native-r1/R3.mp4) · [V90真实失败无损](../../../assets/audio-discontinuity-20261021-lab/native-r1/before-forward-lossless.nut)
+
+![原片实际解码GIF](../../../assets/audio-discontinuity-20261021-lab/native-r1/original.gif)
+
+![实际PCM幅度诊断：独立真值/V90旧实现/当前实现；动画线仅标记时间](../../../assets/audio-discontinuity-20261021-lab/native-r1/actual-PCM-comparison.gif)
+
+这些是限定原创样例的真实输出；诊断GIF不代替自然录音试听或特效质量验收。
+<!-- /V91-NATIVE-AUDIO-INTERVAL-CLOCK -->
+
+<!-- V90-MULTICAM-AFFINE-CLOCK -->
+### V90 多机位仿射时钟与浮点PCM
+
+V90 完整原生回归 **2084 方法/3875.245秒/0跳过**；263产品输入、8外部夹具、14验证脚本和9依赖文件前后相同。新增显式仿射设备时钟和scalar音频float上采样；默认offset保持不变。合入与注册以发布审计收据为准。
+
+| 编号 | 核验 | 实际结果 / 边界 | 证据 |
+|---|---|---|---|
+| V90-01 | 时钟模型 | `source=b+a*reference`；显式 `--clock-model affine`，默认 offset 不变。最多600秒前缀，3–31锚点、4–60秒窗口和20000ppm参数上限，默认5000ppm | [契约](../../../specs/多机位仿射时钟与漂移校准_实验_v0.1_2026-10-21.md) |
+| V90-02 | 拟合、绑定和规划方法 | 当前33方法通过，含±漂移、100ppm/600秒、坏锚点、歧义、SHA / ID / digest / inverse / ppm / duration 篡改与覆盖策略 | [记录](../../../validation/evidence/multicam-affine-clock-20261021-lab/after-validation-r2.json) |
+| V90-03 | 音频重采样修复前后 | 同8个真实PCM方法：修复前6失败/2对照通过；修复后8通过，5.426秒，0跳过。初轮夹具缺视频导致8ERROR，另存为失败，未当作量化缺陷 | [修复后](../../../validation/evidence/multicam-affine-clock-20261021-lab/audio-precision-after-r2.json) |
+| V90-04 | 当前相关回归 | 157个不同方法/283.522秒/0跳过，263输入前后相同；历史141与149是旧源码时点，不与157累计 | [记录](../../../validation/evidence/multicam-affine-clock-20261021-lab/related-r3.json) |
+| V90-05 | 真实CLI与远距离选段 | 参考事件覆盖590秒；取0、295、586秒起各4秒。原生39CLI+21其他命令/52检查；两相机真值+1500ppm/-100ppm | [原生](../../../validation/evidence/multicam-affine-clock-20261021-lab/native-r3/verification.json) |
+| V90-06 | 独立源帧覆盖 | 固定offset对照最大错21/1源帧，affine两例均0；每个无损输出300帧，24,883,200 RGBA字节，与独立的所选原始帧完全相同 | [实测](../../../validation/多机位仿射时钟与浮点音频独立实验_2026-10-21.md) |
+| V90-07 | 参考主音轨 | 每输出每声道576000样本/共4,608,000字节，与先整源float重采样后取样的独立期望逐字节一致；修复8k单声道先s16上采样导致的二次量化 | [诊断](../../../validation/evidence/multicam-affine-clock-20261021-lab/native-r2-mono-format-controls.json) |
+| V90-08 | 隔离交付 | 8轮离线包，162资源源码/轮/安装同字节；安装20检查及隔离媒体52检查已通过。wrapper末段字段误读保留failed，由补验闭合 | [原失败wrapper](../../../validation/evidence/multicam-affine-clock-20261021-lab/installed-r1/verification.json) |
+| V90-09 | 隔离补验 | -I -S实跑41方法/7.075秒/0跳过；累计43次隔离CLI。补验不重复媒体或安装，不借用父版的成片 | [补验](../../../validation/evidence/multicam-affine-clock-20261021-lab/installed-postflight-r3/verification.json) |
+| V90-10 | 媒体资产 | 33资产/9个实际GIF，含短原片、原生/安装输出、原始590秒区间素材和失败夹具；SHA/大小/帧率/时长见清单 | [清单](../../../validation/evidence/multicam-affine-clock-20261021-lab/media-manifest-r1.json) |
+| V90-11 | 静态目检 | 实际GIF帧0/100/200，未连续播放或听审。相机采样相位不同，下行事件计数偶尔比参考少1，符合覆盖源帧契约 | [联系表](../../../assets/multicam-affine-clock-20261021-lab/review-r1/actual-frame-contact-sheet.png) |
+| V90-12 | 未验收 | 非线性/不连续漂移、真实录制/房间回声/自然质量、完整长片/HDR/RSS与播放听审、全剪映功能等价均未验收。MP4只验PTS和身份码；AAC不宣称全PCM相同 | [报告](../../../validation/多机位仿射时钟与浮点音频独立实验_2026-10-21.md) |
+| V90-13 | 完整回归 | 2084方法/3875.245秒/0跳过；专项157为其子集，不累计 | [完整记录](../../../validation/evidence/multicam-affine-clock-20261021-lab/full-r1.json) |
+| V90-14 | 生产发布与Skill | 4份变更与原父版逐项校验；发布时再审全部17份注册、链接和源码SHA，保留历史失败。 | [规格](../../../specs/多机位仿射时钟与漂移校准_v0.1_2026-10-21.md) |
+
+[参考短MP4](../../../assets/multicam-affine-clock-20261021-lab/review-r1/source-selected-reference.mp4) · [参考完整MKV](../../../assets/multicam-affine-clock-20261021-lab/native-r2/source-reference.mkv) · [正漂移输入](../../../assets/multicam-affine-clock-20261021-lab/native-r2/source-positive.mkv) · [小负漂移输入](../../../assets/multicam-affine-clock-20261021-lab/native-r2/source-small-negative.mkv)
+
+![参考三个原片区间](../../../assets/multicam-affine-clock-20261021-lab/review-r1/source-selected-reference.gif)
+
+固定偏移对照与仿射结果（实际MP4解码制作）：
+
+![正漂移固定偏移](../../../assets/multicam-affine-clock-20261021-lab/native-r3/positive-offset.gif)
+
+![正漂移仿射校准](../../../assets/multicam-affine-clock-20261021-lab/native-r3/positive-affine.gif)
+<!-- /V90-MULTICAM-AFFINE-CLOCK -->
+
+
+<!-- V89-OFFLINE-MEDIA-PROFILE -->
+### V89 八轮离线媒体运行时
+
+V89 八轮离线媒体运行时完成2043方法/3988.673秒/0跳过的完整源码回归；260产品输入、8既有外部夹具、15验证脚本和9依赖文件（8上游artifact＋lock）前后相同。默认构建包含NumPy2.4.2，安装会实际执行原生矩阵/FFT核验；没有复制宿主NumPy。
+
+| 编号 | 核验 | 实际结果与边界 | 证据 |
+|---|---|---|---|
+| V89-01 | 完整源码回归 | 2043方法/3988.673秒/0跳过；260输入、8夹具、15脚本。全量为源码原生环境；新安装另有独立CLI证据。 | [记录](../../../validation/evidence/offline-media-profile-20261021-lab/full-r1.json) |
+| V89-02 | 固定依赖冻结 | 8上游artifact＋lock共9文件；包含7个运行时依赖及1个不发行的历史非运行时wheel。运行时加产品共8wheels。完整回归前后字节不变。 | [记录](../../../validation/evidence/offline-media-profile-20261021-lab/full-dependencies-r1.json) |
+| V89-03 | 相关回归 | 260不同方法/708.130秒/0跳过＝父226＋旧安装22＋新安装12。旧34及12属于此子集，不重复累计。 | [记录](../../../validation/evidence/offline-media-profile-20261021-lab/related-r1.json) |
+| V89-04 | 相同断言修复前后 | 同12方法修复前6FAIL/1ERROR/5控制通过，修复后12/1.004秒通过；原测试和错误日志保留。 | [记录](../../../validation/evidence/offline-media-profile-20261021-lab/after-r1.json) |
+| V89-05 | 正式离线NumPy交付 | 官方NumPy2.4.2/cp313 Windows x64；932RECORD文件核对。新安装中931原文件除pip重写RECORD外完全相同，原通知在包和安装中保留。 | [记录](../../../validation/evidence/offline-media-profile-20261021-lab/wheelhouse-r1.json) |
+| V89-06 | 新隔离安装及原生运算 | 8个依赖模块来源审计、两个NumPy.pyd均来自安装site；实际dot=285、2×2求解及FFT通过。20安装检查，无宿主site复制。 | [记录](../../../validation/evidence/offline-media-profile-20261021-lab/installed-r1/verification.json) |
+| V89-07 | 默认入口实际执行 | 不传--wheelhouse的新构建＋全新安装＋1次-I/-S隔离CLI，8检查通过；另一次独立运行，未重复执行媒体或并入完整方法数。 | [记录](../../../validation/evidence/offline-media-profile-20261021-lab/default-profile-r1/verification.json) |
+| V89-08 | 新原生及安装媒体 | 开发23CLI＋32其他命令/39检查；安装26CLI＋1来源进程/14模块、20安装＋39媒体检查。161产品资源源码/wheel/site同字节。 | [记录](../../../validation/evidence/offline-media-profile-20261021-lab/installed-r1/verification.json) |
+| V89-09 | 完整无损帧与PCM | 原点0/5秒、首音频PTS1/6秒；每输出75帧/17,280,000RGBA字节、1,152,000float32PCM字节/每声道144000样本独立一致。视频切换显式选择参考主音轨。 | [记录](../../../validation/evidence/offline-media-profile-20261021-lab/native-r2/verification.json) |
+| V89-10 | 原片/MP4/GIF及静态审查 | 42资产/14GIF两次新生成。MP4各75帧、PTS=n/25、身份色块最大误差1。AAC每声道144384含填充；不作编码整帧/PCM一致或播放听审声明。 | [记录](../../../validation/evidence/offline-media-profile-20261021-lab/media-manifest-r1.json) |
+| V89-11 | 保留验证器失败 | native-r1在0CLI时因旧audit路径停止，native-r2只重绑路径/260输入后通过；相关生成器相对路径失误在写runner前失败。产品源码没有因这些修复改变。 | [记录](../../../validation/evidence/offline-media-profile-20261021-lab/audit-r1.json) |
+| V89-12 | Skills与范围 | 四Skill只合并新块与精确条款，并更新两份通用安装指引；17份总审。固定平台/版本限定；通用依赖求解、完整模型发行、自然/HDR/长片/RSS/播放听审及全部剪映功能效果仍待验收。 | [记录](../../../specs/离线媒体运行时与NumPy交付_v0.1_2026-10-21.md) |
+
+[完整实测](../../../validation/八轮离线媒体运行时实测_2026-10-21.md)。源码全量、子集、独立安装和默认入口命令分别报告，不累计为额外完整方法。
+<!-- /V89-OFFLINE-MEDIA-PROFILE -->
+
+
+<!-- V88-NATIVE-AUDIO-SOURCE-ORIGIN -->
+### V88 原生音频起点与同步
+
+V88 原生音频起点与同步已完成 2031 方法、4718.468 秒、0 跳过的完整回归；259 产品输入、8 已提交外部夹具和18份验证脚本前后相同。源音频首先按 demux 相对 PTS 保留前置静音，再选择、反向、变速或分析同步；不启用 async 漂移校正。
+
+| 编号 | 核验 | 实际结果与边界 | 证据 |
+|---|---|---|---|
+| V88-01 | 完整回归 | 2031 方法/4718.468秒/0跳过；259输入、8夹具、18脚本。 | [记录](../../../validation/evidence/audio-source-origin-20261021-lab/full-r1.json) |
+| V88-02 | 当前相关检查 | 226个不同方法：12本轮＋104父相关＋110既有音频方法。是完整套件子集，各次12方法不重复累计。 | [记录](../../../validation/evidence/audio-source-origin-20261021-lab/related-r1.json) |
+| V88-03 | 修复前后相同控制 | 同12方法：修复前7FAIL/1ERROR/4通过；修复后12通过。中间两次各1个置信度断言失败，均保留。 | [记录](../../../validation/evidence/audio-source-origin-20261021-lab/after-controls-r3.json) |
+| V88-04 | 真实源时钟 | 容器原点0/5秒，音频首PTS1/6秒，两例均有1秒相对缺口；零原点及等原点不得增加错误静音。 | [记录](../../../validation/evidence/audio-source-origin-20261021-lab/native-r1/verification.json) |
+| V88-05 | 完整无损样本与帧 | 每个输出75帧、17,280,000 RGBA字节；立体声float32 PCM 1,152,000字节/每声道144000样本，与独立期望完全相同。 | [记录](../../../validation/evidence/audio-source-origin-20261021-lab/native-r1/verification.json) |
+| V88-06 | 同步与显式主音轨 | 实际CLI偏移1秒，原速source[1,3)放置reference[0,2)，末25帧保留背景；显式作者参考主音轨。score=1仅为此确定性样例。 | [记录](../../../validation/evidence/audio-source-origin-20261021-lab/installed-r1/media/verification.json) |
+| V88-07 | 原生与新隔离安装 | 原生23CLI＋32其他命令/39检查；隔离26CLI＋1来源进程/14模块、15安装＋39媒体检查；161资源同字节。 | [记录](../../../validation/evidence/audio-source-origin-20261021-lab/installed-r1/verification.json) |
+| V88-08 | 离线依赖范围 | 7基础wheel不含NumPy；隔离实测只读复制现有NumPy2.4.2的933个RECORD/许可文件，不能视为安装器已内置。 | [记录](../../../validation/evidence/audio-source-origin-20261021-lab/installed-r1/verification.json) |
+| V88-09 | 观看副本与静态目检 | 42资产/14GIF来自两次新生成；实际MP4各75帧、PTS=n/25、身份色块最大误差1。AAC解码每声道144384样本，编码填充单列。 | [记录](../../../validation/evidence/audio-source-origin-20261021-lab/media-manifest-r1.json) |
+| V88-10 | 反向/曲线/嵌套/R3 | 实际R3输入/输出帧和全静音选区检查；不代表R3输出全PCM相同或听感/音高/立体声相位质量已验收。 | [记录](../../../validation/evidence/audio-source-origin-20261021-lab/after-controls-r3.json) |
+| V88-11 | 保留失败与研究边界 | 最早观察夹具字段错误的渲染结果无效，另有更正后的before-r2；未执行smoke缺import及检查点编码拼写错误均保留，不归为产品故障。 | [记录](../../../validation/evidence/audio-source-origin-20261021-lab/audit-r1.json) |
+| V88-12 | Skill及尚缺验收 | 四Skill仅增量＋精确父版条款更新，17份再审。压缩priming/edit-list、负/不连续时间戳、漂移、自然/HDR/长片/RSS/播放听审与完整剪映等价未验收。 | [记录](../../../specs/原生音频起点与作者采样时钟_v0.1_2026-10-21.md) |
+
+[完整实测](../../../validation/原生音频起点与同步实测_2026-10-21.md)。完整套件、方法子集、CLI命令和安装检查分开报告。
+<!-- /V88-NATIVE-AUDIO-SOURCE-ORIGIN -->
+
+
+<!-- V87-MULTICAM-NATIVE-STREAM-COVERAGE -->
+### V87 多机位原生视频覆盖
+
+V87 多机位原生视频覆盖已完成 2019 方法、3210.232 秒、0 跳过的完整回归；258 个冻结输入、8 个已提交外部夹具及 15 份验证脚本前后相同。视频覆盖取原生首/末帧区间，独立于较长音轨和容器时长；原速剪辑保留真实缺口。
+
+| 编号 | 核验 | 实际结果与边界 | 证据 |
+|---|---|---|---|
+| V87-01 | 完整回归 | 2019 方法 /3210.232 秒 /0 跳过；258 输入、8 夹具、15 验证脚本。 | [记录](../../../validation/evidence/multicam-stream-coverage-20261021-lab/full-r1.json) |
+| V87-02 | 相关回归 | 104 个不同方法：24 本轮＋22 父多机位＋16 空选区＋32 嵌套时钟＋10 CLI；属于完整套件子集，旧 102 不累计。 | [记录](../../../validation/evidence/multicam-stream-coverage-20261021-lab/related-r2.json) |
+| V87-03 | 真实视频边界 | 两组视频实际范围 [0,.32) 与 [1,1.32)，音轨/容器均 2 秒；33 原生 CLI＋25 其他命令、54 检查。 | [记录](../../../validation/evidence/multicam-stream-coverage-20261021-lab/native-r1/verification.json) |
+| V87-04 | 完整无损 RGBA/PCM | 每组 50 帧、11,520,000 RGBA 字节与 768,000 float32 PCM 字节 /每声道 96,000 样本独立一致。主音轨须显式创作。 | [记录](../../../validation/evidence/multicam-stream-coverage-20261021-lab/native-r1/verification.json) |
+| V87-05 | MP4/GIF 与静态目检 | trim/stretch 均 50 帧、PTS=n/25；trim 身份色块最大误差 1，非编码整帧一致。源 GIF 8 帧/320 ms，输出 GIF 2000 ms，黑帧会合并。 | [记录](../../../validation/evidence/multicam-stream-coverage-20261021-lab/static-review-r1.json) |
+| V87-06 | 只读索引与损坏拒绝 | 命中经 SHA 核验的既有原生索引时 0 次源帧探针，仍读 SHA。损坏索引拒绝保留，工程/报告/快照/缓存不被自动修复。 | [记录](../../../validation/evidence/multicam-stream-coverage-20261021-lab/installed-r1/media/verification.json) |
+| V87-07 | 当前源码的新隔离安装 | 161 资源源码/包/安装相同；36 CLI＋1 次 14 模块来源探针、14 安装检查＋54 媒体检查。7 wheels 不含 NumPy，实验只读复制既有 2.4.2 的 933 个 RECORD 文件及许可。 | [记录](../../../validation/evidence/multicam-stream-coverage-20261021-lab/installed-r1/verification.json) |
+| V87-08 | 仅音频及未知 EOF | 有效音频分析可返回偏移与 unknown 视频诊断，生成该机位切换时拒绝；未知视频状态采用模拟，音频真实生成。完整性错误仍拒绝。 | [记录](../../../validation/evidence/multicam-stream-coverage-20261021-lab/audio-only-after-r1.json) |
+| V87-09 | 保留失败与生成器修复 | 真实修复前 8 方法有 7 方法/9 断言失败；另保留子测试错误、仅音频过度拒绝、汇总清单名及生成器数字替换失误。修复未冒称旧结果重跑。 | [记录](../../../validation/evidence/multicam-stream-coverage-20261021-lab/audit-r1.json) |
+| V87-10 | 契约与范围 | 4 Skill 只合并本轮增量，17 份再审。自然/HDR/长片/RSS/漂移/非零音频流起点/连续播放听审及完整剪映功能效果仍待验收。 | [记录](../../../specs/多机位原生帧覆盖与只读索引契约_v0.1_2026-10-21.md) |
+
+[完整实测](../../../validation/多机位原生视频覆盖实测_2026-10-21.md)。方法子集、原生命令、安装检查分开报告，不累计为额外完整方法或剪映等价。
+<!-- /V87-MULTICAM-NATIVE-STREAM-COVERAGE -->
+
+
+<!-- V86-MULTICAM-SOURCE-COVERAGE -->
+### V86 多机位源覆盖与原速事件同步
+
+V86 多机位源覆盖策略已完成 1995 方法、3072.832 秒、0 跳过的完整回归；257 个冻结输入、8 个已提交外部夹具及 10 份验证脚本前后相同。默认拒绝源覆盖不足，显式 trim 保持原速并保留参考事件位置和缺口；stretch 明示事件时钟改变。
+
+| 编号 | 核验 | 实际结果及边界 | 证据 |
+|---|---|---|---|
+| V86-01 | 完整回归 | 当轮 1995 方法 /3072.832 秒 /0 跳过，冻结 257 输入、8 夹具及 10 验证脚本。 | [记录](../../../validation/evidence/multicam-source-range-20261021-lab/full-r1.json) |
+| V86-02 | 关联回归 | 当轮候选 80 个不同方法：22 多机位＋16 空选区＋32 嵌套时钟＋10 既有 CLI；为完整回归子集。 | [记录](../../../validation/evidence/multicam-source-range-20261021-lab/related-r1.json) |
+| V86-03 | 真实原生 CLI | 15 次 CLI＋11 条其他原生命令，23 检查；2 秒 /25 fps /50 帧原创参考，短机位 .4..1.84 秒。 | [记录](../../../validation/evidence/multicam-source-range-20261021-lab/native-r1/verification.json) |
+| V86-04 | 完整无损帧和显式主音轨 | 50 帧、11,520,000 RGBA 字节及 768,000 PCM 字节 /每声道 96,000 采样与独立生成参考完全相同；两端缺口均核验。 | [记录](../../../validation/evidence/multicam-source-range-20261021-lab/native-r1/verification.json) |
+| V86-05 | 编码输出与静态目检 | trim/stretch 各 50 帧、全部 PTS=n/25；trim 帧身份色块实测最大误差 1。联系表已静态查看；未连续播放或听审。 | [记录](../../../validation/evidence/multicam-source-range-20261021-lab/frame-review-r1.json) |
+| V86-06 | 隔离发行与 NumPy 边界 | 161 资源、7 基础 wheels；另将现有 NumPy 2.4.2 的 933 个 RECORD 文件复制至隔离 E 盘 site。18 次隔离 CLI＋1 次来源探针 /14 模块、12 安装检查。基础包未新增 NumPy。 | [记录](../../../validation/evidence/multicam-source-range-20261021-lab/installed-r1/verification.json) |
+| V86-07 | 失败、变基与未重跑声明 | 初次 22 方法 4 FAIL /3 ERROR、数组加载修复及单数 test 解析失误保留。后续仅继承未打包的父 test_cli.py；原媒体/隔离结果保留原冻结图，161 运行时资源相同，未冒称重跑。 | [记录](../../../validation/evidence/multicam-source-range-20261021-lab/audit-r2.json) |
+| V86-08 | 契约、Skills 与局限 | 4 份 Skill 只追加本轮指导，全部 17 份再审。单偏移、容器时长边界；设备漂移、每流真实 EOF、自然/HDR/长片/RSS/听审及完整剪映等价未验收。 | [记录](../../../specs/多机位源覆盖与显式缺口策略_v0.1_2026-10-21.md) |
+
+[完整实测](../../../validation/多机位源覆盖与原速同步实测_2026-10-21.md)。80 项与原生/隔离检查分别报告，不累计成额外完整方法或剪映等价。
+<!-- /V86-MULTICAM-SOURCE-COVERAGE -->
+
+
+<!-- V85-NATIVE-EMPTY-WINDOW -->
+2026-10-21 V85：完整原生回归 **1973 项、3623.367 秒、0 跳过**；256 产品输入与 8 外部夹具不变（本轮限定验收）。293 项专项、媒体与隔离安装保留运行时完全相同的原执行；仅继承父版测试断言后新跑 4 项旧 CLI 控制，未将历史记录标为重跑。293 个不同专项方法、真实 CLI、完整无损画面/PCM 与离线隔离分别记录；补齐 V84 已知的完全空视频选区拒绝缺口。完整剪映目标仍未验收。
+
+[实测与原视频/GIF](../../../validation/原生空视频选区与显式音频保留实测_2026-10-21.md) · [空区间契约](../../../specs/原生视频空区间契约_v0.1_2026-10-21.md)
+<!-- /V85-NATIVE-EMPTY-WINDOW -->
+
+
+<!-- V84-NESTED-NATIVE-CLOCK -->
+2026-10-21 V84：完整原生回归 **1957 项、4856.958 秒、0 跳过**；255 产品输入与 8 外部夹具不变（本轮限定验收）。277 个不同专项方法、两段真实原生/隔离输出分别记录；原生视频叶片保留源时钟，中间表面遵守子级 CFR。完整剪映功能与效果目标保持不变。
+
+[实测与原视频/GIF](../../../validation/嵌套原生VFR时钟与多层速度曲线实测_2026-10-21.md) · [时钟契约](../../../specs/嵌套原生VFR时钟契约_v0.1_2026-10-21.md)
+<!-- /V84-NESTED-NATIVE-CLOCK -->
+
+
+<!-- V83-NATIVE-INDEX -->
+2026-10-21 V83：完整原生回归 **1925 项、3063.161 秒、0 跳过**；254 产品输入与 8 外部夹具不变（本轮限定验收）。新增持久原生帧索引和显式三文件清理，重复倒放避免全源帧扫描。172 个不同专项方法、实际 4K/安装结果分别记录；完整剪映功能与效果目标保持不变。
+
+[实测与原视频/GIF](../../../validation/原生帧索引缓存与倒放复用实测_2026-10-21.md) · [索引契约](../../../specs/原生帧索引缓存契约_v0.1_2026-10-21.md)
+<!-- /V83-NATIVE-INDEX -->
+
+
+<!-- V82-REVERSE-CHUNKS -->
+2026-10-21 V82 原生倒放区间、分块缓存与显式清理：完整原生回归 **1888 项、4198.414 秒、0 跳过**，249 产品输入与 8 外部夹具保持一致（本轮限定验收）。
+
+[契约](../../../specs/原生分块倒放缓存契约_v0.1_2026-10-21.md) · [实测与失败记录](../../../validation/原生分块倒放与离线缓存实测_2026-10-21.md) · [实际输出 GIF](../../../assets/vfr-reverse-chunks-20261021-v82/native-r4/reverse.gif)。
+<!-- /V82-REVERSE-CHUNKS -->
+
+<!-- V81-CURVE-CLOCK -->
+2026-10-21 **V81**：完整原生回归1838项、4452.737秒、0跳过（本轮限定验收）。242冻结输入、8外部夹具；14时钟／5哈希／110自动化专项，5组真实时钟媒体、157资源离线隔离及合并曲线复测已通过。修正1个旧测试断言后162运行时输入字节不变，原媒体通过明确桥接保留。原V80全量失败、未发布，保留历史；[当前限定结果、原视频/GIF及失败](../../../validation/%E6%9C%89%E7%90%86%E6%95%B0%E8%A7%86%E9%A2%91%E6%97%B6%E9%92%9F%E4%B8%8E%E6%9B%B2%E7%BA%BF%E5%80%99%E9%80%89%E5%90%88%E5%B9%B6%E5%AE%9E%E6%B5%8B_2026-10-21.md)、[时间与读取边界](../../../specs/%E7%89%87%E6%AE%B5%E6%9C%89%E7%90%86%E6%95%B0%E6%97%B6%E9%97%B4%E5%9F%BA%E4%B8%8ECFR%E8%BE%B9%E7%95%8C%E5%A5%91%E7%BA%A6_v0.1_2026-10-21.md)。自然质量、VFR倒放、HDR和完整剪映等价未验收。
+<!-- /V81-CURVE-CLOCK -->
+
+
+
+<!-- R14-CURRENT -->
+2026-10-21 **R14 OpenFilm 复核**：[14项可拆模块、采用现状及限定成本](../../../OpenFilm可拆模块与现有内核降本清单_2026-10-21.md)。固定0.2.4 /53156ac5，1577 stars /155 forks（04:31:50 Asia/Taipei）；原始29通过 /1 DTD跳过＋提取3通过，另12组观察，237产品输入未变。已采用能力不重复计费；新增NLE交换与自有Agent宿主上下文裁剪均有前提，不增加产品或模型验收。
+<!-- /R14-CURRENT -->
+
+<!-- V80-CURRENT -->
+2026-10-21 **V80（RGB 曲线控制点动画限定验收）**：补齐差异 #60 的固定拓扑曲线控制点时间动画。`curves/rgb_curves` 支持 `all/red/green/blue.<点号>.x/y`，六种时间插值、完整作者时钟、剪入剪出、倒放嵌套和区间调节层。逐通道整曲线命令保留独立 RGB，拒绝六位小数后交叉／重合的 8-bit x 采样格；共享递归预算与内容寻址缓存。效果目录 **0.9.0／46 项**；原数值引擎仍为 10 家族／34 通道，分色 HSL 25 通道另计。原V80的1819项完整回归因MemoryError失败，未独立发布；本段239输入为历史，当前状态以V81为准；相关专项 **110/110、191.855 秒、0 跳过**，属于全量子集。开发 **32 CLI／44 检查**，5 组×24 帧独立静态参考、原始透明度、PCM 与 PTS、包／片段重建；离线 **156 资源／7 wheels／35 隔离 CLI＋1 来源探针**，开发和安装解码一致；4 份相关 Skill 已更新；17 份发现联接待 main 核对。附加非线性变速／祖先倒放探针 2 组通过；分数帧率与非整帧起点探针暴露 **CFR-01：静态路径也缺末帧覆盖**，该场景未验收。未验收动态增删控制点、HDR／线性光、自然广告质量、连续播放审片、实时性能或完整剪映效果等价。
+
+[曲线动画契约](../../../specs/RGB曲线控制点动画契约_v0.1_2026-10-21.md) · [实测、原素材与失败记录](../../../validation/RGB曲线控制点动画离线实测_2026-10-21.md)
+<!-- /V80-CURRENT -->
+
+<!-- V79-CURRENT -->
+2026-10-21 **V79（HTML 组件字段与逐片段取值限定验收）**：落实 OpenFilm 接入契约 CP-01..06。新命令 `motion html-fields` 无浏览器返回稳定 ID、独立定义／取值、JSON Schema、类型／范围／单位／默认来源及图片选项；`html-render/controls/quality` 共用有类型的组件补丁、单项 null 与全量 reset。本地图片限定原源码登记闭包并检查实际 SHA 与 strict commercial_ad 权利；boolean 在每帧作者动画后执行，并恢复原页面属性。`--replace-clip-id` 仅更换指定片段资产引用，保留作者时间、变换、特效和其他片段。完整原生回归 **1796/1796、5798.792 秒、0 跳过，237 冻结输入＋8 外部夹具前后相同**；专项 **28/28、222.167 秒、0 跳过**，属于全量子集。开发 **28 成功 CLI＋3 明确拒绝／41 检查**；7 组×20 帧无损 RGBA、稳定 ID 改名保值、局部／全量复位、图片与逐帧显隐独立像素、包／片段重建、2 个实际队列输出均核验。离线 **155 资源／7 wheels／34 次隔离 CLI＋1 来源探针**；源码／平台 wheel／安装资源逐字节一致，开发与安装 7 组解码相同；17 Skills／326 本地引用及发现联接已核对。未验收自动字段发现、任意网页／完整 OpenFilm 时间线、自然广告质量、实时连续播放、HDR或完整剪映效果等价。
+
+[组件契约](../../../specs/HTML组件字段与逐片段取值契约_v0.1_2026-10-21.md) · [实测与失败边界](../../../validation/HTML组件字段与逐片段参数离线实测_2026-10-21.md)
+<!-- /V79-CURRENT -->
+
+<!-- V78-CURRENT -->
+2026-10-20 **V78（时间线帧/区间预览与内容缓存限定验收）**：新增 `preview frame/range/cache-list/cache-prune`，完整作者图合成后按输出帧截取；RGBA PNG、FFV1 BGRA＋float32 PCM NUT、H.264/AAC MP4；有理数显示帧率、末帧音频端点与全部 PTS 核验。持久缓存以实际源/派生/运行时 SHA 验证，不能沿用上游路径＋大小＋mtime 命中；新目录导出、取消、损坏拒绝、配额及工程引用保护。完整原生回归 **1768/1768、2772.065 秒、0 跳过、235 冻结输入＋8 外部夹具前后相同**；22 新方法为全量子集，专项 **22/22、48.755 秒、0 跳过**。开发 **32 次 CLI／24 项检查**，四组共37帧；移动 HSL、缩小、实际透明作者输出及 NTSC 不完整末帧，全部 RGBA／每个 PCM 样本与独立完整图参考逐字节一致，包重放一致。离线 **154 资源／7 wheels／35 次隔离 CLI＋1 来源探针／11 项检查**，源码／平台 wheel／安装资源逐字节相同，安装解码结果与开发一致；17 Skills／318 本地引用与发现联接已核对。另作跨转场及本地R3伸缩两组上下文探针：开发/同一隔离安装各22次CLI／15检查，24帧与完整PCM及包重放一致，独立于主四组计数。LUT三种字段再以开发/隔离入口各12次CLI验证同大小/mtime替换失效与新像素；不与上述次数混合。保留早期探测字段、像素转换和演示夹具失败。软件预览从作者起点累计解码，命中仍需内容校验；未验收实时播放、连续审片／听审、自然质量、HDR或完整剪映等价。
+
+[CLI与缓存契约](../../../specs/时间线帧区间预览与内容缓存契约_v0.1_2026-10-20.md) · [实测、失败与时延边界](../../../validation/时间线帧区间预览与离线发行实测_2026-10-20.md) · [完整回归](../../../validation/evidence/timeline-preview-20261020-v78/full-r2.json)
+<!-- /V78-CURRENT -->
+
+<!-- R12-CURRENT -->
+2026-10-20 **R12：OpenFilm 0.2.3 增量研究，产品仍为 V77**。固定 `284f8bd3d6850ceaa773043e2ecb90e13640f547`，1524 stars/153 forks（22:12:10 Asia/Taipei）；全树 **757→781，616 不变/27 新增/138 修改/3 删除**。五份原始纯函数测试 **46/46**；另有 **4 组观察/8 断言**，复现同大小+同 mtime 内容替换仍命中相同预览 key。10 套/31 个 Skill 文件不变，0 新安装；233 个产品输入摘要不变。本轮不增加产品回归或画质验收计数。优先评估组件暴露字段、重写内容 key 的预览缓存及 NLE 薄导出适配；GUI/云 provider 不进入运行时。[模块、成本、证据与复现](../../../OpenFilm_0.2.3增量复用与开发成本评估_2026-10-20.md)；[接入边界，尚未实现](../../../specs/OpenFilm组件参数与预览缓存接入边界_v0.1_2026-10-20.md)。
+<!-- /R12-CURRENT -->
+
+<!-- V77-CURRENT -->
+2026-10-20 **V77（八色 HSL 原生提速与离线发行限定验收）**：catalog **0.8.1／46 项**；本地 C11 frei0r 像素内核＋有界作者表达式 DAG，保留原八色 HSL、25 表达式通道和作者模型；既有 **10 类／34 命令通道**不增计。默认校验摘要后选原生模块，可显式 native／expression；完整性错误拒绝。完整原生回归 **1746/1746、2940.352 秒、0 跳过、233 冻结输入＋8 外部夹具前后相同**；本轮新增 19 内核＋2 安装方法，原 HSL 29 和安装 22 专项均为全量子集。最终专项 **19/19（4.806s）、29/29（42.425s）、22/22（2.993s）**，均无跳过。原生 **24 CLI／50 检查**，四组各 24 帧，独立 colorsys＋source-over RGB 最大差均 **1/255**；Alpha、每组完整 **96,000 帧立体声 PCM**、全部 PTS 和包重建分别核验。离线 **153 资源／7 wheels／27 隔离 CLI＋1 来源探针／13 检查**，源／平台 wheel／安装逐字节一致，安装成片与开发解码和内核元数据一致；17 Skills／310 本地引用与发现联接均核对。**1080p 最终滤镜探针 52.97–67.43fps（60 帧×3，null 输出，最多 3 后台线程＋调用线程）；完整 CLI 静态八色 11.35–13.18fps、强度动画 11.54–12.20fps，未达 30fps。**完整 CLI 包含校验、解码、合成、H.264/AAC 编码和清单，且并发回归；不能把滤镜吞吐当实时预览。保留构建／夹具失败、安装器标签缺口、漏打包 HTML 脚本及两次停止全量。未连续审片／听审；自然质量、HDR、交互预览和完整剪映等价未验收。
+
+[原生契约](../../../specs/八色HSL原生像素内核与表达式DAG契约_v0.1_2026-10-20.md) · [实测与失败](../../../validation/八色HSL原生提速与离线发行实测_2026-10-20.md) · [最终回归](../../../validation/evidence/native-hsl-20261020-v77/full-r3.json)
+<!-- /V77-CURRENT -->
+
+<!-- V76-CURRENT -->
+2026-10-20 **V76（八色分区 HSL 限定功能验收）**：catalog **0.8.0／46 项**；新增八色各 H/S/L＋最终 RGB 强度 **25 个表达式通道**，原生命令仍为 **10 类／34 通道**。按原始色相相邻权重同时分区，灰阶与输入 Alpha 保留；作者时钟、六插值、拆分／反转、区间、工程包／片段重建均核验。修复片段／区间效果超大整数校验，静态中性／零强度旁路不消耗执行配额。完整原生回归 **1725/1725、2092.459 秒、0 跳过、225 冻结输入＋8 外部夹具前后相同**；29 新方法为全量子集。专项 **29/29、17.722 秒、0 跳过**。开发 **24 CLI／50 检查**，四组各 24 帧，独立 colorsys＋source-over 参照的 RGB 最大差均 **1/255**，输出 Alpha、每组完整 **96,000 帧立体声 PCM** 和每帧 PTS 分别检查。离线 **147 资源／7 wheels／27 隔离 CLI＋1 模块来源探针／12 安装检查**，开发／安装全部解码摘要、参数／内核元数据和 PTS 一致；17 Skills／302 本地引用，发行联接与正文均核对。**1080p 单滤镜线程、各 3 帧探针：单色区／八色约 21.040／26.856 秒/帧，未达 30fps；性能仍是明确缺口。**保留首轮 1 failure／2 errors 和参照修正；仅静看最终两张 PNG，未连续审片／听审。本轮为 8 位编码 RGB 算法验收；自然质量、实时预览、线性光／HDR及完整剪映等价未验收。
+
+[契约](../../../specs/八色分区HSL与关键帧契约_v0.1_2026-10-20.md) · [实测与失败](../../../validation/八色分区HSL与离线发行实测_2026-10-20.md) · [当前回归](../../../validation/evidence/selective-hsl-20261020-v76/full-r1.json)
+<!-- /V76-CURRENT -->
+
+<!-- V75-CURRENT -->
+2026-10-20 **V75（空间／抠像效果关键帧限定验收）**：catalog **0.7.0**，45 项效果不增计；新增高斯模糊、颜色对比、镜头畸变、RGB 抠像 **4 类／14 数值通道**，累计 **10 类／34 原生命令通道**。支持作者时钟、六插值、窗口／拆分、完整输出反转、工程包／片段跨项目重建和递归预算。修复超大整数校验异常、静态及动态抠像覆盖原有 Alpha、颜色对比目录默认值；模糊零半径为精确中性。完整原生回归 **1696/1696、2120.997 秒、0 跳过、223 冻结输入＋8 外部夹具前后相同**；29 新方法为全量子集。专项 **29/29、16.696 秒、0 跳过**。开发 **24 CLI／36 检查**，四组各 24 帧，独立静态原生选项＋source-over 参照的全 RGB 最大差均 **0**，输出 Alpha 与每组完整 **96,000 帧立体声 PCM** 精确。离线 **146 资源／7 wheels／27 隔离 CLI＋1 模块来源探针／12 安装检查**，开发／安装全部解码摘要、作者参数、抠像覆盖元数据及每帧 PTS 一致；17 Skills／294 本地引用，发行联接与正文均核对。保留全部失败和已停止的 full-r1；只静看最终开发／安装两张联系图，未连续审片或听审。gblur 会处理 Alpha，colorkey 的 RGB 距离覆盖乘以该阶段输入 Alpha，镜头采用原生采样；自然绿幕／去溢色、线性光／HDR、长片性能和完整剪映等价未验收。
+
+[契约](../../../specs/空间滤镜与抠像参数关键帧契约_v0.1_2026-10-20.md) · [实测与失败](../../../validation/空间滤镜与抠像关键帧实测_2026-10-20.md) · [当前回归](../../../validation/evidence/spatial-automation-20261020-v75/full-r2.json)
+<!-- /V75-CURRENT -->
+
+<!-- V74-CURRENT -->
+2026-10-20 **V74（外部混合动画变速限定验收）**：完整输出相对变速现在保留可编辑 `blend.opacity_animation`，支持恒速、既有有界速度曲线、倒放、定格、重复操作和输出窗口；混合仍在原背景上执行，alpha 只乘一次。修复默认 u8 静音进入 tempo 后的 −256 PCM 偏移。完整原生回归 **1667/1667、2517.215 秒、0 跳过、222 冻结输入＋8 外部夹具前后相同**；23 个新增方法是其子集。专项 **23/23、9.975 秒、0 跳过**；原生 **24 CLI/30 检查**，三组各 30 帧独立 RGB 对照最大误差 **0/1/1 个 8 位码值**，输出 alpha 和每组完整 144,000 帧立体声 PCM 精确。离线 **146 资源/7 wheels/27 隔离 CLI＋1 模块来源探针/11 安装检查**；开发/安装解码摘要、作者模型和每帧 PTS 一致。17 Skills / 286 本地引用，发现联接与正文已核对。保留测试输入、旧栅格参考、音频成片失败及中止的 full-r1；静看两张对照 PNG，未连续审片或听审。连续参数与隔离祖先已栅格化帧序有明确边界；HDR、线性光、自然素材、长片性能、全部剪映混合效果与完整等价均未验收。
+
+[契约](../../../specs/外部混合动画与完整输出变速契约_v0.1_2026-10-20.md) · [实测与失败](../../../validation/外部混合动画变速与静音修复实测_2026-10-20.md) · [当前完整回归](../../../validation/evidence/retime-blend-20261020-v74/full-r2.json)
+<!-- /V74-CURRENT -->
+
+<!-- V73-CURRENT -->
+2026-10-20 **V73（LUT 强度关键帧限定验收）**：catalog **0.6.0** 新增 `lut3d.intensity`，共 6 类/20 个数值通道；四别名、六种插值、作者时钟及共享预算。修复中性 CUBE 静态半强度红蓝索引、常速祖先效果时钟、区间调节层输入分流及项目包 LUT 依赖。完整原生回归 **1644/1644、4143.088 秒、0 跳过、220 冻结输入＋8 外部夹具前后相同**；30 个新方法为其子集。专项 **30/30、16.595 秒、0 跳过**；原生 **8 CLI/9 检查**，24 帧逐帧独立 RGB 对照最大误差 1/255、alpha 全字节一致。**145 资源/7 wheels/11 隔离 CLI＋1 模块来源/12 安装检查**，开发/安装完整解码摘要与每帧 PTS 相同。**17 Skills/278 本地引用**。另各 **7 CLI/2 组解析时钟核验**，线性速度曲线 22 帧、外套 2x 倒放 11 帧，与独立积分逆函数的 RGB 误差≤1；不并入方法数。保留所有旧专项与演示失败；静看对照 PNG，未连续审片或听审。8-bit 编码 RGB 混合；HDR、线性光、全部厂商 LUT 方言、自然调色质量和完整剪映等价未验收。 [契约、实际输入输出与失败记录](../../../validation/LUT强度关键帧与中性调色修复实测_2026-10-20.md)。
+<!-- /V73-CURRENT -->
+
+<!-- R11-CURRENT -->
+2026-10-20 **R11（OpenFilm 0.2.2 源码与创作工作流复核）**：固定 `695f4a887a97258d45ffe5715eadf537b6d2579b`；社区快照为 **1343 stars/137 forks，2026-10-20 10:26:27 Asia/Taipei**。两版 757 文件中 **718 不变、6 新增、33 修改、6 删除**，MIT 原文不变。实际运行 **1 个上游纯帧率测试＋8 个函数观察**；不运行上游完整渲染。**10 套创作工作流/31 文件**及 29 个 provider 文件与旧版全部字节相同，本次未新增安装 Skill。保留 ZIP 根目录误判的首轮失败及最终收据。研究不增加产品测试通过数或成片验收数。 [完整评估、入口、原始证据与复现](../../../OpenFilm_0.2.2差异复核与复用取舍_2026-10-20.md)。
+<!-- /R11-CURRENT -->
+
+<!-- D01-CURRENT -->
+2026-10-20 **D01（原生回归等待取样）**：保存两次非阻塞主线程栈、一次 E 盘 WMI 观察和工具来源摘要。取样时分别位于工程原子写入持久化与 JSON 文件打开路径；单次取样不能解释整轮耗时或证明存储故障。**所核对的 219 个快门候选输入未变，新增功能测试与画质验收均为 0**；正式通过数以各版本全量收据为准。 [记录](../../../validation/原生回归文件等待取样记录_2026-10-20.md)。
+<!-- /D01-CURRENT -->
+
+<!-- V72-CURRENT -->
+2026-10-20 **V72（HTML 子帧快门限定验收）**：采用 OpenFilm 子帧重绘思路，新增可选 `motion html-render --shutter-samples/--shutter-fraction`、源切点与配方重放。中心中点采样＋预乘编码域 sRGB 8-bit；默认/零快门保留原帧路径。隔离分支完整 **1614/1614、9086.433 秒、0 跳过、219 源码输入＋8 外部夹具前后相同**；发布路径字节逐项匹配，21 个快门和 4 个原生 Job 新方法为其子集。专项 **21/21、116.579 秒、0 跳过**；公开原生 **19 CLI/36 检查**，整片 RGBA 对照独立 Python 参考；strict 检查每个实际子帧，打包和片段跨项目重建像素相同。**145 资源/7 wheels/22 隔离 CLI＋1 模块来源/34 安装检查**，开发/安装全部公开输入输出字节一致。**4 次旧安装 CLI**另验默认 PNG、整片 RGBA 与 PTS；不与新安装操作合并。**17 Skills/270 本地引用**。**当前 26 公开文件/14 视频探测**，另保留历史 29 文件/14 复探（总计 55/28）。保留旧 Schema 摘要、Canvas 严格布局测试设置和演示验证命令失败；只静看图片，未连续审片或听审。本轮无模型/GPU 前向、GUI、网络媒体、Docker/WSL/虚拟环境；自然运动、HDR、4K 长片性能和完整剪映等价未验收。 [契约、原输入、实际输出及失败](../../../validation/HTML子帧快门与透明混合实测_2026-10-20.md)。
+<!-- /V72-CURRENT -->
+
+<!-- V71-CURRENT -->
+2026-10-20 **V71（透明联系表限定验收）**：参考 OpenFilm `lookMedia`，新增原生 `media contact-sheet`；透明视频按实际 PTS 输出棋盘格、浅底、深底、Alpha 四视图。显式锚点选择请求时刻或之后的首个可解码帧，0.17 秒样例实际为 0.25 秒，不伪造精确播放定位。隔离分支完整 **1593/1593、9056.192 秒、0 跳过、217 源码输入＋8 外部夹具前后相同**，发布工作区相同相对路径字节逐项匹配；25 个联系表和 4 个原生 Job 新方法为其子集。联系表专项 **25/25、107.100 秒、0 跳过**。开发原生 **7 CLI/35 检查**；四锚点均与完整 24 帧解码对应帧逐字节一致，16 面板通过独立 Alpha 像素对照。**144 资源/7 wheels/10 隔离 CLI＋1 模块来源/38 安装检查**，安装联系表 PNG、来源帧、Alpha、PTS 和字体摘要与开发版一致。原生 Job **4/4**与受控提前退出对照通过；修复挂起创建→加入 Job→恢复主线程，8 份外部夹具显式绑定。**17 Skills/264 本地引用**。**当前 33 公开文件、6 次实际视频探测**（另留 33 历史文件）；静看开发/安装两张图，未连续播放或听审。本版无 GUI、浏览器、模型前向或网络媒体请求；8-bit 抽样预览不验收自然人像、HDR、长片性能或完整剪映等价。 [契约、原视频、实际图片及失败](../../../validation/透明视频多帧联系表与Alpha核验实测_2026-10-20.md)。
+<!-- /V71-CURRENT -->
+
+<!-- V70-CURRENT -->
+2026-10-20 **V70（同批次结果复用限定验收）**：参考 OpenFilm 的批次规则，新增显式 `queue run --reuse-identical`，仅本次调用、同项目、单 worker。实际源字节、有效设置、权利和运行实现绑定摘要；复制另建 operation/manifest，编码证据保留来源身份。完整 **1564/1564、4147.745 秒、0 跳过、214 输入冻结**；28 新契约方法为其子集。针对性 **28/28、62.954 秒、0 跳过**。开发版 **10 次 CLI、22 项检查**；6 个作业中 5 成功/1 参数拒绝，真实 **3 次编码、2 次复制**；普通 MP4、透明 WebM 的副本逐字节、全部 24 帧、PTS、PCM 相同。**143 资源/7 wheels/13 次隔离 CLI＋1 次模块来源检查/38 项安装检查**；安装版独立重复样例，全部帧/PTS/PCM 与开发版相同。真实 ffconcat 伪装登记另 5 CLI＋1 FFprobe，在编码前拒绝；**17 Skills/260 本地引用**。本次为程序生成的 320×180/12 fps/2 秒技术素材；静看两张首帧联系图，未连续播放或听审。**未验收自然素材效果、吞吐提升、跨调用缓存或完整剪映等价**。 [契约、原片/GIF、收据与保留的失败](../../../validation/OpenFilm同批次结果复用实测_2026-10-20.md)。
+<!-- /V70-CURRENT -->
+
+<!-- V69-CURRENT -->
+2026-10-20 **V69（CPU 人脸契约限定验收）**：本地 OpenSeeFace 66 点逐帧锚点，显式磨皮/曝光/瘦脸/眼部放大；默认零强度，缺失/切点清空几何关联，保存完整地标配方并显式重放。完整 **1536/1536、3748.515 秒、0 跳过、212 输入冻结**；16 新契约方法为子集。开发 **16 次基础 CLI/39 条原检查/24 帧，24 次真实检测＋20 次地标**；四项独立控制另 20 检查、0 新模型前向。**142 包内资源/7 wheels/19 次基础隔离 CLI＋1 模块来源检查**；开发/安装另各 1 次 worker 启动后取消核验。安装版另 24 检测/20 地标，全部 RGBA/PCM 与开发相同。**17 Skills/256 引用**。原 Alpha、范围外 RGB、中性输出、逐帧 PTS/PCM、取消/超时回滚通过；PNG 中文路径和 FFV1 色彩标签失败保留。素材为 NASA 静照生成的平移/空脸段，静看 3 帧和控制联系图，未连续播放/听审；**自然动态美颜、透明人脸边缘、美妆/身体及完整剪映等价未验收**。暂存 CRLF 检查曾中止；已保留日志并修正规则，源码与实测文件原字节保留。 [原片/GIF/失败与发行](../../../validation/离线人脸锚点与局部修饰实测_2026-10-20.md)。
+<!-- /V69-CURRENT -->
+
+<!-- V68-CURRENT -->
+2026-10-20 **V68（CLI/协议/发行限定核验）**：显式 `media inpaint|outpaint --temporal-context previous`，把同场景、同一全局帧已经正式输出的生成选区交给后窗，保留已输出前缀；默认/`none` 保持旧路径。完整 **1520/1520、3573.275 秒、0 跳过、204 输入冻结**；65 项 VACE 定向是子集，新增 24 方法。**135 包内资源/7 wheels/28 隔离 CLI**，另 1 次安装模块契约调用；开发/安装各 8 帧真实 LaMa 控制，全部 RGBA/PCM 相同；**17 Skills/250 引用**。真实 VACE previous 在文本权重准入阶段拒绝：物理可用 5146 MiB，要求 7936 MiB；CLI 退出码 6，**0 有效 VACE 前向/无成片**，原错误和诊断保留。 当前 none/previous 的真实成片对照及自然质量仍未验收。 **完整剪映等价未验收**。 [编号核验、原片/GIF、失败及发行](../../../validation/VACE前窗生成上下文实测_2026-10-20.md)。
+<!-- /V68-CURRENT -->
+
+<!-- R09-RESEARCH -->
+2026-10-20 **OpenFilm R09**：固定 main `71922644` /0.2.1 未变，重新核对 757 文件；16 个隔离原声明夹具确认并发预算、改名去重与陈旧缓存的适配边界。复用顺序：批次规划 → 按需透明联系表/HTML 子帧采样 → 中立格式互操作；已有采用不重算收益，云 provider 不接入。本次不新增产品验收、模型结果或视频。[编号清单与人日](../../../OpenFilm最新复用评估与成本取舍_2026-10-20.md#r09当前复核与拆取顺序)、[原始证据](../../../validation/evidence/openfilm-recheck-20261020-r09/verification.json)。
+<!-- /R09-RESEARCH -->
+
+<!-- V67-CURRENT -->
+2026-10-20 **V67（产品限定验收）**：共享 RVM/SAM2/LaMa/VACE 管道新增三角色退出观测、有界脱敏日志、回收前留证和 `diagnostics list/show/export`；保留原错误、operation ID 和事务回滚。完整 **1496/1496、4676.172 秒、0 跳过、202 输入冻结**，34 新专项为子集。开发 **33 CLI**：真实无效 ONNX 解析失败 1 次（0 有效模型前向），LaMa harmonic 真实 **8 次前向/8 帧**；原生离线 **134 包内文件/35 隔离 CLI**，另一次真实解析失败与 8 帧 LaMa 输出，全部解码 RGBA/PCM 与开发版相同；**17 Skills/244 引用**。受控生成区 35.578 dB，≥30 dB 单项通过，沿用原质量门槛；静看 4 帧，未连续播放/听审。**本轮没有新 VACE 模型推理或新 Torch 崩溃，原访问冲突根因/长期稳定性、自然质量及完整剪映等价仍未验收**。 [编号核验/原片/GIF/失败/发行](../../../validation/本地模型管道诊断与回收前留证实测_2026-10-20.md)。
+<!-- /V67-CURRENT -->
+
+<!-- V66-CURRENT -->
+2026-10-20 **V66（产品，10-19 开始的跨日验收）**：新增 `media outpaint`，本地 LaMa/VACE 向更大画布生成背景；显式放置、同源蒙版、归一化原区域 RGBA/PTS/PCM 保护、可编辑配方、工程包与片段组跨项目重绑定。完整 **1462/1462、4928.763 秒、0 跳过、200 输入冻结**；24 扩图专项、41 VACE 专项均为子集，后者含 8 个新增读取方法。开发 **67 CLI/3 次模型交付/24 帧**；原生离线 **133 包内文件/25 隔离 CLI**，LaMa harmonic 的全部 RGBA/PCM 与开发版相同；**17 Skills/238 引用**。生成区预先声明 ≥30 dB，实测 lama/direct 34.485 dB（通过）；lama/harmonic 35.578 dB（通过）；vace/harmonic 19.228 dB（未通过）。原画面保护通过不替代生成质量；**自然扩图、安装版 VACE 推理与完整剪映等价仍未验收**。 VACE 两次原生文本加载访问冲突保留；组件内 `pread` 后本例实际交付通过，**底层根因与长期稳定性仍未确认**。 [原片/GIF/编号核验/失败和发行](../../../validation/本地视频扩图与原画面保护实测_2026-10-19.md)。
+<!-- /V66-CURRENT -->
+
+<!-- V65-CURRENT -->
+2026-10-19 **V65（产品）**：接入 OpenFilm 固定 `f6a65ae5` 的硬件参数/H.273 策略，保留 Python/FFmpeg 主链；独立 `off/prefer/require` 编码/解码、四帧实测、强制硬件帧与 CPU 对照、NV12/P010 输入、帧级/码流色彩标签、有限回退、队列/续跑及持久诊断。完整 **1430/1430、2566.147 秒、0 跳过、198 输入冻结**；20 新专项为子集。开发 **20 CLI/49 断言/8 成片/384 帧/768,000 立体声采样帧**；离线 **132 包内文件/22 隔离 CLI**，8 成片解码视频/PCM 均与开发版相同；**17 Skills/235 引用**。本机 RTX 3060 的 H.264 NVENC＋D3D11VA/CUDA、HEVC 10-bit NVENC＋CUDA 通过；AMF 不可用和 H.264 10-bit 设备拒绝均保留。GIF 为实际成片 8-fps 采样、16 帧/2.01 秒/无声；已查看 6 个静帧，未听审/连续播放。这是位流格式/传输与受控合成样例核验，**不验收内部全精度 10-bit 合成、所有设备、自然画质、提速或完整剪映等价**。 [原片/GIF/编号核验/失败与发行](../../../validation/硬件编解码与显式回退实测_2026-10-19.md)。
+<!-- /V65-CURRENT -->
+
+<!-- R07-RESEARCH -->
+2026-10-19 **R07（OpenFilm 0.2.1 源码研究）**：固定 `f6a65ae5`，API **1142 stars /117 forks** 为 19:18:55 Asia/Taipei 时点；731→749 文件，37 新增/179 修改/19 changeset 删除。选定原测试 **75 通过/1 可选 DTD 跳过**，另 13 纯数据夹具通过；**同大小、还原 mtime 的内容修改未改变预览缓存键，直接复用门槛不通过**。优先候选为硬件编解码探测/显式回退、受控诊断；预览缓存需重写内容指纹，FCPXML 为可选交换。10 份创作 Skill 所在 31 文件、provider 目录 29 文件均与 R06 相同；既有 3 套本地工作流保留，不新增本地 AI 特效内核。196 产品输入与 V64 完整回归相同；本轮为研究，无新产品接入/成片/完整回归。 [18 项复用/成本/证据](../../../OpenFilm_0.2.1复用清单与成本复核_2026-10-19.md)。
+<!-- /R07-RESEARCH -->
+
+<!-- V64-CURRENT -->
+2026-10-19 **V64（产品）**：显式 R3 `source_context_ms` 0..1000、默认 0；真实源前后句柄、有理边缘时间图、原作者采样裁切后反向。完整 **1410/1410、2079.167 秒、0 跳过、196 输入冻结**；9 新专项为子集。开发版 **144 CLI/408 最终帧/816,000 立体声采样帧**；8 次独立原生 R3 裁切 PCM 最大差 0，零上下文与固定 V62 基线解码相同。**131 包内文件/146 隔离 CLI/408 安装帧**；工程往返另 5 隔离 CLI/36 帧/72,000 采样帧；**17 Skills/232 引用**。选定 4 ms 双音 apart 从 375/819.946 改善为 400.085/799.988 Hz，**together 右声道 789.368 Hz 仍失败，apart 反相残差 0.00246022013 仍失败**。28 研究探针/旧代码基线分别计数。GIF 是实际采样统计图、3 页/6 秒、无声；静帧已看，未听审/连续播放。自然质量及完整剪映等价未验收。 [原输入/GIF/失败/发行](../../../validation/离线音频真实源上下文与短窗音高实测_2026-10-19.md)；[契约](../../../specs/离线音频真实源上下文与精确选区契约_v0.1_2026-10-19.md)。
+<!-- /V64-CURRENT -->
+
+<!-- V63-REJECTION -->
+2026-10-19 **V63（真实资源拒绝）**：不变 V62 产品/原 VACE 模型流程在 `text-weights` 前因物理可用 3,718 MiB、要求 7,936 MiB 拒绝；0 新模型前向/修复视频。失败、空项目状态与事后自有进程快照保留；未终止其它任务，显存观测不预约资源。 [真实日志与限制](../../../validation/VACE共享显存真实重试与准入拒绝_2026-10-19.md)。
+<!-- /V63-REJECTION -->
+
+<!-- V62-CURRENT -->
+历史产品 2026-10-19 **V62（产品）**：新增本地 PP-OCRv4 CPU `ocr adapter/scan/anchors`，源帧/PTS、原文字/多边形、唯一精确查询生成可编辑位置/缩放和回全景。完整 **1401/1401、2428.911 秒、0 跳过、195 文件冻结**；27 OCR 专项为全量子集。开发版 **42 CLI /192 最终帧 /1,152,000 立体声采样帧**；32 聚焦帧边缘最大差 1.484375 px，160 全景帧 RGB 最大差 2，PCM 0。英文四个选定目标/中文四个目标通过，原生前向分别 6 det+60 rec /1 det+4 rec；**英文首帧全十行仅 5/10 完全一致，7/255 字符编辑**，保留空格错误，非盲测。**131 包内文件 /44 隔离 CLI /192 安装帧**，同源预测/解码音画一致；**17 Skills /228 引用**。冒号文本误判、静音夹具/字体缺字、标点阈值参考与旧回归中断保留。静帧已看，未连续播放/听审；文字框不代表点击区域，全隐私、自然 OCR/语义、VACE 修订版完整交付与完整剪映等价仍未验收。 [原片/GIF/识别错误/安装与范围](../../../validation/离线OCR与文字锚点真实成片实测_2026-10-19.md)。
+<!-- /V62-CURRENT -->
+
+<!-- R06-RESEARCH -->
+2026-10-19 **R06（OpenFilm 源码研究）**：固定 `91b4e90c`，API **1098 stars /116 forks** 为 16:37 Asia/Taipei 时点；相对 R05 **727→731 文件，4 新增/20 修改/707 不变**。新增可脱离 GUI 的轨道种类/编号/分层函数，修复 FCPXML 音画连接、原轨道标签和 stem 角色；**64 原测试通过/1 可选 DTD 跳过，8 个独立轨道夹具通过**，非完整上游套件。CLI/渲染 `src/` 28 文件原字节不变。导出/轨道模块仍为候选，未接入生产转换、未运行目标 NLE；不新增本地 AI 模型，不改变完整剪映等价未达成的状态。 [源码变化/编号复用与工期](../../../OpenFilm导出修复与纯轨道模块复用复核_2026-10-19.md)。
+<!-- /R06-RESEARCH -->
+
+<!-- V61-CURRENT -->
+历史工作流 2026-10-19 **V61（Agent 工作流适配）**：将固定 OpenFilm 的参考片重建、长转短、录屏演示创作要求适配为 **3 个本地 `video-cut-` Skill，累计 17 个**；沿用现有编辑内核。当前 **62 次真实 CLI、158 个最终编码帧/PTS、948,000 个立体声采样帧**；长转短另有 94 个中间基础帧，不叠加为最终产量。参考运镜中心最大差 0.878 像素；字幕前源帧最大差 2，三类 PCM 最大差 0；录屏控件边缘最大差 2.600 像素，5 次回全景 RGB 最大差 2，94 帧字幕安全边缘通过。**188 产品输入与 V60 相同，沿用已完成的 1374/1374，未重跑完整回归**。首轮音频/时长失败、第二版出框/裁切及后续底边拒绝保留。公开原片、无音预览/GIF；生成语音仅内部使用、商业权利拒绝。未连续播放/听审；自动语义/点击识别、自然质量及完整剪映等价未验收。 [原片/GIF/实测/失败/Skill](../../../validation/OpenFilm三套本地创作Skill与实片核验_2026-10-19.md)。
+<!-- /V61-CURRENT -->
+
+<!-- V60-CURRENT -->
+历史产品 2026-10-19 **V60（产品增量，GPU 完整交付待验）**：VACE 用完整 GPU UUID 对齐物理/Torch free，在文本加载、视频上卡和每个非空窗口准入；补充文本卸载钩子清理及当前 worker 空闲缓存的前后记录。**1374/1374、2480.857 秒、0 跳过、188 文件冻结**；16 新资源专项和 33 VACE 专项属于全量子集。本机原生离线安装 **125 包内文件/2 隔离 CLI/安装版 CUDA 准入** 通过，当前源码原生 **128 MiB** 有效分配/自身空闲缓存释放通过。首轮模型在窗口 1 前因 Torch free 522.441 MiB 拒绝；修订版小额探测在分配前因物理 free 440.000 MiB 拒绝，该次未执行分配，资源回升后的复测通过。**本轮无新修复成片**；保留原片/选区/真值及失败。不预约显存、不保证无 OOM，当前真模型整链、自然质量和完整剪映等价待验。 [原片/拒绝/范围/安装证据](../../../validation/VACE物理显卡准入与真实交付实测_2026-10-19.md)。 另有 [OpenFilm 三套创作流程适配设计](../../../OpenFilm创作流程本地适配设计_2026-10-19.md)：22 命令声明映射，未新增 Skill 或整片。
+<!-- /V60-CURRENT -->
+
+<!-- V59-RESEARCH -->
+历史研究 2026-10-19 **V59（研究）**：固定 ROSE 作者 Transformer、Wan T5/VAE 在现有 Windows 原生 CUDA Python 真实运行两条既有样例，各 32 帧@8 fps、50 步；补末帧至 33 后裁回，不改原时钟。受控整体 **28.116434 dB /运动残差 3.442043**，沿用 ≥30 dB、MAE≤5 且不差于 FGT 的门槛，结果 **未通过**。原始全画面和限于选区的合成分别保存；区外 RGB/原 Alpha/每帧 PTS 与自然 768,000 字节 PCM 核对。ROSE 仍为独立研究 runner，未注册生产引擎；#56 自然背景/纹理/阴影反射、全局显存准入与完整剪映等价未验收。186 产品输入未改，未重跑产品全量；该轮最近完整产品回归为 V58 1357/1357。 [原片/GIF/失败与范围](../../../validation/ROSE本地对象移除与原始全画面输出实测_2026-10-19.md)、[先行契约](../../../specs/ROSE离线对象移除与副作用核验契约_v0.1_2026-10-19.md)。
+<!-- /V59-RESEARCH -->
+
+<!-- R05-RESEARCH -->
+2026-10-19 **R05（OpenFilm 源码研究）**：最新固定 `7a64d1fe`，API **947 stars /99 forks** 为 02:21:46 Asia/Taipei 时点；713→727 文件，14 新增/41 修改，148 个既有 CLI/渲染/服务端文件原字节不变。选定原测试 **63 通过、1 跳过**，窗口仅 mock，无 GUI/服务商/新模型。现有拆取方案继续适用；新增主要为桌面会话/设置，不新增本地 AI 剪辑内核。[编号复用决策、剩余人日和原始证据](../../../OpenFilm复用复核与开发成本更新_2026-10-19.md)。研究结果与 V58 产品回归分别计数。
+<!-- /R05-RESEARCH -->
+
+<!-- V58-CURRENT -->
+历史产品 2026-10-19 **V58（产品）**：色温、基础色彩平衡、三向色轮、曝光、色阶共 **19 数值通道**逐帧执行，保留作者时钟和可编辑字段；独立实例、递归配额、运行时能力及缓存摘要门禁。**1357/1357、2022.398 秒、0 跳过、186 文件冻结**；28 新增专项为全量子集。**64 CLI /14 组 /262 帧 /1,158,528 立体声采样帧**；13 组独立参数参考 RGB 最大差 1，文字另验实际颜色变化、Alpha 0 与同编码音频一致；全部 PCM 0。**124 包内文件 /65 隔离 CLI /282 安装帧 /1,254,528 采样帧；14 Skills /206 引用**。另验复合容器自身效果：6 隔离 CLI/20 帧/96,000 采样帧，RGB/Alpha/PCM 0，重复实例时钟重置。原曝光参考失配与文字夹具修正保留，未放宽误差门槛。原生静态参考共用 FFmpeg 算法及相同交付边界；Kelvin/基础平衡仍为阴影映射，物理白平衡、HDR、自然质量、连续播放/听审、另一台机器及完整剪映等价未验收。[契约](../../../specs/逐帧调色参数自动化契约_v0.1_2026-10-19.md)、[原输入/MP4/GIF/失败/安装](../../../validation/逐帧调色参数自动化实测_2026-10-19.md)。
+<!-- /V58-CURRENT -->
+
+<!-- V57-CURRENT -->
+历史 **V57（产品，2026-10-19）**：完整作者输出的相对变速、曲线、反向、定格与主轨自动随动，保留可编辑作者子序列；局部关联音画共用宿主时钟，连续 BGM 可选保持速度波纹或显式变速。**1329/1329、2092.274 秒、0 跳过、184 文件冻结**；40 新增专项、66 旧磁吸集成为完整子集，不叠加。**62 CLI /344 主帧 /1,651,200 立体声采样帧**，RGB 最大差 1、PCM 0；**123 包内文件 /51 隔离 CLI /454 安装帧 /2,179,200 采样帧**；**14 Skills /202 引用**。原曲线 PCM 失败已修复；文件头部与总线尾部选样参考分开，开发失败全数保留。未连续播放/听审、自然质量、动态外部 blend、全手势、长片/HDR、另一台机器及完整剪映等价未验收。[契约](../../../specs/完整作者输出变速与磁吸联动契约_v0.1_2026-10-18.md)、[原输入/MP4/GIF/失败/发行](../../../validation/完整作者输出变速与磁吸联动实测_2026-10-19.md)。
+<!-- /V57-CURRENT -->
+
+2026-10-18 **V56（产品）**：持久主轨磁吸、剪口吸附及 append/remove/shift/trim 联动，跨不同位移剪口的连续音频/字幕/嵌套输出自动分段。完整 **1289/1289，1986.638 秒**、0 跳过、**181 文件**冻结；66 磁吸专项含 26 新增与 40 旧重排，为完整子集。**44 CLI /236 主帧 /1,132,800 立体声采样帧**，RGB 最大差 1、PCM 0；**121 包内文件 /39 隔离 CLI /316 安装帧 /1,516,800 采样帧**，开发版与安装版解码一致；**14 Skills /198 引用**通过。局部片段组真实失败与旧回归中断保留；复杂音频/字形参考使用同版完整作者图，独立原源参考另计。未连续播放/听审；速度/曲线/定格长度自动随动、全手势、自然质量、长片/HDR、另一台机器及完整剪映等价未验收。[契约](../../../specs/主轨磁吸模式与跨剪口同步拆分契约_v0.1_2026-10-18.md)、[原输入/MP4/GIF/失败/发行](../../../validation/主轨磁吸模式与跨剪口同步拆分实测_2026-10-18.md)。
+
+历史产品 2026-10-18 **V55（产品）**：[命名音频 bus、发送/返回与侧链契约](../../../specs/命名音频总线发送返回与侧链契约_v0.1_2026-10-18.md) / [原 WAV、实际 MP4/GIF、工程包、安装和失败记录](../../../validation/命名音频总线发送返回与侧链实测_2026-10-18.md)。完整 **1263/1263，1847.991 秒**、0 跳过、**178 文件**冻结；37 专项为全量子集。六组 60 CLI/156 主帧/62.4 万立体声采样帧、119 文件/30 隔离 CLI/204 安装帧通过，历史失败分计。自然听感/空间声/插件/完整剪映等价未验收。
+
+2026-10-18 **R04 /V54**：[OpenFilm 最新源码复核与 17 项降本清单](../../../OpenFilm最新源码复核与降本清单_2026-10-18.md)。main 已更新至 `5c2000b8`，713 文件比较，914 stars /95 forks 为 API 时点；本地同步模板解析小修复，73/73 HTML 定向通过，上游 38 通过/1 跳过分计；FCPXML/GPU/创作 Skill 尚未接入，R04 当轮未重跑完整产品回归。
+
+2026-10-18 **V53（产品）**：新增明确的主轨整片段 `reorder`，自动紧邻排列，被挤动镜头的关联配音/字幕随动，复杂作者与有效转场保留；断开的转场默认拒绝。完整 **1223/1223，1762.901 秒**、0 跳过、**175 文件**冻结；40 新增专项为全量子集。**69 CLI /380 主帧**；独立原 PCM **115.2 万采样帧差 0**，复杂块参考另计；**118 包内文件 /19 隔离 CLI /190 安装帧**，**14 Skills /190 引用**通过。四轮开发夹具失败保留；9 时刻静帧，未连续播放/听审。持久磁吸模式/全手势、自然 AI/声音、长片/HDR、另一台机器及完整剪映等价仍未验收。 [原输入/GIF/成片/失败/发行包](../../../validation/主轨磁吸重排与关联附着实测_2026-10-18.md)。
+
+历史产品 2026-10-18 **V52（产品）**：受控 VP9 无损交付及重新入轨的 Alpha 最大差 **0**；4.01 秒工程按作者时钟核对端点，保留原始 90 ms 差及 **80 ms** 门槛，真实偏移仍拒绝。完整 **1183/1183，2258.638 秒**、0 跳过、**173 文件**冻结；22 新增专项是全量子集。**36 当前 CLI /251 主帧**，另有 4 次 V51 对照；**117 包内文件 /13 隔离 CLI /98 安装帧**，**14 Skills /186 引用**通过。有损 VP9 /VP8 的 Alpha 差 **12 /4**，仍不接受精确交付；YUV 4:2:0 不代表 RGB 无损。8 时刻静帧、未连续播放/听审；自然 AI/声音、另一台机器、长片/HDR与完整剪映等价仍未验收。 [原输入/GIF/原视频/安装包与失败](../../../validation/透明视频交付与音画端点实测_2026-10-18.md)。
+
+历史产品 2026-10-18 **V51（产品）**：复合片段先完成完整子画面/字幕/动画/转场与子音频总线，再统一定格；父动画继续。完整 **1161/1161，2083.168 秒**，0 跳过，**172 文件**冻结；26 新增专项为全量子集，相同测试在固定 V50 上 22 失败/4 控制通过。九组 **30 CLI /327 主帧 /1,567,101 立体声采样帧**；曲线音频只验长度/有限性。**117 包内文件 /9 隔离 CLI /80 新安装帧**与开发版 RGB/PCM 一致；**14 Skills /182 引用**通过。**正式 VP9 精确 alpha 失败：326,400 像素最大差 1（128→129）**；另 3 CLI/41 帧门禁诊断中，10 fps /4.01 秒 MP4 被现有 80 ms AV 门禁拒绝。无损图精确不能替代交付通过。四时刻静帧、未连续播放/听审，0 新模型前向；自然声音/AI、长片/HDR与完整剪映等价仍未验收。 [原片/GIF/安装包与失败](../../../validation/复合片段定格与完整音画时钟实测_2026-10-18.md)。
+
+历史研究 2026-10-18 **V50（研究）**：完成字词边界三方案对照，**3 个实际模型 worker /6 次新前向**；Qwen 两组最大误差 **220 /161 ms**，仍未过既定 **66.6667 ms** 门槛，中文一字零时长/六处相邻重叠；Whisper-DTW 与新留出 CTC 也失败。两组最终研究图 **458 帧**核对 PTS、**243,835 个原 PCM 样本**精确保留，两个中间静帧可读性检查，未连续播放/听审。**170 产品/测试/发行文件与 V49 相同，本轮没有重跑历史 1135/1135**；Qwen 尚未成为正式 engine，完整剪映等价仍未达成。 [原输入/GIF/逐词失败/来源](../../../validation/开源字词边界模型对照实测_2026-10-18.md)。
+
+历史产品 2026-10-18 **V49（产品）**：新增本地 Wav2Vec2 CTC `subtitle align`、原文码点/样本时钟、长音频重叠窗和 SRT 窗口，**英文定位门槛未通过：最大 258.1875 ms，高于预声明 66.6667 ms**。完整 **1135/1135，1592.399 秒**，0 跳过，**170 文件**冻结；28 新增方法为完整子集。英文开发 15 CLI/3 worker/5 前向，中文 12 CLI/2 worker/3 前向（含一次预期繁体 OOV 拒绝）；逐帧高亮 236 帧、48 kHz 单声道 377,550 样本核对通过。最终原生安装 **116 包内文件 /11 隔离 CLI /七轮依赖包**，另一次真实 worker/一次前向，RGB/PCM 与开发版一致；缺 Pillow 的旧安装、双音轨和错误 16 kHz 预期均保留。**14 Skills /172 引用**通过。三时刻静帧、未连续播放/听审；自然对齐/歌词、完整声音、长片/HDR、另一台干净机器及完整剪映等价仍未验收。 [契约](../../../specs/离线CTC字词强制对齐契约_v0.1_2026-10-18.md)、[原片/GIF/安装包与失败](../../../validation/离线CTC字词强制对齐实测_2026-10-18.md)。
+
+历史产品 2026-10-18 **V48（产品）**：拆取 OpenFilm 示例两个原描线函数，新增 `motion stroke-source`，显式字符时间/折线转为可编辑离线源并沿用透明编码和工程包；完整 **1107/1107，1677.105 秒**，0 跳过，**165 文件**冻结，23 新增专项为全量子集。开发版 **17 CLI /108 HTML 帧**，另 216 次乱序重绘、36 时间线主帧；独立几何 36 帧覆盖 100%，颜色切换 alpha 与工程包重建 RGBA 一致。**112 包内文件 /12 独立 CLI**；实际原生离线安装另 **6 CLI /36 帧**，五个固定依赖，均与开发版 RGBA 一致。**14 Skills /164 引用**通过；浏览器页面/子进程全回收。三时刻静帧，未连续播放/听审，0 新模型推理。只处理明确输入的笔画，不提供自动汉字笔顺、字体生成或语音对齐；自然 AI/声音、复杂 HTML、长片/HDR、干净机器、FGT 自然画质、内容库和完整剪映等价仍未验收。 [契约](../../../specs/离线逐笔描线动效契约_v0.1_2026-10-18.md)、[原输入/原视频/GIF/发行包与失败](../../../validation/离线逐笔描线动效实测_2026-10-18.md)。
+
+
+历史产品 2026-10-18 **V47（产品）**：固定 Schema 随 wheel 分发，声明本地校验依赖及显式日期检查，缺资源/执行器或摘要不符拒绝成功降级；新增 `schema show/export` 和原生 Windows CPython 3.13 x64 离线安装入口。完整 **1084/1084，1524.818 秒**，0 跳过，**160 文件（含测试/发行代码）**冻结；33 新增专项为全量子集。实际安装 **108 包内文件 / 22 隔离 CLI**，关联音画源滑移与工程包往返共 90 新帧、432,000 立体声采样帧；独立源帧身份一致、RGB 最大差 1、PCM 差 0，重建 RGB/PCM 一致。**14 Skills /162 引用**通过，日期夹具层级失败和周期音频弱观察保留。三时刻静帧，未连续播放/听审，0 新模型推理；本机独立安装及 Schema 随包已验，其他机器/平台、自然 AI/声音、复杂 HTML、长片/HDR、内容库及完整剪映功能/效果仍未验收。 [契约](../../../specs/离线发行与随包Schema契约_v0.1_2026-10-18.md)、[发行包/原片/GIF/实测](../../../validation/离线发行与随包Schema实测_2026-10-18.md)。
+
+历史产品 2026-10-18 **V46（产品）**：采用 OpenFilm MIT `cutText` 原函数作同帧诊断对照，新增 `motion html-quality` 和 `html-render --layout-check strict`；逐帧检查部分/完全出框、容器独立轴裁切、实际平台字体及本地 Unicode→glyph 映射。严格门禁随配方继承并重新执行，失败报告/PNG 保留，工程/台账/新编码资产不变。完整 **1051/1051，1697.011 秒**，0 跳过；**152 文件（含测试）**冻结，26 新增专项为全量子集。原创样例 **26 CLI / 60 编码帧**，120 次额外渲染重绘；9 次质量检查共 108 帧及 108 次独立反序重绘，FontTools 独立核对 120 个字符，33 页面全关闭/Job 回收，继承及工程包重建 RGBA 一致。**104 包内文件 / 14 独立进程 CLI** 的离线 wheel、**14 Skills / 156 引用**通过。V45 缺 O 字体负例及两轮开发实测失败保留；公开出框/裁切/修复使用新原创完整字体，不发布系统 fallback 像素。三时刻静帧，未连续播放；无音频、0 新模型推理。复杂字形/变换、WOFF2、自然质量、长片/HDR、Schema 随包/干净机器、FGT 自然画质与来源链及完整剪映等价仍未验收。 [契约](../../../specs/HTML文字布局与字体覆盖核验契约_v0.1_2026-10-18.md)、[原片/GIF/实测](../../../validation/HTML文字布局与字体覆盖实测_2026-10-18.md)。
+
+
+历史产品 2026-10-18 **V45（产品）**：复用 OpenFilm MIT 模板字段与原字节覆盖/恢复函数，新增 `motion html-controls` 和 `html-render --overrides`；CSS 单位、原文/换行、已登记图片、逐帧恢复、配方继承/单项 null 撤销及跨工程重建可用。完整 **1025/1025，1436.703 秒**，0 跳过；**146 文件（含测试）**冻结，20 新增专项为全量子集。原创样例 **26 CLI / 72 编码帧**，144 次额外乱序重绘、2 次单帧检查；17,280 品牌像素及 84,924 不透明图片像素与独立参考一致，继承/撤销/工程包/片段组重建 RGBA 一致，浏览器 Job 全部回收。**100 包内文件 / 11 独立进程 CLI** 的离线 wheel、**14 Skills / 150 引用**通过。三时刻静帧目检，未连续播放；原创样例无音频、0 新模型推理。缺字/越界、自然广告美学、长片/HDR、Schema 随包/干净机器及完整剪映等价仍未验收；FGT 继续为 V44 研究候选，自然画质和来源链未关闭。 [契约](../../../specs/离线HTML模板控件与覆盖恢复契约_v0.1_2026-10-18.md)、[原片/GIF/完整实测](../../../validation/离线HTML模板控件与覆盖恢复实测_2026-10-18.md)。
+
+
+历史研究 2026-10-18 **V44（研究）**：FGT 原生离线多帧修复在一个原创双表面样本通过预声明门槛：选区 PSNR **26.143899→33.137925 dB**，已知运动残差 MAE **5.213643→0.908588**；同一自然 32 帧仍有残留/纹理补丁，**自然质量与完整剪映等价未验收**。两个 worker 合计 RAFT 124 / LAFC 124 / FGT 14 次前向，受控 LaMa 32 次；ROSE 仅断网导入、0 次推理。全部编码帧/PTS/alpha/选区外 RGB 核对通过，自然 768,000 字节 PCM 一致；四时刻静态目检，未连续播放/听审。生产 **141 文件**与 V43 相同，本轮未重跑最近 **1005/1005**、0 跳过的完整产品回归，不增加产品 CLI/测试计数。FGT 尚未注册产品适配器，来源链/商业权利仍开放。 [原片/失败/下一步](../../../validation/开源FGT时序修复候选实测_2026-10-18.md)。
+
+历史产品 2026-10-18 **V43（产品）**：新增标准库/FFmpeg `media mask-edit`，支持笔刷、框、椭圆、多边形、有序布尔覆盖、关键帧和切镜重置，编辑计划随工程包保留并可重建。完整 **1005/1005，1432.864 秒**，0 跳过，134 Python+4 MJS+Schema+pyproject+MIT 共 141 文件冻结；30 新增专项为完整子集。原创 16 帧/12 CLI、1,228,800 RGBA 字节与独立真值完全一致，24 检查点通过；同一自然场景末帧显式修正 261 个 alpha 像素，五个旧检查点由 4/5 到 5/5，前 31 帧 alpha 不变。真实 LaMa 一次 worker/32 次帧调用消费新蒙版，扩张外 RGB 改变 0、源 alpha 与 768,000 字节 PCM 精确保留；**自然背景仍涂抹，完整对象/画质未验收**。96 文件离线 wheel/11 新进程 CLI、14 Skills/140 引用通过；锁码测试误期望、策略元数据真实失败与主动停止的旧回归保留。仅两张静帧目检，未连续播放/听审；完整剪映等价、长片资源与干净机器发行未验收。 [实测/原片/GIF](../../../validation/本地蒙版笔刷与关键帧修正实测_2026-10-18.md)、[机器证据](../../../validation/evidence/mask-edits-20261018/verification.json)。
+
+历史研究 2026-10-18 **V42（研究）**：空间/时序一致供体选择完成 7 组、124 候选帧及独立复核，**41/41 研究检查，质量门槛未通过（12 区域中 4 失败）**；三组新增输入无严格 MSE 改善。原输入/失败/GIF 和研究 CLI 已保留，未进入产品；137 产品文件与 V41 一致，本轮未重跑其 975 项完整回归，研究与产品计数分开。 [实测与原片](../../../validation/空间与时序一致参考选择实测_2026-10-18.md)、[机器证据](../../../validation/evidence/coherent-reference-20261018/verification.json)。
+
+2026-10-18 开源复查 **R03**：[OpenFilm 当前复用落地决策](../../../OpenFilm_v0.2增量复用与接入建议_2026-10-18.md#当前复用落地决策r03)。main 无新增代码；复核 702 上游文件、130 产品冻结文件及字幕/MIT 原字节，区分已采用、剩余候选和不采用模块，列出剩余适配成本及验收边界。[两次 API/摘要/链接检查](../../../validation/evidence/openfilm-current-review-20261018/verification.json)；该 R03 复查没有重跑历史 20/897 项测试、安装新 Skill 或生成媒体；后续 V40 产品核验另列。
+
+2026-10-18 开源研究 **R02**：[OpenFilm 0.2.0 整树增量、复用优先级与十份 Skill](../../../OpenFilm_v0.2增量复用与接入建议_2026-10-18.md)。619→702 文件全量比较，87 新增/4 删除/126 改变；原核心与 MIT 不变。新增片段组库和 HTML 模板控制，独立副本仅分离两处依赖后 20/20 上游选定测试、两组实际文件/数据通过；原 React/Playwright 加载失败保留。该批是研究，未接入新 runtime、未编码视频或重跑完整产品回归；不能与 V35 的 764 或 R01 的 123 相加。
+
+| 项目 | 内容 |
+|---|---|
+| 文档编号 | DOCS-INDEX-001 |
+| 状态 | 有效 |
+| 审计日期 | 2026-10-18（V44 研究受控通过/自然未验；产品仍 V43 完整 1005，旧失败保留） |
+
+2026-10-17 新增开源研究 **R01**：[OpenFilm 12 项源码拆解与复用成本评估](../../../OpenFilm源码拆解与复用成本评估_2026-10-17.md)。固定 `b138595d`；原选定模块 58/58、React Hook 分离副本 65/65，通过数分计；原依赖失败与两组实际数据公开。O02 整片段子集已进入 V33，O01 字幕分段已进入 V34；V35 借鉴 O03 工作流新写真实源句柄转场；HTML 动效等仍未集成；研究记录不与完整产品回归相加。
+
+历史产品 V41（以下为当轮记录）：提取 OpenFilm 原帧时钟，新增完全本地 `motion html-register/html-source/html-inspect/html-render`；保留 HTML/CSS/SVG/Canvas 源码、固定资源/工具链、强类型参数、新版本重建和普通时间线透明叠加。完整 **975/975，1302.879 秒**，0 跳过；137 文件冻结，37 新增专项为完整子集。五组成功内容/三项页面拒绝共 30 CLI 入口调用，96 HTML 编码输入帧、192 全帧乱序重绘、24 原生时间线主帧分计；独立 RGB 合成最大差 3、均值 0.476496，工程包/片段组重建 RGBA 一致，所有实际浏览器 Job 回收。94 文件离线 wheel/11 独立进程 CLI、14 Skills/133 本地引用通过；六张静帧目检，未连续播放/听审。初始 MKV 帧时钟错位、源长和回收/工具链诊断失败原证据保留；正式采用逐帧精确 PTS 的 FFV1/BGRA NUT。完整 OpenFilm HTML 时间线/媒体/WebGL、自动模板控件/缺字越界诊断、HDR/自然广告美学、长片资源、Schema 随包/干净机器及完整剪映等价仍未验收。 见[原片/GIF/实测](../../../validation/离线HTML动效源码与透明合成实测_2026-10-18.md)和[机器证据](../../../validation/evidence/html-motion-20261018.json)。
+
+历史 V40：统一关联 `slip`、真实有限源 `extend_source` 与 roll/slide 显式 `handle_policy:source`；默认仍使用保留作者句柄，源界/关联锁/跟踪观察/转场额外句柄和原子事务统一检查，旧 compose slip 也走相同规划器。完整 **938/938，2478.552 秒**，0 跳过；127 Python+2 MJS+Schema+pyproject+MIT 共 132 文件冻结，41 新增方法为完整子集。九组/79 CLI 入口（66 成功、4 当前预期拒绝、9 固定 V39 缺项拒绝），505 新主帧/2,424,000 立体声采样帧与手工固定 V39 工程完全相同；两组另核对 100 个直接源帧身份，0 错配。同产品参照不独立验收渲染或音质。90 文件离线 wheel/26 独立进程 CLI、14 Skills/128 引用通过；四时刻静态目检，未连续播放/听审；开发失败与主动中断原记录保留。真实外扩重新求值效果/淡入淡出/retiming；嵌套曲线明确告警其时长再归一化，原主体采样不变未验收。完整磁吸、跟踪重规划、自然画质/音质、长片资源、Schema 随包/干净机器、内容库规模及完整剪映等价仍未验收。 见[本轮原片/GIF/实测](../../../validation/真实源外扩与关联Slip实测_2026-10-18.md)和[机器证据](../../../validation/evidence/source-edits-20261018.json)。
+
+历史 V39：新增本地 `insert/overwrite/lift/extract/roll/slide` 六种专业范围编辑，复用完整作者输出窗口，保留曲线/倒放/动画/音频；关联音轨、同步锁、骑乘片段、文件字幕偏移、全差异计划和批量事务共用现有入口。完整 **897/897，1510.144 秒**，0 跳过；125 Python+2 MJS+Schema+pyproject+MIT 共 130 文件冻结，53 新增专项为完整子集。八组/73 CLI（59 成功、6 当前预期拒绝、8 固定 V38 缺项拒绝），340 新主帧、1,632,000 立体声采样帧与固定同产品 V38 完整作者选区/拼接完全相同；参照不是独立渲染或变速算法。89 文件离线 wheel/30 产品隔离 CLI、14 Skills/124 引用通过；四个时刻静态对照和 CTA 移位抽查，未连续播放/听审。开发报错优先级/非法 action、生成器错误码和复制幂等历史失败保留。roll/slide 只用保留作者句柄；源范围外扩、复杂关联 slip、完整磁吸、自然质量/长片资源、Schema 随包/干净机器与完整剪映等价仍未验收。 见[本轮原片/GIF/实测](../../../validation/专业范围编辑与滚滑剪口实测_2026-10-18.md)和[机器证据](../../../validation/evidence/range-edits-20261018.json)。
+
+历史 V38：原生输出窗口保留完整作者源时钟、倒放、曲线、定格、动画与片段音频，再执行拆分、内部波纹插入/删除和 `trim_clip`；嵌套音频总线、黑边策略及跨工程片段组继续保留。完整 **844/844，1515.979 秒**，0 跳过；123 Python+2 MJS+Schema+pyproject+MIT 共 128 文件冻结，30 新增专项为完整子集。九组/54 CLI（53 成功、1 预期锁拒绝），300 新主帧、1,440,000 立体声采样帧与固定 V37 原片选区逐帧/逐采样完全相同；此参照不是独立图像/时钟算法。88 文件 wheel/10 次产品隔离 CLI、14 Skills/120 引用通过。原变量/端口/字幕黑底/黑边/非法夹具/无效动画夹具及三次中断完整日志保留。仅短合成素材、三帧静态目检，无连续播放或听审；源范围外扩、完整磁吸/insert/overwrite/roll、自然质量、长片资源、Schema 随包/干净机器及完整剪映等价仍未验收。 见[本轮原片/GIF/实测](../../../validation/输出窗口裁切与作者时钟实测_2026-10-18.md)和[机器证据](../../../validation/evidence/windows-20261018.json)。
+
+历史 V37：参考 OpenFilm O13 Saved，新增离线 `fragment save/list/inspect/apply`，跨工程保存并插入可编辑片段组；递归保留嵌套/作者时钟、关联/转场/跟踪闭包、原生画布、字体/LUT/文件字幕和权利修订/处置历史，新实例隔离同名 ID。完整 **814/814，1644.572 秒**，0 跳过；121 Python+2 MJS+Schema+pyproject+MIT 共 126 文件前后冻结，29 新增专项为完整子集。六组/84 CLI（79 成功、5 预期拒绝），340 新主帧、1,632,000 立体声采样帧与固定 V36 手工作者参照逐帧/逐采样完全一致；参照使用同一既有渲染器，不是独立图像算法。87 文件离线 wheel/11 次产品隔离 CLI、14 Skills/116 引用通过。原脚本依赖隔离/子进程路径/漏传原生工具、夹具路径/name、restricted 误期望、顶层错误码、暂存查询/目录联接边界失败及失去冻结资格的开发回归公开。只在相同时基/FPS/色彩/音频上下文插入嵌套组；全局调节/外部音频程序和部分闪避总线拒绝。自由文本限制不自动解析、后续来源撤回不自动传播，崩溃可能留未引用资源；自然素材/听审、长片资源、干净机器发行及完整剪映等价仍未验收。 见[本轮原片/GIF/实测](../../../validation/可复用片段组库与跨项目插入实测_2026-10-18.md)和[机器证据](../../../validation/evidence/fragments-20261018.json)。
+
+历史 V36：含真实源句柄转场的子序列先在原生透明画布合成，再接受父级裁切、倒放、恒速/曲线与多级投影；原始音频与总线保留，不生成中间视频。完整 **785/785，1123.814 秒**，0 跳过；119 Python+2 MJS+Schema+pyproject+MIT 共 124 文件前后冻结，52 转场专项为完整子集（21 新增）。22 组/236 CLI（234 成功、2 预期拒绝），920 新帧、441.6 万立体声采样帧；22 组固定子级/解析父时钟最大 RGB 差 1.7，其中 12 组/520 帧另有独立源混合参考，最大差 1.946；六组/144 万采样帧独立 PCM 最大差 3.72e-9，其余变速音频仅验长度/有限性。86 文件离线 wheel/11 次隔离 CLI、14 Skills/112 引用通过；112 公开文件/16,982,469 字节，55 视频/50 音频流复解码。原二倍速提前一帧、倒放采样时钟/原动画相位失败及中断回归保留，修复后从头重跑；三帧静态目检，未连续播放/听审，0 新模型推理。转场端点容器/曲线/定格/跟踪/blend、祖先定格仍拒绝；方向窗内独立画质、自然音画、HDR/VFR、长片 RSS、干净机器发行及完整剪映等价仍未验收。 见[本轮原片/GIF、22 组及失败](../../../validation/嵌套转场与父级重映射实测_2026-10-18.md)和[机器证据](../../../validation/evidence/nested-transitions-20261018.json)。
+
+历史 V35：参考 OpenFilm O03 操作工作流，原生新增真实源句柄转场的添加/调长/移除、关联音频与多剪口链；作者剪口/片段/总长不改，渲染副本取真实源余量。完整 **764/764，1233.183 秒**，0 跳过；117 Python+2 MJS+Schema+打包配置+MIT 共 122 文件前后字节冻结，31 新增专项为子集。十五组/113 CLI（108 成功、4 产品预期拒绝、1 固定旧版缺命令拒绝），900 新帧、432 万个新立体声采样帧；四组独立 RGB 最大差 1.8、十五组独立 PCM 最大差 0，其余类型未独立验收窗内方向画质。85 文件离线 wheel/8 次隔离 CLI、14 Skills/108 引用通过；三张静帧目检，无连续播放/听审或新模型推理。四项开发记录含剪口白场失败与指标截断，修复后保留原证据。嵌套/曲线/定格等显式拒绝，自然广告、HDR/VFR、长片/干净机器发行与完整剪映等价未验收。证据轮次从 10-17 开始，完整回归于台北时间 10-18 00:02:48 结束。 见[本轮原片/GIF/实测](../../../validation/真实源句柄转场与可逆编辑实测_2026-10-17.md)和[机器证据](../../../validation/evidence/source-transitions-20261017.json)。
+
+历史 V34：固定复用 OpenFilm O01 原算法，新增本地 `subtitle segment`：中文/英文/数字单位分段、明确提供的双语、绑定输入摘要的局部回写，生成 JSON/SRT 并可入轨。完整 **733/733，1604.604 秒**，0 跳过；115 Python+2 MJS+Schema+打包配置+MIT 原文共 120 文件前后字节冻结；38 新增专项为完整子集。四组/108 CLI（100 成功、8 预期拒绝），192 新帧与手工文字/时钟参考一致；参考使用同一渲染器，编辑前后 PCM 一致。另一次真实 Whisper CPU 推理将 5 条原句分成 9 条字幕，CER 2%，同一既有语料、无逐字对齐，音视频因权利未核验留本地。上游 13 测试/48 数据另计；离线 wheel 的 84 文件和 7 次隔离 CLI、14 Skills/104 引用通过。仅三帧静态目检，未连续播放/听审；分段估时、启发式译文对齐、样式迁移、广泛语言/自然质量、干净机器发行与完整剪映等价仍未验收。 见[本轮原片/实测/失败](../../../validation/本地字幕分段与双语回写实测_2026-10-17.md)和[机器证据](../../../validation/evidence/subtitle-segments-20261017.json)。
+
+历史 V33：OpenFilm O02 整片段规划子集已适配为本地 Python，提供关联/解关联、同步锁、主轨骑乘跟随、共同闭隙与平移；不引入上游 GUI/Node/网络。完整 **695/695，1329.624 秒**，0 跳过；113 Python+1 Schema+1 打包配置+1 MIT 原文共 116 文件冻结，31 新增/132 关联均为完整子集。九组/187 CLI（177 成功、10 预期拒绝），360 新帧与编辑前/手工参考分计，216 万个新立体声采样帧的独立混音最大差 0。固定上游 80/80 数据对照另计；固定 V32 同测 31 方法均失败、含子测试 53 条记录。视频手工参考使用同一渲染器；59 视频/69 音频复核、GIF/原片和九条开发记录公开，未连续播放/听审。源边缘裁切、插入/覆盖、完整磁吸重排、长片/自然质量与完整剪映等价仍未完成。 见[本轮实测](../../../validation/关联剪辑与主轨联动真实音画实测_2026-10-17.md)和[机器证据](../../../validation/evidence/linked-edit-20261017.json)。
+
+历史 V32：序列容器可显式选择预乘面积采样，默认双线性保留；投影工作配额默认 1 GiB，超限在任务创建前拒绝。完整 **664/664，1590.627 秒**，0 跳过，111 Python+1 Schema 共 112 文件原字节冻结；21 新增/135 关联均为完整子集。固定 V31 同测 21 方法：19 失败、2 控制通过，含子测试 39 条失败记录。九组/74 CLI：72 成功、2 次预期资源拒绝；144 面积帧、144 默认控制帧、144 旧帧与 144 独立参考帧分计。最大 RGB 误差 4（门槛 4），九组默认控制均与 V31 解码像素一致。45 视频重新解码、27 路预期静音核对；开发夹具失败与标题跨列原预览保留，0 新模型推理，未连续播放或听审。一般旋转精确足迹、叶采样、深层 area 组合、HDR/线性光、进程 RSS/长片、自然质量与完整剪映等价未验收。 见[九组面积实测](../../../validation/序列面积采样与工作配额实测_2026-10-17.md)和[机器证据](../../../validation/evidence/sequence-sampling-20261017.json)。
+
+历史 V31：序列可声明独立像素画布，子级先在本地画布合成，父级按原生子坐标一次预乘双线性投影；选中子序列的 render/quality/queue 默认使用其画布。完整 **643/643，1128.545 秒**，0 跳过，109 Python+1 Schema 共 110 文件原字节冻结；25 新增/114 关联方法均为完整子集。固定 V30 同测 25 方法：20 失败、5 控制通过，含子测试 30 条失败记录。九组/65 次正式 CLI 全成功，216 新主帧、216 旧帧、216 参考帧与 24 个单独子级帧分计；C01–C08 最大 RGB 误差 2（门槛 5），C09 与旧版字节一致。168 帧为空间独立参考，24 帧只验字形投影，24 帧只验继承兼容。开发配置失败和错误参考保留，0 新模型推理；未连续播放或听审。独立子 FPS/色域/SAR、高频抗锯齿、长片资源、自然质量和完整剪映等价仍未验收。 见[九组实测与失败](../../../validation/独立序列画布与原生坐标投影实测_2026-10-17.md)和[机器证据](../../../validation/evidence/sequence-canvas-20261017.json)。
+
+历史 V30：默认分段 atempo 使用作者选区内的 float32 上下文，末段从实际伸缩结果取尾；超过 64 MiB 估算末端 PCM 时在规划阶段拒绝。完整 **618/618，1529.147 秒**，0 跳过，107 Python+1 Schema 共 108 文件原字节冻结；12 新增及 94 关联方法均为完整子集。固定 V29 同测 12 项为 6 失败/6 控制。11 组、88 次正式 CLI 全成功；396 新视频帧与旧版像素一致。1,584,000 新立体声采样帧检查长度/有限性及各自声明的内容条件；六组 DC 完整有效区间均通过，T01 检查区零采样帧 82→0。S01 资源拒绝另计 6 次 CLI；开发尾部缺样和错误参考预览保留。未连续播放或听审，通用音高/相位/瞬态、极短输入、自然声音及完整剪映等价仍未验收。 见[11 组实际成片及开发失败](../../../validation/分段音频上下文与完整尾部实测_2026-10-17.md)和[机器证据](../../../validation/evidence/tempo-context-20261017.json)。
+
+历史 V29：片段→轨道→子序列→父容器分层混音，轨道/容器效果在各自求和之后执行；音频 mute/solo 按序列作用，音量包络逐采样计算。完整 **606/606，2333.520 秒**，0 跳过，105 Python+1 Schema 共 106 份原字节冻结；24 新增与 83 关联方法均为完整子集。固定 V28 同测 24 方法：23 失败、1 控制通过；31 条失败记录包含参数子测试。12 组/102 次正式 CLI 全成功，含 24 渲染、12 质量、12 策略；1,152,000 个新立体声采样帧（2,304,000 个通道数值）全部检查，最大绝对差 0，阈值 2e-6。旧版采样、独立参考分别同量另计；288 新主视频帧与旧版逐像素一致。旧版 11 组内容失败、1 控制通过。另保留非线性 atempo DC 诊断：幅度偏差 0.30517578125、检查区内 82 个零采样帧，包络对照通过不能关闭该内容失败。多轨由自动归一化改为浮点求和，旧工程音量可能改变；无自动限幅。命名 send/return、空间音频、通用效果自动化、嵌套 freeze/VFR、长片性能和完整剪映等价未完成；既有极短音高/相位失败保留，未连续播放或听审。 见[12 组实际成片及 DC 失败](../../../validation/分层音频总线与真实采样实测_2026-10-17.md)和[机器证据](../../../validation/evidence/audio-buses-20261017.json)。
+
+历史 V28：嵌套序列先在透明画布隔离合成，再执行父级 crop/TRS/opacity/effects/mask/fade，父级枢轴与轨道槽位独立生效。完整 **582/582，1358.132 秒**，0 跳过；104 份 Python 源码/测试加 1 份 Schema（共 105 份）原字节冻结。17 项新增与 96 项关联回归均为完整套件子集；固定 V27 同测 17 项，14 失败、3 控制通过。14 组正式实测、112 次 CLI 全部成功，含 28 渲染、14 质量、14 策略；360 新主帧、360 固定 V27 帧与 360 独立参考帧分计。新版全部像素最大 RGB 误差 3（阈值 5），14 组受控通过；旧版 12 组失败、2 组控制通过。另保留 57 帧开发缩放回归对照：缺失行 2→0、最大可测宽度误差 78.8494→0.9864 px，单独计数。原视频、旧/新/参考视频、GIF/MP4、开发失败与摘要已公开。未连续播放或听审；组级音频、独立子画布、嵌套定格/VFR、HDR/线性光、长片性能、自然 AI 画质及完整剪映等价继续未验收；既有音高/相位失败保留。 见[14 组实际成片](../../../validation/嵌套序列隔离合成与逐帧像素实测_2026-10-17.md)和[机器证据](../../../validation/evidence/sequence-groups-20261017.json)。
+
+历史 V27：完整 **565/565，2302.693 秒**，0 跳过；103 份 Python 源码/测试加 1 份 Schema（共 104 份）原字节冻结。10 项新增与 71 项关联回归均为完整套件子集；固定 V26 对照中，新增 apart 配置 1 项按预期拒绝、恒速控制 1 项通过，分开计数。20 组正式实测、180 次 CLI 含 60 渲染/20 质量/20 策略全部成功；516 新主帧、516 精度控制与 516 旧帧分别核对，三路视频像素相等、源帧身份无误。默认 together 的 10 组控制通过：9 组 float 缓存与 V26 字节一致、1 组恒速 AAC 解码一致。11 组受控交付通过，9 组内容检查未通过：8 组极短音高失败、1 组 apart 反相单声道混合失败。声道策略是明确取舍；瞬态/相位/听感、默认 atempo 极短窗、3..8 声道、长片性能和完整剪映等价继续未验收。 见[20 组实测](../../../validation/R3声道策略与立体声权衡实测_2026-10-17.md)和[机器证据](../../../validation/evidence/audio-channels-20261017.json)。
+
+前轮 V26：完整 **555/555，1598.173 秒**，0 跳过；102 份 Python 源码/测试加 1 份 Schema（共 103 份）原字节冻结。18 项新增与 61 项关联回归均为完整套件子集；固定旧版的 1 项恒速控制也通过，不记作旧版失败。8 组正式实测、72 次 CLI 含 24 渲染/8 质量/8 策略全部成功；210 新主帧、210 精度控制与 210 旧帧分计，三路视频像素相等，源帧身份无误。4 组受控通过；4 组 4 ms→250 ms 已有声，但音高失败：原 400 Hz 脉冲约 386.72 Hz，双声道 400/800 Hz 两路主峰均约 797.24 Hz。瞬态/相位/听感、默认 atempo 极短窗、长片性能和完整剪映等价继续未验收。 见[八组实测](../../../validation/离线音频伸缩与真实采样实测_2026-10-17.md)和[机器证据](../../../validation/evidence/offline-audio-stretch-20261017.json)。
+
+本目录是 `AI广告剪辑` 项目的项目文档唯一入口。当前基线版本为 2026-10-12，最近一次体系审计为 2026-10-15，最近增量审计为 2026-10-18；产品需求、技术方案、兼容性结论、开发计划、验收记录和研究结果都应在这里落盘。
+
+前轮 V25：[视频帧区间契约](../../../specs/嵌套视频帧区间与结束时钟契约_v0.1_2026-10-17.md)。完整 **537/537，1282.599 秒**；99 份 Python 源码/测试加 1 份 Schema（共 100 份）原字节冻结。新增 13 项与 79 项关联回归均为完整套件子集；固定旧版同测 13 项，8 失败、5 控制通过。10 组正式实测，85 次 CLI 含 22 渲染、10 质量、10 策略；83 次成功、2 次质量失败。496 新主帧与 116 控制帧分计，视频可见性 0 不匹配、源帧最大差 1；V24 第 50/51 帧背景缺失已在同源重验中恢复，误差 0。8 组整体交付通过，2 组极短音频变速后全静音，交付失败。4 毫秒音频拉伸到 250 毫秒仍未验收；非整帧项目时长、VFR/嵌套定格、完整群组、HDR、自然 AI 画质、内容库、性能及完整剪映等价继续未完成。 见[十组实测](../../../validation/嵌套视频帧区间与结束时钟实测_2026-10-17.md)和[机器证据](../../../validation/evidence/nested-frame-coverage-20261017.json)。
+
+前轮 V24：[文字动画/打字机契约](../../../specs/文字动画高亮组合与原生打字机契约_v0.1_2026-10-17.md)。完整 **524/524，1027.580 秒**；98 份 Python 源码/测试加 1 份 Schema（共 99 份）原始字节前后不变；18 项新增专项为完整套件子集，固定旧版同测 18 方法失败、含 subTest 共 28 条失败记录。12 组正式 CLI 实测，160 次调用包含 50 次渲染、12 次质量和 12 次本地策略审计；846 新主帧（其中 52 帧属于未通过交付）与 1818 控制帧分计，794 帧来自 11 组通过交付。文字组合最大 R/G 差为 2，独立前缀/词状态均无不匹配；各组变体解码 PCM 一致。裁切+倒放+Bezier 样例末尾第 50/51 帧背景消失，源帧最大差 5，保留失败成片，整组交付未验收。29.97 fps 仅验明确 90 帧/3.003 秒时间线；任意非整帧时长、动态内嵌、通用塑形/RTL、VFR/定格/HDR、长片性能和完整剪映等价仍未验收。 见[12 组实测与失败](../../../validation/文字动画高亮组合与原生打字机实测_2026-10-17.md)、[机器证据](../../../validation/evidence/text-animation-20261017.json)。
+
+前轮 V23 产品增量：[文字颜色/透明度契约](../../../specs/文字颜色透明度与独立覆盖率契约_v0.1_2026-10-16.md)。完整 **506/506，947.834 秒**；96 份 Python 产品源码/测试和 1 份 Schema（共 97 份）执行前后原始字节摘要一致；15 项新增专项为完整套件子集，固定旧版同测 15 方法失败（含 subTest 共 18 条失败记录）。九组实际成片，123 次正式 CLI（其中 39 次渲染、9 次质量、9 次本地策略）；独立复核 632 个新版主帧、1480 个空白/覆盖率对照帧，旧版 632 帧另计。最大 RGB 误差由旧版 9.93–54.91 降至 2.22–3.61（阈值 6）；源帧误差为 0，同组各变体解码 PCM 摘要一致。0 新模型推理。受控 8-bit 编码 RGB 下的字面/框/阴影/描边颜色、透明度及已测淡入/图层 opacity 子项通过；动态尺寸内嵌颜色显式近似，ASS、逐词+动画、随机/有状态位置组合、通用 CJK/RTL、超低 alpha 高精度、HDR/线性光、定格/VFR/群组、4K 性能和完整剪映等价未验收。 见[九组实际视频及失败](../../../validation/文字颜色透明度与实际合成实测_2026-10-16.md)、[机器证据](../../../validation/evidence/text-paint-20261016.json)与[本轮文档审计](../../../validation/evidence/docs-audit-text-paint-20261016.json)。
+
+前轮 V22 产品增量：[原生排版契约](../../../specs/逐字高亮原生排版与颜色选择契约_v0.1_2026-10-16.md)。完整 **491/491，887.673 秒**；94 份 Python 产品源码/测试及 1 份 Schema（共 95 份）执行前后字节摘要一致；21 项新增专项为完整套件子集，固定旧版同测 21 方法失败。九组真实旧版/新版/普通字幕对照，632 个新版主帧与 632 个普通对照帧；R/G 轮廓最大差由 51–255 降至 2（阈值 3），逐词激活/串色、源帧与音频脉冲检查均无不匹配。90 次生成 CLI 含 27 次渲染、9 次质量检查，另有 9 次本地策略审计；0 新模型实测推理。受控字体/字幕排版子项通过；自动换行仍由 Pillow 选行，CJK 仅四个确认字形。动态尺寸内嵌高亮显式降级，任意颜色透明度、复杂文字动画、RTL、定格/VFR、群组、自然质量和整体剪映等价未验收。 见[九组真实成片与失败](../../../validation/逐字高亮原生排版与真实成片实测_2026-10-16.md)、[机器证据](../../../validation/evidence/word-layout-20261016.json)及[本轮文档审计](../../../validation/evidence/docs-audit-word-layout-20261016.json)。
+
+前轮产品增量：[字幕契约](../../../specs/嵌套字幕与文字动画时钟契约_v0.1_2026-10-16.md)。完整 **470/470，1150.472 秒**；92 份产品源码/测试及 Schema 前后摘要一致；18 项新增专项为子集，固定旧版同测 18 方法失败（19 个失败记录，含 subTest）。八组主场景 448 新帧的源帧误差为 0，四份校准另计 288 帧、最大差 1；105 次正式 CLI 含 20 次渲染、12 次质量，0 新模型实测推理。逐字状态、打字机和透明度对应通过；旋转只接受 6 个选定姿态。高亮字形定位仍偏移，动态尺寸内嵌透明度、定格、VFR、群组、自然画质及整体剪映等价未验收。见[实测与失败](../../../validation/嵌套字幕与文字动画原时钟实测_2026-10-16.md)与[汇总](../../../validation/evidence/subtitle-clock-20261016.json)。
+
+前轮产品增量：[速度 Easing/Bezier 契约](../../../specs/速度曲线Easing与Bezier契约_v0.1_2026-10-16.md)与[七组真实前后成片](../../../validation/速度Easing与Bezier原时钟实测_2026-10-16.md)。完整 452/452、738.867 秒；90 份源码/测试及 Schema 冻结，17 项新增专项为子集。336 新输出帧均为 0 源帧误差，动画 8.1369→0.9911 px；31 次生成与 7 次交付质量分别记录。独立参数域积分复核原曲线与编译界，见[机器证据](../../../validation/evidence/speed-easing-20261016.json)和[文档审计](../../../validation/evidence/docs-audit-speed-easing-20261016.json)。前轮[嵌套时钟与 435 项](../../../validation/嵌套变速倒放与关键帧时钟实测_2026-10-16.md)保留历史成绩。
+
+前序研究：[多运动参考选择与双表面真值](../../../validation/本地多运动参考选择与双表面真值实测_2026-10-16.md)增加相机配准、相机/DIS 共同可见评分和不同供体帧计数；新增 12 项，研究合计 22/22。真实人工遮挡墙面 30.11→32.46 dB、床单 24.80→25.36 dB；新增双表面相对前序略退化，自然画质未通过，未接入生产。7 份研究源码冻结、89 份产品相关源码当时与 363 项回归相同，该批次未重跑完整产品回归。见[机器证据](../../../validation/evidence/temporal-reference-selection-20261016.json)。
+
+前序研究：[光流背景传播与真实画面遮挡真值](../../../validation/本地光流背景传播与遮挡真值实测_2026-10-16.md)增加原生光流/补全/供体传播诊断 CLI，10 项独立检查通过，墙面与床单人工遮挡指标改善；自然人物移除仍未通过，未接入生产。89 份产品/测试/烟测源码与上一轮 363 项回归相同，没有重跑完整产品回归。见[机器证据](../../../validation/evidence/temporal-background-flow-20261016.json)；不把研究检查计入产品验收。
+
+前序产品增量：[区域色差融合契约](../../../specs/本地修复区域色差融合契约_v0.1_2026-10-16.md)及[真实实测](../../../validation/本地区域色差融合实测_2026-10-16.md)。LaMa/VACE 共享 harmonic 已接入；当轮完整 363/363，含 73 项融合子集，89 份 Python 源码前后不变。LaMa 受控/自然/全空及 VACE 受控完成最终原生验证；独立 RGBA/PCM 和成片检查通过，自然画质未通过。详见[当轮机器证据](../../../validation/evidence/repair-blend-smoke-20261016.json)。
+
+前序显式参数增量：当前进度见[26 模块构建进度总表](../../../构建进度总表_2026-10-16.md)。[VACE 契约](../../../specs/本地VACE联合视频编辑契约_v0.1_2026-10-16.md)与[实测](../../../validation/VACE本地多帧编辑与生成填充实测_2026-10-16.md)新增显式 shift、1/2/4 倍模型输入、倍率平方预算与真实栅格核对；41/41 专项、344/344 完整回归及新受控正式链路通过，87 份源码前后摘要一致；4 倍/shift 16 输出与校准组原始 RGBA 一致，受控画质仍未通过。见[本轮正式证据](../../../validation/evidence/vace-profiles-20261016.json)。五组同源校准已全部结束，暗矩形补丁均未消除，默认仍为 3/1。见[校准证据](../../../validation/evidence/vace-calibration-20261016.json)。前序 338/338、32 帧 SAM2→VACE→成片和自然色块/残影/纹理缺口继续见[历史正式证据](../../../validation/evidence/vace-smoke-20261016.json)，不能用旧回归覆盖本轮改动。
+
+前序 [LaMa 区域修复契约](../../../specs/本地LaMa区域修复与对象移除契约_v0.1_2026-10-16.md)和[CPU/CUDA、SAM2→修复实测](../../../validation/LaMa本地区域修复与物体移除实测_2026-10-16.md)记录 303/303 当轮完整回归；自然腿部残影、纹理涂抹及时序质量仍有缺口。14 个 video-cut- Skill 审计通过，完整剪映对标未完成。LaMa 依据见[机器证据](../../../validation/evidence/lama-smoke-20261016.json)和[当轮文档审计](../../../validation/evidence/docs-audit-lama-20261016.json)。
+
+上一轮验证见[SAM2 机器证据](../../../validation/evidence/sam2-smoke-20261016.json)和[文档审计](../../../validation/evidence/docs-audit-sam2-20261016.json)。此前[在建状态快照](../../../validation/evidence/build-progress-checked-sam2-20261016.json)为历史记录。RVM [人物抠像契约](../../../specs/本地RVM人物视频抠像与透明素材契约_v0.1_2026-10-16.md)和[透明成片实测](../../../validation/RVM本地人物抠像与透明成片实测_2026-10-16.md)继续有效，RVM 轮完整回归为 257/257。
+
+此前[LaMa 仅在建状态快照](../../../validation/evidence/build-progress-checked-lama-20261016.json)核对的是 `bfc4a9b7`、278 项回归和未集成基础代码，作为历史保留。上一轮 [SAM2 契约](../../../specs/本地SAM2对象分割与提示修正契约_v0.1_2026-10-16.md)和[实测](../../../validation/SAM2本地对象分割与提示修正实测_2026-10-16.md)继续记录点/框、多对象、修正/重置和概率掩码质量边界。
+
+上一轮[HDemucs 契约](../../../specs/本地HDemucs人声伴奏分离契约_v0.1_2026-10-16.md)和[CPU/CUDA 实测](../../../validation/HDemucs本地人声伴奏分离实测_2026-10-16.md)记录分离、入轨、成片及权利阻断，当轮完整回归为 233/233。RVM 轮[机器证据](../../../validation/evidence/rvm-smoke-20261016.json)和[文档审计](../../../validation/evidence/docs-audit-rvm-20261016.json)为已提交基线的验证入口；此前[仅准备模型的状态核对](../../../validation/evidence/build-progress-checked-20261016.json)是历史记录。
+
+上一轮新增[原生 YOLO 检测/跟踪契约](../../../specs/本地YOLO检测与多目标跟踪契约_v0.1_2026-10-15.md)、[真实模型与成片实测](../../../validation/YOLO本地多目标跟踪与重构图实测_2026-10-15.md)及[Windows 长滤镜图契约](../../../specs/本地长滤镜图与Windows命令长度契约_v0.1_2026-10-15.md)。两个受控对象、文字绑定、竖屏裁切、模型权利和本地编码闭环通过，该轮完整产品 194/194 回归通过；25 模块进度总表同步维护，完整剪映等价仍未完成。
+
+最近能力更新：[Whisper 模型登记与转写契约](../../../specs/本地Whisper模型登记与转写验收契约_v0.1_2026-10-15.md)及[中文真实模型实测](../../../validation/Whisper中文离线转写实测_2026-10-15.md)，覆盖 CPU/CUDA、跨 30 秒长音频、字幕入轨、CER、字体导入与事务回滚。
+
+此前能力更新：[本地 SoulX 中文配音契约](../../../specs/本地SoulX中文配音与声线登记契约_v0.1_2026-10-15.md)与[真实模型实测](../../../validation/SoulX中文离线配音实测_2026-10-15.md)，覆盖模型/声线登记、完整性、入轨、渲染和发布门禁。
+
+本轮补齐[跟踪坐标与重算契约](../../../specs/本地跟踪绑定坐标空间与渲染重算契约_v0.1_2026-10-15.md)及[组合渲染实测](../../../validation/跟踪坐标绑定与组合渲染实测_2026-10-15.md)：直接源层几何/时钟与输出画布重算、实际 YOLO 重构图+标签横竖双版闭环通过；完整产品 **211/211** 回归通过，完整剪映等价仍待验收。
+
+前序显式参数核对覆盖 26 个模块；当轮完整回归 344/344、专项 41/41 通过，前序已发布为 338/338。VACE、LaMa 等八类模型已有真实本地运行记录；VACE 为实验能力，成功交付和像素保留不等于生成质量达标，#56 保持 degraded。色差融合当时未接入产品；本轮已接入，见上述实测。历史 NumPy 原型 9 项独立测试、29 帧交叉核验见[原型证据](../../../validation/evidence/vace-numpy-harmonic-prototype-20261016.json)。此前[337 方法/34 项专项错误快照](../../../validation/evidence/build-progress-current-vace-20261016.json)、[323 项历史核对](../../../validation/evidence/build-progress-checked-vace-20261016.json)和[前序文档审计](../../../validation/evidence/docs-audit-vace-20261016.json)保留为历史。
+
+前序显式参数批次的文档链接、元数据状态、空文档及摘要审计见[显式参数文档审计](../../../validation/evidence/docs-audit-vace-profiles-20261016.json)。审计仅核对本地文件与首个状态，不验证外链、锚点或代替画质/许可验收。
+
+公开演示规则与前序多轨批次见[README 功能核验与实测演示](../../../validation/README功能核验与实测演示_2026-10-16.md)：当时正式 CLI 14 次调用，5.5 秒/165 帧实际成片、3 份 GIF、2 组研究对照和可导入项目包。该批次未重跑原生产 363 项回归，89 份源码摘要相同，见[原机器记录](../../../assets/readme-20261016/verification.json)。当前 README 已扩展至 V35，新增蒙版锚定/重构图、透明补边修复和自然失败的原输入/GIF/MP4，不覆盖历史证据。
+
+## 文档约束
+
+1. 项目新建的 Markdown、CSV、决策记录、需求说明、架构说明、评估报告、测试记录和路线图必须放在 `docs/` 下。根目录不再新增项目文档。
+2. 根目录的 `AGENTS.md` 属于工作区级约束，必须保留在根目录；脚本、安装清单和运行配置（包括 `ai-ad-editor.ps1`）属于工程文件，也保留在根目录。
+3. `research/`、`skills/`、`sources/` 是外部研究资料、可编辑技能和原始仓库快照目录。它们可以保留上游随附的说明文件，但不得在其中新建项目级结论文档；项目结论要回写到 `docs/`。研究文档和快照中的公开 URL、服务商名称只用于来源/差异审计，不是运行入口；生产 Skill 与 CLI 必须通过本地运行策略和 `policy audit`。
+4. 文件名使用“主题_YYYY-MM-DD.md”。稳定的规范文档可以保留日期作为版本锚点，并在本文档索引中标注当前有效版本。表格型研究数据使用同名 `.csv`，并与说明文档成对维护。
+5. 每份外部研究结论必须记录检索日期、来源 URL 或仓库地址、提交版本（如适用）、许可证和结论边界。无法确认的内容要标记为“待验证”，不得写成确定事实。
+6. 需求、架构和兼容性变化必须同步更新基线文档、对应决策记录和验收条件。单独修改代码或技能而不更新文档，视为未完成变更。
+7. 文档状态统一使用：`草案`、`评审中`、`有效`、`已替代`、`归档`。只有 `有效` 文档是已批准的发布约束；`评审中` 文档可以作为实现草案，但进入发布门禁前必须完成评审并改为 `有效`。
+8. 每轮功能新增、功能核验和真实实测同步维护根目录 README 的编号核验表、结果、证据和未通过项。可视能力优先附可公开的原输入与实际输出 MP4/GIF；研究、产品和历史回归分别标注，禁止把演示或研究计入产品回归总数。
+9. 对外演示的固定媒体放在 `docs/assets/<批次>/`，包含来源/权利、生成脚本、文件摘要、帧率/时长/帧数及核验记录；临时媒体仍放忽略目录。GIF 降帧、色数和播放时钟变化必须说明，音频结果附可听媒体；没有听审/连续播放只能注明机器核验或抽帧检查。无法确认发布权利时仅保留实测记录。
+
+## 推荐目录（后续新增）
+
+```text
+docs/
+├─ README.md                         # 文档入口与管理规则
+├─ 产品需求与开发路线基线_YYYY-MM-DD.md # 当前有效的产品、架构和路线基线
+├─ adr/                              # 架构与重大取舍，格式 ADR-NNN_主题.md
+├─ specs/                            # CLI、项目格式、接口和数据契约
+├─ plans/                            # 迭代计划、里程碑和发布计划
+├─ validation/                       # 验收、回归、性能和兼容性报告
+└─ research/                         # 已确认的开源社区研究结论
+```
+
+目录可以按需要创建；新目录也必须位于 `docs/` 之下。历史报告暂时保持平铺，以便保留原始文件名和已有链接。
+
+## 当前权威文档
+
+新增有效入口：[真实源句柄转场契约](../../../specs/真实源句柄转场与可逆编辑契约_v0.1_2026-10-17.md)与[十五组实际音画/失败](../../../validation/真实源句柄转场与可逆编辑实测_2026-10-17.md)；[本地字幕分段契约](../../../specs/本地字幕分段与局部回写契约_v0.1_2026-10-17.md)与[字幕分段/双语实测](../../../validation/本地字幕分段与双语回写实测_2026-10-17.md)。
+
+| 文档 | 用途 | 状态 |
+|---|---|---|
+| [离线 HTML 动效契约](../../../specs/离线HTML动效与可编辑源码契约_v0.1_2026-10-18.md) | 工具链、可编辑源码/资源、参数、精确帧时钟与进程回收 | 有效 |
+| [HTML 动效实测](../../../validation/离线HTML动效源码与透明合成实测_2026-10-18.md) | 五组内容/30 CLI/37 专项、完整回归、wheel/Skill/原失败 | 有效 |
+| [真实源范围外扩契约](../../../specs/真实源范围外扩与关联Slip契约_v0.1_2026-10-18.md) | 关联源 slip/真实有限源外扩/source 句柄滚滑、旧入口、重处理与警告边界 | 有效 |
+| [真实源编辑实测](../../../validation/真实源外扩与关联Slip实测_2026-10-18.md) | 九组音画/GIF、938 完整、wheel/Skill/开发原记录 | 有效 |
+| [输出窗口裁切契约](../../../specs/片段输出窗口裁切与波纹编辑契约_v0.1_2026-10-18.md) | 完整作者时钟/窗口/内部波纹/锁与渲染边界 | 有效 |
+| [裁切与作者时钟实测](../../../validation/输出窗口裁切与作者时钟实测_2026-10-18.md) | 844 完整、九组反事实音画对照/原片/GIF/失败 | 有效 |
+| [可复用片段组契约](../../../specs/可复用片段组库与跨项目插入契约_v0.1_2026-10-18.md) | 不可变版本/资源与权利闭包/作者时钟/跨工程插入 | 有效 |
+| [片段组实测](../../../validation/可复用片段组库与跨项目插入实测_2026-10-18.md) | 814 完整、六组音画对照/五项拒绝、原片与失败 | 有效 |
+| [嵌套转场契约](../../../specs/嵌套转场合成与作者时钟契约_v0.1_2026-10-18.md) | 子级先合成、父级时间与空间、原音频/警告/预算 | 有效 |
+| [22 组嵌套转场实测](../../../validation/嵌套转场与父级重映射实测_2026-10-18.md) | 785 完整、236 CLI、源/GIF、独立参考范围与开发失败 | 有效 |
+| [构建进度总表_2026-10-16.md](../../../构建进度总表_2026-10-16.md) | 26 模块进度、V35 完整 764 项/31 新增子集；15 组/900 新帧/432 万采样帧、历史与研究分计 | 有效 |
+| [README功能核验与实测演示_2026-10-16.md](../../../validation/README功能核验与实测演示_2026-10-16.md) | README 同步规则与 V01–V25 批次；原视频/GIF/MP4/项目包、真实调用与核验边界 | 有效 |
+| [构建进度总表_2026-10-15.md](../../../构建进度总表_2026-10-15.md) | 跟踪坐标增量完成时的历史进度快照 | 有效 |
+| [产品需求与开发路线基线_2026-10-12.md](../../../产品需求与开发路线基线_2026-10-12.md) | 产品边界、强制约束、架构、里程碑、验收门禁和变更规则 | 有效 |
+| [文档体系审计与补全记录_2026-10-13.md](../../../文档体系审计与补全记录_2026-10-13.md) | 文档覆盖审计、已补缺口、残余工程缺口和文档出口 | 有效 |
+| [ADR-001_Concat基础路线.md](../../../adr/ADR-001_Concat基础路线.md) | Concat fork、抽取核心和 FFmpeg 重写三条路线的评审门槛 | 评审中 |
+
+## 规范与验收入口
+
+| 文档 | 用途 | 状态 |
+|---|---|---|
+| [独立序列画布契约](../../../specs/独立序列画布与父级投影契约_v0.1_2026-10-17.md) | 像素尺寸、继承、原生裁切/锚点、一次父投影及输出/交换边界 | 有效 |
+| [九组独立画布实测](../../../validation/独立序列画布与原生坐标投影实测_2026-10-17.md) | 643 完整、65 CLI、216 新主帧、三种参考范围、开发失败及原素材/GIF | 有效 |
+| [面积采样与投影配额契约](../../../specs/序列面积采样与工作栅格预算契约_v0.1_2026-10-17.md) | 显式核、分数积分、默认兼容、确定性配额及 RSS 边界 | 有效 |
+| [九组面积采样实测](../../../validation/序列面积采样与工作配额实测_2026-10-17.md) | 664 完整、74 CLI、144 area 帧、原输入/四列 GIF 与保留失败 | 有效 |
+| [文字颜色/透明度契约](../../../specs/文字颜色透明度与独立覆盖率契约_v0.1_2026-10-16.md) | 组件覆盖率、直通 RGBA、顺序合成、颜色探针与降级 | 有效 |
+| [九组文字颜色实际成片](../../../validation/文字颜色透明度与实际合成实测_2026-10-16.md) | 固定旧版/新版/控制视频、506 项与失败日志、独立数值复核 | 有效 |
+| [嵌套帧区间与 EOF 契约](../../../specs/嵌套视频帧区间与结束时钟契约_v0.1_2026-10-17.md) | 部分源帧、作者端点/公共输出网格 | 有效 |
+| [十组帧覆盖实测](../../../validation/嵌套视频帧区间与结束时钟实测_2026-10-17.md) | 原片/GIF、537 项回归和两组音频失败 | 有效 |
+| [动画/高亮与原生打字机契约](../../../specs/文字动画高亮组合与原生打字机契约_v0.1_2026-10-17.md) | 固定段落前缀、CFR 原时钟、组件命令与降级 | 有效 |
+| [十二组动画实际成片](../../../validation/文字动画高亮组合与原生打字机实测_2026-10-17.md) | 524 项、实际原片/GIF/MP4、背景缺失/发布拒绝 | 有效 |
+| [AgentProjectJSON规范_v0.1_2026-10-13.md](../../../specs/AgentProjectJSON规范_v0.1_2026-10-13.md) | 规范项目文件、时间基准、片段、关键帧、模板和 provenance | 评审中 |
+| [agent-project.schema.json](../../../specs/agent-project.schema.json) | Agent Project JSON 的最小机器可校验 schema | 评审中 |
+| [AgentCLI契约_v0.1_2026-10-13.md](../../../specs/AgentCLI契约_v0.1_2026-10-13.md) | CLI 命令、JSON envelope、错误码、进度、幂等、取消和渲染队列入口 | 有效 |
+| [本地跟踪绑定坐标空间与渲染重算契约](../../../specs/本地跟踪绑定坐标空间与渲染重算契约_v0.1_2026-10-15.md) | 源时钟观测、crop/变换/镜像、输出画布重算、定格帧时钟与互操作烘焙 | 有效 |
+| [跟踪坐标绑定与组合渲染实测](../../../validation/跟踪坐标绑定与组合渲染实测_2026-10-15.md) | 17 项增量、真实 YOLO 组合成片、像素定位及完整回归证据 | 有效 |
+| [本地YOLO检测与多目标跟踪契约](../../../specs/本地YOLO检测与多目标跟踪契约_v0.1_2026-10-15.md) | CPU ONNX、显式模型/证据、两轮运动关联、对象选择、采样时钟和片段模型权利 | 有效 |
+| [本地长滤镜图与Windows命令长度契约](../../../specs/本地长滤镜图与Windows命令长度契约_v0.1_2026-10-15.md) | 完整滤镜图本地文件传入、SHA-256、dry-run、续跑和 Windows 参数预算 | 有效 |
+| [本地项目包与交换清单契约_v0.1_2026-10-15.md](../../../specs/本地项目包与交换清单契约_v0.1_2026-10-15.md) | 本地项目、媒体、Rights Ledger、哈希清单的可移植打包与安全恢复 | 有效 |
+| [本地明文草稿双向适配器契约_v0.1_2026-10-15.md](../../../specs/本地明文草稿双向适配器契约_v0.1_2026-10-15.md) | 本地剪映式明文 JSON 字段映射、原声往返、严格损失门禁与未验收边界 | 有效 |
+| [本地渲染队列与任务状态契约_v0.1_2026-10-14.md](../../../specs/本地渲染队列与任务状态契约_v0.1_2026-10-14.md) | 项目内队列文件、作业状态、失败恢复、取消和顺序执行边界 | 有效 |
+| [本地项目写锁与取消通道契约_v0.1_2026-10-14.md](../../../specs/本地项目写锁与取消通道契约_v0.1_2026-10-14.md) | 原生 Windows 项目写锁、竞争写入错误和持锁期间队列取消确认语义 | 有效 |
+| [跨文件项目事务恢复契约_v0.1_2026-10-15.md](../../../specs/跨文件项目事务恢复契约_v0.1_2026-10-15.md) | 项目/Rights/操作元数据事务日志、断电恢复、`project recover` 和大文件副作用边界 | 有效 |
+| [本地素材语义索引与重复分组契约_v0.1_2026-10-14.md](../../../specs/本地素材语义索引与重复分组契约_v0.1_2026-10-14.md) | 确定性本地素材搜索、字幕侧车、媒体属性过滤和 SHA-256 重复组 | 有效 |
+| [本地素材库增量刷新与感知候选契约_v0.1_2026-10-14.md](../../../specs/本地素材库增量刷新与感知候选契约_v0.1_2026-10-14.md) | stat 签名增量刷新、FFmpeg 平均哈希候选组和人工复核边界 | 有效 |
+| [本地色彩Scope审查契约_v0.1_2026-10-14.md](../../../specs/本地色彩Scope审查契约_v0.1_2026-10-14.md) | 无 GUI 的 waveform、vectorscope、histogram 色彩审查图和哈希报告 | 有效 |
+| [本地质量Golden清单规范_v0.1_2026-10-14.md](../../../specs/本地质量Golden清单规范_v0.1_2026-10-14.md) | 固定本地媒体/设置哈希、稳定质量指标和后续漂移验证 | 有效 |
+| [本地分割蒙版轨迹与锚定契约](../../../specs/本地分割蒙版轨迹与锚定契约_v0.1_2026-10-16.md) | 显式已登记蒙版→轨迹/绑定/重构图、源时钟、检查点门禁、失败报告与权利 | 有效 |
+| [本地蒙版逐帧核验与检查点契约_v0.1_2026-10-16.md](../../../specs/本地蒙版逐帧核验与检查点契约_v0.1_2026-10-16.md) | 编码 alpha/luma、逐帧面积/包围框/IoU、selected/clear 断言、存储预算与失败报告 | 有效 |
+| [本地运行策略与远程引用审计契约_v0.1_2026-10-14.md](../../../specs/本地运行策略与远程引用审计契约_v0.1_2026-10-14.md) | 本地路径、网络关闭、远程引用拒绝和生产 Skill 边界 | 有效 |
+| [本地效果目录与参数契约_v0.1_2026-10-14.md](../../../specs/本地效果目录与参数契约_v0.1_2026-10-14.md) | 本地 FFmpeg 效果目录、参数范围、注入防护、关键帧和降级规则 | 有效 |
+| [本地光流补帧与智能慢动作契约_v0.1_2026-10-15.md](../../../specs/本地光流补帧与智能慢动作契约_v0.1_2026-10-15.md) | 本地 `minterpolate` 光流补帧、智能慢动作参数、质量门禁和 CPU 边界 | 有效 |
+| [本地视频防抖与稳定化派生素材契约_v0.1_2026-10-15.md](../../../specs/本地视频防抖与稳定化派生素材契约_v0.1_2026-10-15.md) | 本地 `vidstabdetect`/`vidstabtransform` 两遍防抖、派生资产、父权利继承、快照和质量边界 | 有效 |
+| [本地节拍卡点与混剪时间线契约_v0.1_2026-10-15.md](../../../specs/本地节拍卡点与混剪时间线契约_v0.1_2026-10-15.md) | 本地 FFmpeg 能量节拍、源范围合法的卡点片段计划、视频轨道应用、快照和近似边界 | 有效 |
+| [本地多机位同步与切换契约_v0.1_2026-10-15.md](../../../specs/本地多机位同步与切换契约_v0.1_2026-10-15.md) | 本地音频指纹偏移估计、固定/显式机位切换计划、视频轨道应用、快照和置信度边界 | 有效 |
+| [本地音频提取与派生资产契约_v0.1_2026-10-15.md](../../../specs/本地音频提取与派生资产契约_v0.1_2026-10-15.md) | 本地 FFmpeg 第一条音频流提取、无损 WAV 派生资产、Rights Ledger 继承和音频轨道应用 | 有效 |
+| [本地音频mid-side与源分离适配器边界契约_v0.1_2026-10-15.md](../../../specs/本地音频mid-side与源分离适配器边界契约_v0.1_2026-10-15.md) | center/side 相位近似、轨道应用和原生模型分离入口的边界 | 有效 |
+| [本地模型适配器注册与音频分离门禁契约_v0.1_2026-10-15.md](../../../specs/本地模型适配器注册与音频分离门禁契约_v0.1_2026-10-15.md) | 本地音频模型/执行器路径、哈希、许可证、Rights Ledger、runner 门禁和禁止隐式 fallback | 有效 |
+| [本地HDemucs人声伴奏分离契约_v0.1_2026-10-16.md](../../../specs/本地HDemucs人声伴奏分离契约_v0.1_2026-10-16.md) | 原生 CPU/CUDA、六项哈希、分段采样、vocals/accompaniment 和事务/权利约束 | 有效 |
+| [HDemucs本地人声伴奏分离实测_2026-10-16.md](../../../validation/HDemucs本地人声伴奏分离实测_2026-10-16.md) | 真实权重受控混音、指标、成片、策略和发布阻断证据 | 有效 |
+| [本地 SAM2 对象分割契约](../../../specs/本地SAM2对象分割与提示修正契约_v0.1_2026-10-16.md) | 本地 CPU/CUDA、点/框、多对象、修正/重置、掩码与透明交付 | 有效 |
+| [SAM2 真实模型实测](../../../validation/SAM2本地对象分割与提示修正实测_2026-10-16.md) | CPU/CUDA、自然运动、选择/概率、278 项回归和画质边界 | 有效 |
+| [本地RVM人物视频抠像与透明素材契约](../../../specs/本地RVM人物视频抠像与透明素材契约_v0.1_2026-10-16.md) | 原生 CPU、循环 soft alpha、MOV/音频、时间线应用、范围/预算和清理约束 | 有效 |
+| [RVM本地人物抠像与透明成片实测](../../../validation/RVM本地人物抠像与透明成片实测_2026-10-16.md) | 真模型、两背景与透明 WebM、24 项专项和首帧/手持物体画质缺口 | 有效 |
+| [本地视觉模型适配器与对象跟踪协议契约_v0.1_2026-10-15.md](../../../specs/本地视觉模型适配器与对象跟踪协议契约_v0.1_2026-10-15.md) | 本地视觉模型/执行器 registry、argv-only JSON runner、逐帧框校验、关键帧/绑定/重构图应用和质量复核边界 | 有效 |
+| [本地多目标视觉跟踪与对象选择协议契约_v0.1_2026-10-15.md](../../../specs/本地多目标视觉跟踪与对象选择协议契约_v0.1_2026-10-15.md) | v2 多目标轨迹、唯一对象身份、`--object-id` 应用、`--all-objects` 报告和三条 CLI 路径的选择门禁 | 有效 |
+| [本地高光候选与自动粗剪时间线契约_v0.1_2026-10-15.md](../../../specs/本地高光候选与自动粗剪时间线契约_v0.1_2026-10-15.md) | 本地镜头/静音/节拍证据、高光候选报告、显式时间线应用、快照、重叠门禁和复核警告 | 有效 |
+| [关键帧运镜预设契约_v0.1_2026-10-15.md](../../../specs/关键帧运镜预设契约_v0.1_2026-10-15.md) | 本地运镜目录、别名、参数范围、关键帧映射、`motion list/inspect/apply` 和限制 | 有效 |
+| [本地智能剪口播与静音裁切契约_v0.1_2026-10-15.md](../../../specs/本地智能剪口播与静音裁切契约_v0.1_2026-10-15.md) | 本地 `silencedetect` 与字幕显式短语 cue 计划、视频/音频联动裁切、快照、关键帧切片和拒绝边界 | 有效 |
+| [本地自动重构图与对象跟踪应用契约_v0.1_2026-10-15.md](../../../specs/本地自动重构图与对象跟踪应用契约_v0.1_2026-10-15.md) | 本地模板跟踪到目标画幅动态裁切、置信度/越界警告、快照和拒绝边界 | 有效 |
+| [本地跟踪绑定与对象锚定契约_v0.1_2026-10-15.md](../../../specs/本地跟踪绑定与对象锚定契约_v0.1_2026-10-15.md) | 将本地跟踪结果映射到独立文字/贴纸/效果片段，含 ROI 缩放、时钟映射、快照和拒绝边界 | 有效 |
+| [RightsLedger与素材模板登记规范_v0.1_2026-10-13.md](../../../specs/RightsLedger与素材模板登记规范_v0.1_2026-10-13.md) | 0.2.0 版本化素材台账、撤下/争议状态、历史处置决策、渠道检查、审计历史和发布清单 | 有效 |
+| [项目转换报告规范_v0.1_2026-10-13.md](../../../specs/项目转换报告规范_v0.1_2026-10-13.md) | Exact/Mapped/Approximate/Baked/Unsupported/Failed 转换语义、OTIO/MLT 受限互操作 | 有效 |
+| [本地AI适配器与字幕流水线规范_v0.1_2026-10-13.md](../../../specs/本地AI适配器与字幕流水线规范_v0.1_2026-10-13.md) | 离线 Transformers/FFmpeg Whisper ASR、模型登记、SRT、字幕资产与字幕轨道接入边界 | 评审中 |
+| [独立文字轨道与本地排版契约_v0.1_2026-10-14.md](../../../specs/独立文字轨道与本地排版契约_v0.1_2026-10-14.md) | 独立文字轨道、字体登记、换行、逐字时间、透明层旋转、片段变换（含锚点）/遮罩/混合和混合轨道排序 | 有效 |
+| [广告模板变量契约_v0.1_2026-10-14.md](../../../specs/广告模板变量契约_v0.1_2026-10-14.md) | 模板变量类型、默认值、枚举/范围校验、内嵌替换和快照可复现边界 | 有效 |
+| [广告计划与时间线应用契约_v0.1_2026-10-15.md](../../../specs/广告计划与时间线应用契约_v0.1_2026-10-15.md) | `ad plan` / `ad apply` 的本地规划、标记写入、时长同步、快照、幂等和重复应用边界 | 有效 |
+| [本地LUT资产库与效果引用契约_v0.1_2026-10-15.md](../../../specs/本地LUT资产库与效果引用契约_v0.1_2026-10-15.md) | 项目内 LUT 登记、SHA-256、`.cube` 元数据、静态 intensity 派生缓存、Rights Ledger、`lut_id` 引用和哈希门禁 | 有效 |
+| [本地对象跟踪与关键帧规范_v0.1_2026-10-13.md](../../../specs/本地对象跟踪与关键帧规范_v0.1_2026-10-13.md) | 本地模板跟踪、置信度、关键帧报告和安全写回边界 | 有效 |
+| [输出档案与渠道渲染规范_v0.1_2026-10-13.md](../../../specs/输出档案与渠道渲染规范_v0.1_2026-10-13.md) | 竖屏、方形、横屏和自定义画布输出的渲染与验收语义 | 评审中 |
+| [系统边界与模块契约_v0.1_2026-10-13.md](../../../architecture/系统边界与模块契约_v0.1_2026-10-13.md) | Agent、项目模型、媒体后端、适配器、权利和验证层边界 | 评审中 |
+| [P0黄金样例与验收计划_v0.1_2026-10-13.md](../../../validation/P0黄金样例与验收计划_v0.1_2026-10-13.md) | 固定样例、质量阈值、证据包和 P0 退出条件 | 评审中 |
+| [回归验证记录_2026-10-13.md](../../../validation/回归验证记录_2026-10-13.md) | E 盘迁移后的代码、运行时、文档、Skill 和上游快照验证证据 | 有效 |
+| [本地蒙版驱动锚定与重构图实测](../../../validation/本地蒙版驱动锚定与重构图实测_2026-10-16.md) | 受控 64 帧实际渲染、透明补边修复、26 项专项及自然失败 | 有效 |
+| [本地蒙版范围与正负检查点实测_2026-10-16.md](../../../validation/本地蒙版范围与正负检查点实测_2026-10-16.md) | 379 项完整回归、公开原蒙版/GIF、真实 SAM2 修正仍失败及逐点证据 | 有效 |
+| [能力覆盖与验收矩阵_v0.1_2026-10-13.md](../../../validation/能力覆盖与验收矩阵_v0.1_2026-10-13.md) | 130 项功能差异到 P0/P1/P2、后端和验收证据的追踪 | 评审中 |
+| [性能预算与设备基线_v0.1_2026-10-13.md](../../../validation/性能预算与设备基线_v0.1_2026-10-13.md) | 原生 Windows 设备档案、P0 性能预算和资源策略 | 评审中 |
+| [版本依赖与发布门禁_v0.1_2026-10-13.md](../../../ops/版本依赖与发布门禁_v0.1_2026-10-13.md) | 版本锁定、许可证、供应链、发布阶段和回滚 | 评审中 |
+| [安全与隐私边界_v0.1_2026-10-13.md](../../../ops/安全与隐私边界_v0.1_2026-10-13.md) | 本地素材、插件、网络、日志和 Agent 执行边界 | 评审中 |
+| [仓库与运行依赖锁定_v0.1_2026-10-13.md](../../../仓库与运行依赖锁定_v0.1_2026-10-13.md) | 已拉取上游仓库、运行时边界、版本和许可证门禁 | 有效 |
+| [产品实现入口与P0使用说明_v0.1_2026-10-13.md](../../../产品实现入口与P0使用说明_v0.1_2026-10-13.md) | 当前 CLI 入口、P0 闭环、代码边界和验证证据 | 有效 |
+| [工作区迁移记录_2026-10-13.md](../../../工作区迁移记录_2026-10-13.md) | 从 C 盘迁移到 E 盘的范围、校验、Skill 联接和后续路径约束 | 有效 |
+
+机器可读的上游提交清单位于 [`../sources/upstream-manifest.json`](../../../../sources/upstream-manifest.json)，P0 实现位于 [`../product/`](../../../../product)。
+
+## 已归档到本目录的项目文档
+
+### 产品、方案与工程评估
+
+| 文档 | 内容 |
+|---|---|
+| [10套纯开源AI广告剪辑方案_2026-10-12.md](../../../10套纯开源AI广告剪辑方案_2026-10-12.md) | 十套开源程序与技能组合方案 |
+| [程序与Skill_剪映水准评估_2026-10-12.md](../../../程序与Skill_剪映水准评估_2026-10-12.md) | 程序与 Skill 组合的能力评估 |
+| [纯开源_程序与Skill_剪映水准评估_2026-10-12.md](../../../纯开源_程序与Skill_剪映水准评估_2026-10-12.md) | 排除剪映后的开源能力评估 |
+| [面向Agent的视频编辑内核调研_2026-10-11.md](../../../面向Agent的视频编辑内核调研_2026-10-11.md) | 面向 Agent 的视频编辑内核候选调研 |
+| [现状结论_开源Agent剪映内核_2026-10-12.md](../../../现状结论_开源Agent剪映内核_2026-10-12.md) | 开源 Agent 剪映型内核现状判断 |
+| [FFmpeg从头构建Agent视频内核工程量估算_2026-10-12.md](../../../FFmpeg从头构建Agent视频内核工程量估算_2026-10-12.md) | 从 FFmpeg 构建 Agent 内核的工程量估算 |
+| [Concat无GUIAgent化与剪映差异补全可行性评估_2026-10-12.md](../../../Concat无GUIAgent化与剪映差异补全可行性评估_2026-10-12.md) | Fork Concat、移除 GUI 和补齐能力的可行性 |
+| [Concat与剪映功能差异矩阵_2026-10-12.md](../../../Concat与剪映功能差异矩阵_2026-10-12.md) | 130 项细化功能差异矩阵 |
+
+### 开源社区、技能与互操作性研究
+
+新增：[OpenFilm 固定源码、可拆模块、原生测试、数据样例与成本](../../../OpenFilm源码拆解与复用成本评估_2026-10-17.md)；[研究机器证据](../../../validation/evidence/openfilm-reuse-20261017.json)。
+
+| 文档 | 内容 |
+|---|---|
+| [相关Skills_Star排行_2026-10-11.md](../../../相关Skills_Star排行_2026-10-11.md) | 相关开源 Skill 的 Star 排行研究 |
+| [相关Skills_Star排行_2026-10-11.csv](../../../相关Skills_Star排行_2026-10-11.csv) | 上述排行的机器可读数据 |
+| [Concat与pyJianYingDraft_配套Skills_Star排行_2026-10-11.md](../../../Concat与pyJianYingDraft_配套Skills_Star排行_2026-10-11.md) | Concat 与 pyJianYingDraft 的配套 Skill 研究 |
+| [Concat与pyJianYingDraft_配套Skills_Star排行_2026-10-11.csv](../../../Concat与pyJianYingDraft_配套Skills_Star排行_2026-10-11.csv) | 配套 Skill 研究数据 |
+| [run-concat与video-recap-skills_纯开源补充评估_2026-10-12.md](../../../run-concat与video-recap-skills_纯开源补充评估_2026-10-12.md) | run-concat 与 video-recap-skills 的补充评估 |
+| [开源素材模板库与剪映项目互转可行性评估_2026-10-12.md](../../../开源素材模板库与剪映项目互转可行性评估_2026-10-12.md) | 开源素材、模板库和剪映项目互转边界 |
+| [面向Agent的视频编辑内核_候选清单_2026-10-11.csv](../../../面向Agent的视频编辑内核_候选清单_2026-10-11.csv) | 内核候选的机器可读清单 |
+| [video-cut_本地Skills使用指南.md](../../../video-cut_本地Skills使用指南.md) | 当前本地 Skill 前缀和调用指南 |
+
+## 文档变更流程
+
+1. 先在基线文档或 ADR 中写清目标、范围、验收条件和影响面。
+2. 再修改代码、Skill、配置或研究结果，并在文档中记录证据和版本。
+3. 完成验证后将状态从 `草案` 更新为 `有效`，同时在本索引补充链接。
+4. 被新决策替代的文档保留原文件，标记为 `已替代`，并在顶部写明替代文档。
+
+## 审计要求
+
+每次新增规范、重大研究结论或里程碑结束后，更新 [文档体系审计与补全记录_2026-10-13.md](../../../文档体系审计与补全记录_2026-10-13.md) 或创建新的日期版本。审计至少重新检查：根目录文档策略、相对/本地链接、文档状态、需求追踪、P0 契约和未关闭工程缺口。
+
+
+历史候选已接入：[本地修复区域色差融合契约](../../../specs/本地修复区域色差融合契约_v0.1_2026-10-16.md)现为有效，功能与当轮完整回归见上方区域融合记录，自然形体/纹理仍未通过。
+
+区域融合批次文档审计见[区域融合文档审计](../../../validation/evidence/docs-audit-repair-blend-20261016.json)，覆盖 README、AGENTS 与 docs 全部 Markdown 的本地目标、首个状态、空文档和摘要；不代替外链/锚点、自然画质或许可验收。
+
+历史文档本地目标与状态核对见[蒙版锚定文档审计](../../../validation/evidence/docs-audit-mask-tracking-20261016.json)；[前轮蒙版核验](../../../validation/evidence/docs-audit-mask-review-20261016.json)、[参考研究](../../../validation/evidence/docs-audit-temporal-reference-selection-20261016.json)及更早审计保留为历史快照。
+
+## 透明素材缩放增量
+
+| 文档 | 用途 | 状态 |
+|---|---|---|
+| [预乘 Alpha 契约](../../../specs/透明素材缩放与预乘Alpha契约_v0.1_2026-10-16.md) | 输入识别、普通缩放路径、straight RGBA 输出、未覆盖采样和性能边界 | 有效 |
+| [真实前后实测](../../../validation/透明素材缩放边缘与标签精度实测_2026-10-16.md) | 原视频/标签/GIF/MP4、六项回归、自然标签复验与漏选失败 | 有效 |
+
+## 透明几何与文字增量
+
+| 文档 | 用途 | 状态 |
+|---|---|---|
+| [重采样与文字 Alpha v0.2](../../../specs/透明素材重采样与文字Alpha契约_v0.2_2026-10-16.md) | 仿射/crop/文字源、straight RGBA 接口、补边语义和保留限制 | 有效 |
+| [实际前后与人物复用](../../../validation/仿射动态裁切与文字透明合成实测_2026-10-16.md) | 原视频/RGBA、六份成片/GIF、17 项专项、RVM 36 帧补边和 SAM2 复验 | 有效 |
+
+## 2026-10-16 原生逐词排版入口
+
+- [功能契约](../../../specs/逐字高亮原生排版与颜色选择契约_v0.1_2026-10-16.md)
+- [九组实测与开发失败](../../../validation/逐字高亮原生排版与真实成片实测_2026-10-16.md)
+- [完整/专项/旧版日志与独立证据](../../../validation/evidence/word-layout-20261016.json)
+- [14 个 Skills 审计](../../../validation/evidence/skills-audit-word-layout-20261016.json)
+- [文档本地链接/元数据/摘要审计](../../../validation/evidence/docs-audit-word-layout-20261016.json)
+
+## 2026-10-17 R3 声道策略入口
+
+- [配置与相位边界](../../../specs/R3声道策略契约_v0.1_2026-10-17.md)
+- [20 组实际成片、原音频、GIF 和失败](../../../validation/R3声道策略与立体声权衡实测_2026-10-17.md)
+- [完整回归和独立解码证据](../../../validation/evidence/audio-channels-20261017.json)
+- [14 个 Skills 审计](../../../validation/evidence/skills-audit-audio-channels-20261017.json)
+- [文档本地目标与摘要审计](../../../validation/evidence/docs-audit-audio-channels-20261017.json)
+
+V28 专项：[隔离合成契约](../../../specs/嵌套序列隔离合成契约_v0.1_2026-10-17.md)、[全帧媒体与复现](../../../validation/嵌套序列隔离合成与逐帧像素实测_2026-10-17.md)。
+
+V29 专项：[分层总线契约](../../../specs/分层音频总线与采样包络契约_v0.1_2026-10-17.md)、[逐采样实测与原素材](../../../validation/分层音频总线与真实采样实测_2026-10-17.md)。
+
+V30 专项：[分段上下文契约](../../../specs/分段音频变速上下文契约_v0.1_2026-10-17.md)、[11 组原视频/原声与失败记录](../../../validation/分段音频上下文与完整尾部实测_2026-10-17.md)。
+
+V33 专项：[关联编辑契约](../../../specs/关联片段与主轨联动规划契约_v0.1_2026-10-17.md)、[九组真实音画/失败/复现](../../../validation/关联剪辑与主轨联动真实音画实测_2026-10-17.md)、[MIT 随包声明](../../../third-party/OpenFilm复用声明_2026-10-17.md)。
+
+V34 专项：[字幕分段与局部回写契约](../../../specs/本地字幕分段与局部回写契约_v0.1_2026-10-17.md)、[原视频/GIF、双语与真实 ASR](../../../validation/本地字幕分段与双语回写实测_2026-10-17.md)、[本轮文档审计](../../../validation/evidence/docs-audit-subtitle-segments-20261017.json)。
+
+V35 专项：[真实源句柄/时钟与拒绝契约](../../../specs/真实源句柄转场与可逆编辑契约_v0.1_2026-10-17.md)、[原片/GIF、十五组与四项开发记录](../../../validation/真实源句柄转场与可逆编辑实测_2026-10-17.md)、[本轮文档审计](../../../validation/evidence/docs-audit-source-transitions-20261017.json)。
+
+V43 新入口：[蒙版编辑契约](../../../specs/本地蒙版笔刷与关键帧修正契约_v0.1_2026-10-18.md)、[原片/关键帧/本地修复实测](../../../validation/本地蒙版笔刷与关键帧修正实测_2026-10-18.md)。
+
+## V47 发行与当前 OpenFilm 决策
+
+- [离线发行与随包 Schema 契约](../../../specs/离线发行与随包Schema契约_v0.1_2026-10-18.md)
+- [安装包、原片/GIF、独立音画与失败记录](../../../validation/离线发行与随包Schema实测_2026-10-18.md)
+- [固定 Python 依赖与日期检查器许可](../../../third-party/离线Python依赖与日期检查器许可说明_2026-10-18.md)
+- [OpenFilm 当前编号复用决策](../../../OpenFilm当前复用决策_2026-10-18.md)
+- [十份官方 Skill 的本地 CLI 与能力缺口](../../../OpenFilm官方Skill本地能力映射_2026-10-18.md)
+- [配套示例与描线/文字/后处理内核](../../../OpenFilm示例与动效内核复用评估_2026-10-18.md)
+
+- [V48 离线逐笔描线契约](../../../specs/离线逐笔描线动效契约_v0.1_2026-10-18.md)与[实测/原片/失败](../../../validation/离线逐笔描线动效实测_2026-10-18.md)。
+- [OpenFilm 描线复用归属](../../../third-party/OpenFilm示例描线函数复用声明_2026-10-18.md)。
+- [CTC 对齐来源预研](../../../CTC对齐模型来源预研_2026-10-18.md)：历史 V48 仅元数据；后续 V49 真实推理与失败精度门槛另列。
+
+- [V49 CTC 对齐契约](../../../specs/离线CTC字词强制对齐契约_v0.1_2026-10-18.md)、[原片/GIF/安装/精度失败](../../../validation/离线CTC字词强制对齐实测_2026-10-18.md)及[模型/语音/依赖来源](../../../third-party/CTC模型与英文演示语音来源_2026-10-18.md)。
+
+V53 文档入口：[主轨重排契约](../../../specs/主轨磁吸重排与关联附着契约_v0.1_2026-10-18.md)、[实际音画/失败/发行记录](../../../validation/主轨磁吸重排与关联附着实测_2026-10-18.md)。
+
+[V82 发布前字节审查修复](../../../validation/原生倒放缓存发布前字节审查修复_2026-10-21.md)：保留暂存检查失败、历史 CRLF 字节和脚本 EOF 格式桥接。
