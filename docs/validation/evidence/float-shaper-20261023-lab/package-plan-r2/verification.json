@@ -1,0 +1,19 @@
+{
+  "status": "prepared-focused-offline118-not-executed",
+  "at_utc": "2026-10-22T19:31:05.517275+00:00",
+  "actual_methods_executed_here": 0,
+  "planned_installed_methods": 118,
+  "planned_full_methods": 2930,
+  "previous_837_plan_executed": false,
+  "source_modules": [
+    "test_float_shaper",
+    "test_float_lut",
+    "test_lut_automation",
+    "test_float_preview"
+  ],
+  "reason": "Changed runtime files are LUT parsing/evaluation, registration metadata and capabilities. The fresh package must exercise new shapers, unchanged 3D LUT behavior, registry automation and real formal/preview/PCM/PNG integration. Global regression remains a separate complete suite.",
+  "scripts": {
+    "verify_float_shaper_install.py": "sha256:a0d796e148016f2ccf90e0477fd4e3f563ba840098ff0e76906e8a020913516d",
+    "run_float_shaper_installed_suite.py": "sha256:578c32fa8bf091e1ec2c043dcc62514c4e217b20a7edc8eb761cc23fa6e7457b"
+  }
+}

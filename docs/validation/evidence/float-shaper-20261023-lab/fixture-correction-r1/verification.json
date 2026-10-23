@@ -1,0 +1,17 @@
+{
+  "status": "corrected-extreme-fixture-after-preserved-118-method-failure",
+  "at_utc": "2026-10-22T19:36:17.024563+00:00",
+  "previous_methods": 118,
+  "previous_failures": 2,
+  "previous_errors": 0,
+  "previous_skipped": 0,
+  "reason": "Formatting exact Float32 maximum with nine significant decimal digits yields a decimal slightly above the accepted mathematical Float32 maximum. r1 therefore rejected the sample at parse time, before the intended cubic overflow. Use 90 percent of the maximum so parsing succeeds and cubic overshoot still exceeds the Float32 output range.",
+  "runtime_changed": false,
+  "tolerances_changed": false,
+  "source_before": "sha256:32f24c5aedbb7a16092b1b83b9bf43413cc48dc8c5228ba0a497a3b64ca11da2",
+  "source_after": "sha256:240be751dafc34b0f39a6c2b76f459cf87e3cf020d7ffd2ab8d9b3839453f704",
+  "second_failure": "The six-mode fixture used exact analytic Bezier midpoint .5; existing author animation explicitly uses a 33-knot, 20-step inverse and eight-decimal serialized lookup. Bind the established independent declared-Bezier oracle, assert the exact sampled intensity and retain the original pixel tolerance.",
+  "additional_coverage": "Execute a complete 65,536-point per-channel table at the admitted upper size; retained as part of the same method.",
+  "new_actual_methods_executed_here": 0,
+  "prior_failure_preserved": true
+}

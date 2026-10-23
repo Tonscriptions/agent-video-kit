@@ -250,7 +250,7 @@ class FloatLUTTests(unittest.TestCase):
     def test_parser_rejects_incomplete_extra_nonfinite_and_unknown_data(self):
         cases = ['LUT_3D_SIZE 2\n0 0 0\n','LUT_3D_SIZE 2\n'+'0 0 0\n'*9,
             'LUT_3D_SIZE 2\n'+'nan 0 0\n'*8,'LUT_3D_SIZE 2\n'+'1e100 0 0\n'*8,
-            'LUT_1D_SIZE 2\n0 0 0\n1 1 1\n','LUT_3D_SIZE 2\nDOMAIN_MIN 1 0 0\n'+'0 0 0\n'*8,
+            'LUT_1D_SIZE 2\n0 0 0\n','LUT_3D_SIZE 2\nDOMAIN_MIN 1 0 0\n'+'0 0 0\n'*8,
             'LUT_3D_SIZE 2\nLUT_3D_SIZE 2\n'+'0 0 0\n'*8,
             'LUT_3D_SIZE 2\n0 0 0\nDOMAIN_MIN 0 0 0\n'+'0 0 0\n'*7]
         for text in cases:

@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\run_native_persistent_owner_20261023.py", line 42, in <module>
+    runpy.run_path(str(script),run_name='__main__')
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen runpy>", line 287, in run_path
+  File "<frozen runpy>", line 98, in _run_module_code
+  File "<frozen runpy>", line 88, in _run_code
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\float-shaper-lab-20261023\product\.runtime\float-shaper-20261023\run_complete_after_stage_r5.py", line 109, in <module>
+    if __name__=='__main__':main()
+                            ~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\float-shaper-lab-20261023\product\.runtime\float-shaper-20261023\run_complete_after_stage_r5.py", line 37, in main
+    scripts={p.relative_to(ROOT).as_posix():sha(p) for p in sorted((ROOT/'scripts').iterdir()) if p.is_file()}
+                                                                   ~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Python313\Lib\pathlib\_local.py", line 575, in iterdir
+    with os.scandir(root_dir) as scandir_it:
+         ~~~~~~~~~~^^^^^^^^^^
+FileNotFoundError: [WinError 3] 系统找不到指定的路径。: 'E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\float-shaper-lab-20261023\\product\\.runtime\\scripts'

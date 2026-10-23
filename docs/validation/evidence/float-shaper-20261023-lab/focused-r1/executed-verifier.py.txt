@@ -1,0 +1,77 @@
+"""Byte-freeze and run meaningful shaper, prior LUT, registry and preview tests."""
+from datetime import datetime, timezone
+import argparse
+import contextlib
+import json
+import os
+from pathlib import Path
+import subprocess
+import sys
+import time
+import unittest
+from unittest.mock import patch
+from run_frozen_regression import frozen, sha
+
+ROOT=Path(__file__).resolve().parents[1]
+REL=ROOT/'docs/validation/evidence/float-shaper-20261023-lab'
+
+def main():
+    parser=argparse.ArgumentParser();parser.add_argument('--revision',required=True)
+    parser.add_argument('--focused',action='store_true');args=parser.parse_args()
+    assert args.revision.startswith('r') and args.revision[1:].isdigit()
+    work=REL/(('focused-' if args.focused else 'native-')+args.revision);work.mkdir(exist_ok=False)
+    before=frozen();assert len(before)==331
+    parent=json.loads((REL/'foundation-r1.json').read_bytes())['parent_frozen_inputs']
+    for name,digest in before.items():
+        if parent.get(name)!=digest:
+            target=work/'executed-source'/name;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes((ROOT/name).read_bytes())
+    (work/'executed-verifier.py.txt').write_bytes(Path(__file__).read_bytes())
+    state=dict(status='running',pid=os.getpid(),started_at_utc=datetime.now(timezone.utc).isoformat(),
+        frozen_before=before,verifier_sha256=sha(Path(__file__)),calls=[],network=False,virtualization=False,
+        native_windows=True,published=False,full_capcut_parity=False)
+    def save(): (work/'verification.json').write_text(json.dumps(state,ensure_ascii=False,indent=2)+'\n',encoding='utf8',newline='\n')
+    save();sys.path[:0]=[str(ROOT/'product/src'),str(ROOT/'product/tests')]
+    os.environ.update(TEMP=str(ROOT/'product/.runtime/temp'),TMP=str(ROOT/'product/.runtime/temp'),TMPDIR=str(ROOT/'product/.runtime/temp'))
+    from ai_ad_editor.runtime import configure_local_runtime
+    configure_local_runtime()
+    names=['test_float_shaper','test_float_lut','test_lut_automation','test_float_preview']
+    if args.focused:
+        names=['test_float_shaper.FloatShaperTests.test_author_intensity_six_modes_and_Fraction_ticks',
+            'test_float_shaper.FloatShaperTests.test_nonfinite_1D_interpolation_does_not_reach_3D_indices',
+            'test_float_shaper.FloatShaperTests.test_combined_budget_rejects_before_allocation_and_actual_65536_points_execute']
+    tests=unittest.defaultTestLoader.loadTestsFromNames(names)
+    state.update(modules=names,planned_methods=tests.countTestCases(),suite_launched=True);save()
+    native_run=subprocess.run
+    def recorded(*positional,**kwargs):
+        caught=None
+        try: result=native_run(*positional,**kwargs)
+        except subprocess.CalledProcessError as exc:
+            caught=exc;result=subprocess.CompletedProcess(exc.cmd,exc.returncode,exc.stdout,exc.stderr)
+        command=positional[0] if positional else kwargs.get('args')
+        row={'command':list(map(str,command)) if isinstance(command,(list,tuple)) else str(command),'exit_code':result.returncode}
+        index=len(state['calls'])
+        for label,data in [('input',kwargs.get('input')),('stdout',result.stdout),('stderr',result.stderr)]:
+            if isinstance(data,bytes):
+                path=work/f'call-{index:03d}.{label}.bin';path.write_bytes(data)
+                row[label]={'file':path.name,'bytes':len(data),'sha256':sha(path)}
+        state['calls'].append(row)
+        if caught is not None: raise caught
+        return result
+    started=time.monotonic()
+    try:
+        with (work/'unittest.log').open('w',encoding='utf8',newline='\n') as log:
+            with contextlib.redirect_stdout(log),contextlib.redirect_stderr(log),patch.object(subprocess,'run',recorded):
+                result=unittest.TextTestRunner(stream=log,verbosity=2).run(tests)
+        state.update(status='passed' if result.wasSuccessful() and not result.skipped else 'failed-preserved',
+            methods=result.testsRun,seconds=time.monotonic()-started,failures=len(result.failures),
+            errors=len(result.errors),skipped=len(result.skipped),log_sha256=sha(work/'unittest.log'))
+    except BaseException as exc:
+        state.update(status='failed-preserved',error=repr(exc));raise
+    finally:
+        state.update(frozen_after=frozen(),finished_at_utc=datetime.now(timezone.utc).isoformat())
+        state['frozen_equal']=before==state['frozen_after']
+        if not state['frozen_equal']:state['status']='failed-source-changed'
+        save();print(json.dumps({k:state.get(k) for k in ('status','planned_methods','methods','seconds','failures','errors','skipped','frozen_equal','error')}),flush=True)
+    return 0 if state['status']=='passed' else 1
+
+if __name__=='__main__': raise SystemExit(main())

@@ -1,0 +1,69 @@
+"""Correct a stale parent-owner name after a preserved pre-suite rejection."""
+from datetime import datetime,timezone
+import ctypes
+from ctypes import wintypes
+import hashlib
+import importlib.util
+import json
+from pathlib import Path
+import shutil
+
+MAIN=Path(__file__).resolve().parents[2]
+ROOT=MAIN/'product/.runtime/float-shaper-lab-20261023'
+WORK=ROOT/'product/.runtime/float-shaper-20261023'
+SKILLS=MAIN/'product/.runtime/float-skill-sync-20261023-r2'
+REL=ROOT/'docs/validation/evidence/float-shaper-20261023-lab/owner-reference-r1'
+def sha(p):return 'sha256:'+hashlib.sha256(p.read_bytes()).hexdigest()
+def read(p):return json.loads(p.read_bytes())
+
+
+def main():
+    k=ctypes.WinDLL('kernel32',use_last_error=True)
+    k.OpenProcess.argtypes=[wintypes.DWORD,wintypes.BOOL,wintypes.DWORD];k.OpenProcess.restype=wintypes.HANDLE
+    for pid in (14384,19624):
+        assert not k.OpenProcess(0x1000,False,pid) and ctypes.get_last_error()==87,pid
+    state=read(WORK/'complete-r3/run.json')
+    assert state['status']=='failed-preserved' and state['suite_launched'] is False
+    assert read(WORK/'release-r3/run.json')['main_mutated'] is False
+    spec=importlib.util.spec_from_file_location('shaper_owner_repair_frozen',ROOT/'scripts/run_frozen_regression.py')
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+    assert module.frozen()==state['frozen_inputs']
+    assert {p.relative_to(ROOT).as_posix():sha(p) for p in (ROOT/'scripts').iterdir() if p.is_file()}==state['verification_scripts']
+    REL.mkdir(parents=True,exist_ok=False)
+    for p in [WORK/'complete-r3/run.json',WORK/'release-r3/run.json']:
+        shutil.copyfile(p,REL/(p.parent.name+'-before.json'))
+    for name in ('run_float_shaper_complete_r3.py','publish_float_shaper_after_complete_r3.py','float_shaper_release_docs.py'):
+        shutil.copyfile(ROOT/'scripts'/name,REL/(name+'.before.txt'))
+    t=(ROOT/'scripts/run_float_shaper_complete_r3.py').read_text(encoding='utf8')
+    assert t.count("for name in ('complete-r1','release-r1'):")==1
+    t=t.replace("for name in ('complete-r1','release-r1'):","for name in ('complete-r2','release-r2'):")
+    t=t.replace('/float-shaper-20261023/complete-r3','/float-shaper-20261023/complete-r4')
+    p=ROOT/'scripts/run_float_shaper_complete_r4.py';assert not p.exists();p.write_text(t,encoding='utf8',newline='\n');compile(t,str(p),'exec')
+    t=(ROOT/'scripts/publish_float_shaper_after_complete_r3.py').read_text(encoding='utf8')
+    t=t.replace('/float-shaper-20261023/release-r3','/float-shaper-20261023/release-r4')
+    t=t.replace('/float-shaper-20261023/complete-r3','/float-shaper-20261023/complete-r4')
+    p=ROOT/'scripts/publish_float_shaper_after_complete_r4.py';assert not p.exists();p.write_text(t,encoding='utf8',newline='\n');compile(t,str(p),'exec')
+    p=ROOT/'scripts/float_shaper_release_docs.py';t=p.read_text(encoding='utf8')
+    needle="    report+=link(REPORT,CONTRACT,'完整契约与一手格式来源')"
+    assert t.count(needle)==1
+    addition="    report+='\\n恢复 owner 首次仍引用旧父 owner 名称，因旧记录已封存而在启动套件前被拒绝；'+link(REPORT,REL+'/owner-reference-r1/verification.json','R3 原状态与引用修正')+'保留，实际方法数为零。产品源码及已通过的源码/安装收据不变。\\n'\n"
+    t=t.replace(needle,addition+needle);compile(t,str(p),'exec');p.write_text(t,encoding='utf8',newline='\n')
+    record=dict(status='corrected-stale-parent-owner-before-suite',at_utc=datetime.now(timezone.utc).isoformat(),
+        reason='R3 name-based parent loop retained complete-r1/release-r1 even though explicit paths used r2',
+        prior_complete_status=state['status'],prior_suite_launched=False,actual_methods_executed=0,
+        product_inputs=331,product_unchanged=module.frozen()==state['frozen_inputs'],new_parent_owner_names=['complete-r2','release-r2'],
+        new_complete='complete-r4',new_publisher='release-r4',main_mutated=False,published=False)
+    (REL/'verification.json').write_text(json.dumps(record,ensure_ascii=False,indent=2)+'\n',encoding='utf8',newline='\n')
+    shutil.copyfile(Path(__file__),REL/'executed-reference-repair.py.txt')
+    old=SKILLS/'product/.runtime/publish_after_shaper_r2.py';t=old.read_text(encoding='utf8')
+    t=t.replace('/float-shaper-20261023/release-r3','/float-shaper-20261023/release-r4')
+    t=t.replace('/float-shaper-20261023/complete-r3','/float-shaper-20261023/complete-r4')
+    p=SKILLS/'product/.runtime/publish_after_shaper_r3.py';assert not p.exists();compile(t,str(p),'exec');p.write_text(t,encoding='utf8',newline='\n')
+    evidence=SKILLS/'docs/validation/evidence/float-skill-sync-20261023'
+    shutil.copyfile(p,evidence/'publisher-r3.py.txt')
+    (evidence/'parent-reference-preflight-r1.json').write_text(json.dumps(dict(status='preflight-rejected-parent-failure-no-owner-created',
+        owner_created=False,main_mutated=False,reason=record['reason'],next_parent='R112 release-r4',actual_product_tests_executed=0),ensure_ascii=False,indent=2)+'\n',encoding='utf8',newline='\n')
+    print(json.dumps(record,ensure_ascii=False))
+
+
+if __name__=='__main__':main()

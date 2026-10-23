@@ -1,0 +1,607 @@
+{
+  "schema_version": "0.1.0",
+  "project": {
+    "id": "float_shaper_media",
+    "name": "Original standalone 1D and Resolve shaper LUT grading demo",
+    "created_at": "2026-10-22T19:38:00.424417Z",
+    "updated_at": "2026-10-22T19:39:10.178451Z",
+    "creator": "ai-ad-editor",
+    "source_revision": "local"
+  },
+  "settings": {
+    "timebase": {
+      "ticks_per_second": 90000,
+      "display_fps": {
+        "num": 10,
+        "den": 1
+      }
+    },
+    "canvas": {
+      "width": 320,
+      "height": 180,
+      "pixel_aspect": {
+        "num": 1,
+        "den": 1
+      },
+      "background": "#102040"
+    },
+    "color": {
+      "primaries": "bt709",
+      "transfer": "bt709",
+      "matrix": "bt709",
+      "range": "limited"
+    },
+    "audio": {
+      "sample_rate": 48000,
+      "channels": 2
+    },
+    "output": {
+      "container": "mkv",
+      "video": {
+        "codec": "libx264",
+        "preset": "ultrafast",
+        "crf": 0,
+        "pixel_format": "yuv444p10le"
+      },
+      "audio": {
+        "codec": "pcm_f32le"
+      }
+    },
+    "pixel_pipeline": {
+      "engine": "float32-native-v1",
+      "working_signal": {
+        "primaries": "bt709",
+        "transfer": "linear"
+      },
+      "output_signal": {
+        "primaries": "bt709",
+        "transfer": "bt709-oetf"
+      },
+      "range_policy": "clip",
+      "window_frames": 3,
+      "max_source_cache_bytes": 4194304,
+      "sources": {
+        "picture": {
+          "source_signal": {
+            "primaries": "bt709",
+            "transfer": "bt709-oetf"
+          },
+          "display_geometry": "square-unrotated"
+        }
+      }
+    }
+  },
+  "assets": [
+    {
+      "id": "picture",
+      "kind": "video",
+      "uri": "assets/original.native.mkv",
+      "sha256": "sha256:91e17e690edb097708373fc908b8f9e1d7707fe98f17ea118f2406d59ac33910",
+      "probe": {
+        "duration_seconds": 2.0,
+        "duration_tick": 180000,
+        "format": "matroska,webm",
+        "format_long_name": "Matroska / WebM",
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "ffv1",
+            "codec_long_name": "FFmpeg video codec #1",
+            "codec_type": "video",
+            "codec_tag_string": "[0][0][0][0]",
+            "codec_tag": "0x0000",
+            "width": 320,
+            "height": 180,
+            "coded_width": 320,
+            "coded_height": 180,
+            "has_b_frames": 0,
+            "pix_fmt": "gbrap16le",
+            "level": -99,
+            "color_range": "pc",
+            "color_space": "gbr",
+            "field_order": "progressive",
+            "r_frame_rate": "10/1",
+            "avg_frame_rate": "10/1",
+            "time_base": "1/1000",
+            "start_pts": 0,
+            "start_time": "0.000000",
+            "bits_per_raw_sample": "16",
+            "extradata_size": 201,
+            "disposition": {
+              "default": 0,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            },
+            "tags": {
+              "ENCODER": "Lavc62.28.100 ffv1",
+              "DURATION": "00:00:02.000000000"
+            }
+          }
+        ],
+        "video": {
+          "codec": "ffv1",
+          "width": 320,
+          "height": 180,
+          "pix_fmt": "gbrap16le",
+          "fps": "10/1",
+          "color_space": "gbr",
+          "duration_seconds": 0.0,
+          "start_time_seconds": 0.0
+        },
+        "audio": {
+          "codec": null,
+          "sample_rate": 0,
+          "channels": 0,
+          "duration_seconds": 0.0,
+          "start_time_seconds": 0.0
+        }
+      },
+      "rights_ref": "picture"
+    },
+    {
+      "id": "sound",
+      "kind": "audio",
+      "uri": "assets/original.audio.wav",
+      "sha256": "sha256:fc2715ae60bc1c781e04a61426c58e0d0b69390756721aba0a5e3e9150f67249",
+      "probe": {
+        "duration_seconds": 2.0,
+        "duration_tick": 180000,
+        "format": "wav",
+        "format_long_name": "WAV / WAVE (Waveform Audio)",
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "pcm_f32le",
+            "codec_long_name": "PCM 32-bit floating point little-endian",
+            "codec_type": "audio",
+            "codec_tag_string": "[3][0][0][0]",
+            "codec_tag": "0x0003",
+            "sample_fmt": "flt",
+            "sample_rate": "48000",
+            "channels": 2,
+            "bits_per_sample": 32,
+            "initial_padding": 0,
+            "r_frame_rate": "0/0",
+            "avg_frame_rate": "0/0",
+            "time_base": "1/48000",
+            "duration_ts": 96000,
+            "duration": "2.000000",
+            "bit_rate": "3072000",
+            "disposition": {
+              "default": 0,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            }
+          }
+        ],
+        "video": {
+          "codec": null,
+          "width": null,
+          "height": null,
+          "pix_fmt": null,
+          "fps": null,
+          "color_space": null,
+          "duration_seconds": 0.0,
+          "start_time_seconds": 0.0
+        },
+        "audio": {
+          "codec": "pcm_f32le",
+          "sample_rate": 48000,
+          "channels": 2,
+          "duration_seconds": 2.0,
+          "start_time_seconds": 0.0
+        }
+      },
+      "rights_ref": "sound"
+    }
+  ],
+  "sequences": [
+    {
+      "id": "seq_main",
+      "name": "Main",
+      "duration_tick": 180000,
+      "tracks": [
+        {
+          "id": "track_video_1",
+          "kind": "video",
+          "order": 0,
+          "muted": false,
+          "locked": false,
+          "clips": [
+            {
+              "id": "look_1d_linear",
+              "asset_id": "picture",
+              "timeline_start_tick": 0,
+              "duration_tick": 36000,
+              "source_in_tick": 0,
+              "source_out_tick": 36000,
+              "effects": [
+                {
+                  "type": "lut",
+                  "parameters": {
+                    "lut_id": "1d_linear",
+                    "input_signal": {
+                      "primaries": "bt709",
+                      "transfer": "bt709-oetf"
+                    },
+                    "output_signal": {
+                      "primaries": "bt709",
+                      "transfer": "bt709-oetf"
+                    },
+                    "interpolation_1d": "linear",
+                    "intensity": 0.2
+                  },
+                  "keyframes": [
+                    {
+                      "property": "intensity",
+                      "keyframes": [
+                        {
+                          "at_tick": 0,
+                          "value": 0.2,
+                          "interpolation": "ease_in_out"
+                        },
+                        {
+                          "at_tick": 36000,
+                          "value": 0.9,
+                          "interpolation": "linear"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "exposure",
+                  "parameters": {
+                    "amount": 0.1
+                  },
+                  "keyframes": [
+                    {
+                      "property": "amount",
+                      "keyframes": [
+                        {
+                          "at_tick": 0,
+                          "value": 0.1,
+                          "interpolation": "ease_in"
+                        },
+                        {
+                          "at_tick": 36000,
+                          "value": 0.35,
+                          "interpolation": "linear"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "look_1d_cubic",
+              "asset_id": "picture",
+              "timeline_start_tick": 36000,
+              "duration_tick": 36000,
+              "source_in_tick": 36000,
+              "source_out_tick": 72000,
+              "effects": [
+                {
+                  "type": "exposure",
+                  "parameters": {
+                    "amount": 0.1
+                  },
+                  "keyframes": [
+                    {
+                      "property": "amount",
+                      "keyframes": [
+                        {
+                          "at_tick": 0,
+                          "value": 0.1,
+                          "interpolation": "ease_in"
+                        },
+                        {
+                          "at_tick": 36000,
+                          "value": 0.35,
+                          "interpolation": "linear"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "lut",
+                  "parameters": {
+                    "lut_id": "1d_cubic",
+                    "input_signal": {
+                      "primaries": "bt709",
+                      "transfer": "bt709-oetf"
+                    },
+                    "output_signal": {
+                      "primaries": "bt709",
+                      "transfer": "bt709-oetf"
+                    },
+                    "interpolation_1d": "cubic",
+                    "intensity": 0.2
+                  },
+                  "keyframes": [
+                    {
+                      "property": "intensity",
+                      "keyframes": [
+                        {
+                          "at_tick": 0,
+                          "value": 0.2,
+                          "interpolation": "ease_in_out"
+                        },
+                        {
+                          "at_tick": 36000,
+                          "value": 0.9,
+                          "interpolation": "linear"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "look_1d_spline",
+              "asset_id": "picture",
+              "timeline_start_tick": 72000,
+              "duration_tick": 36000,
+              "source_in_tick": 72000,
+              "source_out_tick": 108000,
+              "effects": [
+                {
+                  "type": "lut",
+                  "parameters": {
+                    "lut_id": "1d_spline",
+                    "input_signal": {
+                      "primaries": "bt709",
+                      "transfer": "bt709-oetf"
+                    },
+                    "output_signal": {
+                      "primaries": "bt709",
+                      "transfer": "bt709-oetf"
+                    },
+                    "interpolation_1d": "spline",
+                    "intensity": 0.2
+                  },
+                  "keyframes": [
+                    {
+                      "property": "intensity",
+                      "keyframes": [
+                        {
+                          "at_tick": 0,
+                          "value": 0.2,
+                          "interpolation": "ease_in_out"
+                        },
+                        {
+                          "at_tick": 36000,
+                          "value": 0.9,
+                          "interpolation": "linear"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "exposure",
+                  "parameters": {
+                    "amount": 0.1
+                  },
+                  "keyframes": [
+                    {
+                      "property": "amount",
+                      "keyframes": [
+                        {
+                          "at_tick": 0,
+                          "value": 0.1,
+                          "interpolation": "ease_in"
+                        },
+                        {
+                          "at_tick": 36000,
+                          "value": 0.35,
+                          "interpolation": "linear"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "look_combined",
+              "asset_id": "picture",
+              "timeline_start_tick": 108000,
+              "duration_tick": 36000,
+              "source_in_tick": 108000,
+              "source_out_tick": 144000,
+              "effects": [
+                {
+                  "type": "lut",
+                  "parameters": {
+                    "lut_id": "combined",
+                    "input_signal": {
+                      "primaries": "bt709",
+                      "transfer": "bt709-oetf"
+                    },
+                    "output_signal": {
+                      "primaries": "bt709",
+                      "transfer": "bt709-oetf"
+                    },
+                    "interpolation_1d": "cosine",
+                    "intensity": 0.2,
+                    "interpolation": "trilinear"
+                  },
+                  "keyframes": [
+                    {
+                      "property": "intensity",
+                      "keyframes": [
+                        {
+                          "at_tick": 0,
+                          "value": 0.2,
+                          "interpolation": "ease_in_out"
+                        },
+                        {
+                          "at_tick": 36000,
+                          "value": 0.9,
+                          "interpolation": "linear"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "exposure",
+                  "parameters": {
+                    "amount": 0.1
+                  },
+                  "keyframes": [
+                    {
+                      "property": "amount",
+                      "keyframes": [
+                        {
+                          "at_tick": 0,
+                          "value": 0.1,
+                          "interpolation": "ease_in"
+                        },
+                        {
+                          "at_tick": 36000,
+                          "value": 0.35,
+                          "interpolation": "linear"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "look_headroom",
+              "asset_id": "picture",
+              "timeline_start_tick": 144000,
+              "duration_tick": 36000,
+              "source_in_tick": 144000,
+              "source_out_tick": 180000,
+              "effects": [
+                {
+                  "type": "lut",
+                  "parameters": {
+                    "lut_id": "headroom",
+                    "input_signal": {
+                      "primaries": "bt709",
+                      "transfer": "bt709-oetf"
+                    },
+                    "output_signal": {
+                      "primaries": "bt709",
+                      "transfer": "bt709-oetf"
+                    },
+                    "interpolation_1d": "nearest",
+                    "intensity": 0.2,
+                    "interpolation": "tetrahedral"
+                  },
+                  "keyframes": [
+                    {
+                      "property": "intensity",
+                      "keyframes": [
+                        {
+                          "at_tick": 0,
+                          "value": 0.2,
+                          "interpolation": "ease_in_out"
+                        },
+                        {
+                          "at_tick": 36000,
+                          "value": 0.9,
+                          "interpolation": "linear"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "exposure",
+                  "parameters": {
+                    "amount": 2.5
+                  },
+                  "keyframes": [
+                    {
+                      "property": "amount",
+                      "keyframes": [
+                        {
+                          "at_tick": 0,
+                          "value": 2.5,
+                          "interpolation": "ease_in"
+                        },
+                        {
+                          "at_tick": 36000,
+                          "value": 2.9,
+                          "interpolation": "linear"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "track_audio_1",
+          "kind": "audio",
+          "order": 0,
+          "muted": false,
+          "locked": false,
+          "clips": [
+            {
+              "id": "audio_clip",
+              "asset_id": "sound",
+              "timeline_start_tick": 0,
+              "duration_tick": 180000,
+              "source_in_tick": 0,
+              "source_out_tick": 180000
+            }
+          ]
+        }
+      ],
+      "markers": []
+    }
+  ],
+  "templates": [],
+  "outputs": [],
+  "provenance": {
+    "cli_version": "0.1.0",
+    "engine_version": "ffmpeg-local",
+    "model_versions": [],
+    "input_hashes": [],
+    "change_log": []
+  }
+}

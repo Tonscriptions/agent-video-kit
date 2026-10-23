@@ -1,5 +1,28 @@
 # Agent Video Kit
 
+## V112：本地 Float32 1D LUT 与组合 shaper（完整验收候选）
+
+新增独立 1D CUBE（每通道 2–65,536 点）与 Resolve 1D→3D 组合 shaper，复用项目 LUT 注册、明确输入/输出信号、原作者强度关键帧、线性混合及共享正式/预览内核。支持 1D nearest/linear/cosine/cubic/spline，3D 保留原五种插值；输入范围明确归一化，输出保留 Float32 过冲与 alpha 位。
+
+| 编号 | 实际核验内容 | 状态 | 证据 |
+|---|---|---|---|
+| V112.1 | 1D 五种插值、25 个 1D/3D 原生对照、注册、时钟及正式/预览/PCM/PNG16 | 通过：118 项 | [记录](docs/validation/evidence/float-shaper-20261023-lab/native-r2/verification.json) |
+| V112.2 | 首轮源码回归：118 项，2 失败、0 错误、0 跳过；用例修正后 3 项边界复核通过 | 历史失败保留 | [记录](docs/validation/evidence/float-shaper-20261023-lab/fixture-correction-r1/verification.json) |
+| V112.3 | 原创 20 帧/2 秒、320×180，2 个正式渲染和 3 个独立预览 CLI；完整与选区 PCM、PNG16 | 通过 | [记录](docs/validation/evidence/float-shaper-20261023-lab/media-r1/verification.json) |
+| V112.4 | 3 个 3840×2160 单帧、8 次公开 CLI；每项正式输入与预览、独立行参考 | 通过 | [记录](docs/validation/evidence/float-shaper-20261023-lab/4k-r1/verification.json) |
+| V112.5 | 8 个离线 wheel、197 源码/包/安装资源及 NumPy 原始文件，安装后 118 项相关回归 | 通过：118 项 | [记录](docs/validation/evidence/float-shaper-20261023-lab/installed-r1/verification.json) |
+| V112.6 | 完整回归目标 2,930；发现方法数与实际运行通过数分别记录 | 通过：2930 项 | [记录](docs/validation/evidence/float-shaper-20261023-lab/full-r1.json) |
+| V112.7 | 5 个时刻/10 面板静态目检；未连续播放或听审 | 已静态查看 | [记录](docs/validation/evidence/float-shaper-20261023-lab/static-review-r1/verification.json) |
+
+![原创原片与实际 CLI 预览对照](docs/assets/float-shaper-20261023-r1/comparison.gif)
+
+[原片](docs/assets/float-shaper-20261023-r1/original.mp4) · [正式结果](docs/assets/float-shaper-20261023-r1/edited.mp4) · [预览选区](docs/assets/float-shaper-20261023-r1/range.mp4) · [可编辑项目](docs/assets/float-shaper-20261023-r1/author-project.json)
+
+`.3dl/.csp/.dat`、逆 LUT、ICC/PQ/HLG/nits、自然审美、连续 4K 性能与峰值 RSS 仍未验收。旧编码渲染路径不新增 1D 能力；单帧 4K、静态目检、编码成功和方法通过数均不代表完整剪映等价。
+
+[当轮实测](docs/validation/连续浮点1D-LUT与组合shaper实测_2026-10-23.md) · [参数/格式契约](docs/specs/连续浮点1D-LUT与组合shaper契约_v0.1_2026-10-23.md)
+
+
 <!-- R111-FLOAT-COLOR-KEYER-DIAGNOSTICS -->
 ### R111 共同浮点调色、抠像与诊断恢复：最终快照核验
 

@@ -1,0 +1,194 @@
+"""Publish reviewed Skill instructions only after the exact V112 product gate."""
+from datetime import datetime, timezone
+import hashlib
+import importlib.util
+import json
+import os
+from pathlib import Path
+import re
+import shutil
+import subprocess
+import sys
+import time
+import urllib.parse
+
+ROOT = Path(__file__).resolve().parents[2]
+MAIN = ROOT.parents[2]
+R111 = ROOT.parent / 'pipeline-recovery-lab-20261023'
+R112 = ROOT.parent / 'float-shaper-lab-20261023'
+PARENT_OWNER = R112 / 'product/.runtime/float-shaper-20261023/release-r6/run.json'
+PARENT_FULL = R112 / 'product/.runtime/float-shaper-20261023/complete-r6/run.json'
+WORK = ROOT / 'product/.runtime/release-r3'
+EVIDENCE = 'docs/validation/evidence/float-skill-sync-20261023'
+GUIDE = 'docs/Agent显式浮点编辑Skill使用指引_2026-10-23.md'
+
+
+def read(path):
+    return json.loads(path.read_bytes())
+
+
+def sha(path):
+    return 'sha256:' + hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def save(path, data):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(path.name + '.' + str(os.getpid()) + '.tmp')
+    temporary.write_text(json.dumps(data, ensure_ascii=False, indent=2)+'\n', encoding='utf8', newline='\n')
+    os.replace(temporary, path)
+
+
+def git(root, *args):
+    command = ['git','-c','gc.auto=0','-c','maintenance.auto=false','-c','core.fsmonitor=false',*args]
+    result = subprocess.run(command, cwd=root, capture_output=True,
+        timeout=3600 if args and args[0]=='push' else 600, creationflags=subprocess.CREATE_NO_WINDOW)
+    assert result.returncode == 0, (args, result.stderr.decode('utf8','replace')[-1500:])
+    return result.stdout
+
+
+def load(path, name):
+    spec = importlib.util.spec_from_file_location(name, path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def inputs():
+    record = read(ROOT / EVIDENCE / 'prepare-r1.json')
+    assert record['status'] == 'passed-unpublished-three-skill-documentation'
+    assert len(record['prepared_files']) == 4 and len(record['validations']) == 3
+    assert record['checked_local_links'] == 316 and all(v['returncode']==0 for v in record['validations'])
+    rows = dict(record['prepared_files'])
+    rows.update({p.relative_to(ROOT).as_posix():sha(p) for p in sorted((ROOT/EVIDENCE).rglob('*')) if p.is_file()})
+    return record, rows
+
+
+def verify(record, rows):
+    assert all(sha(ROOT/name)==digest for name,digest in rows.items())
+    assert all(sha(MAIN/name)==digest for name,digest in record['original_skill_inputs'].items())
+
+
+def check_links(rows, stage):
+    count = 0
+    for name in rows:
+        if not name.endswith('.md'): continue
+        text = (stage/name).read_text(encoding='utf-8-sig')
+        for raw in re.findall(r'!?\[[^\]]*\]\(([^)]+)\)', text):
+            if re.match(r'^[A-Za-z][A-Za-z0-9+.-]*:',raw) or raw.startswith('#'): continue
+            raw = urllib.parse.unquote(raw.split('#',1)[0])
+            relative = Path(os.path.normpath(str(Path(name).parent/raw)))
+            assert any((base/relative).is_file() for base in (stage,MAIN)), (name,raw)
+            count += 1
+    return count
+
+
+def preflight():
+    record, rows = inputs()
+    verify(record, rows)
+    expected = read(PARENT_OWNER)
+    assert expected['status'] in ('waiting-for-actual-full2930-installed118', 'published-V112-full2930-installed118')
+    assert len(expected['frozen_inputs']) == 331
+    return record, rows
+
+
+def main():
+    record, rows = preflight()
+    if '--preflight' in sys.argv:
+        print(json.dumps(dict(status='passed-native-publication-preflight',prepared_files=len(rows),main_mutated=False,published=False)))
+        return
+    WORK.mkdir(parents=True, exist_ok=False)
+    publisher_sha = sha(Path(__file__))
+    state = dict(status='waiting-for-actual-published-V112',pid=os.getpid(),started_at_utc=datetime.now(timezone.utc).isoformat(),
+        main_mutated=False,published=False,product_changed=False,product_tests_executed_here=0,
+        prepared_inputs=dict(rows),publisher_sha256=publisher_sha,force_push=False,virtualization=False)
+    def checkpoint():
+        state['updated_at_utc']=datetime.now(timezone.utc).isoformat()
+        save(WORK/'run.json',state)
+    checkpoint()
+    try:
+        deadline=time.monotonic()+43200
+        while True:
+            verify(record,rows);assert sha(Path(__file__))==publisher_sha
+            owner=read(PARENT_OWNER)
+            complete=read(PARENT_FULL)
+            assert not owner['status'].startswith(('failed','aborted')),owner.get('error')
+            assert not complete['status'].startswith(('failed','aborted')),complete.get('error')
+            if owner['status']=='published-V112-full2930-installed118':break
+            assert time.monotonic()<deadline,'waiting for V112 publication exceeded twelve hours'
+            time.sleep(10)
+        baseline=owner['commit'];expected=owner['frozen_inputs']
+        assert owner['remote_main']==baseline and owner['main_clean']
+        assert complete['methods']==2930 and complete['status']=='passed-complete-native-suite-not-published'
+        frozen=load(MAIN/'scripts/run_frozen_regression.py','float_skill_main_frozen')
+        assert frozen.frozen()==expected
+        assert git(MAIN,'branch','--show-current').decode().strip()=='main'
+        assert git(MAIN,'remote','get-url','origin').decode().strip()=='git@github.com:Tonscriptions/agent-video-kit.git'
+        assert git(MAIN,'rev-parse','HEAD').decode().strip()==baseline
+        assert git(MAIN,'ls-remote','origin','refs/heads/main').decode().split()[0]==baseline
+        assert not git(MAIN,'status','--porcelain','-z')
+        state.update(status='building-reviewed-native-document-stage',parent_commit=baseline);checkpoint()
+        stage=WORK/'native-stage';stage.mkdir()
+        for name,digest in rows.items():
+            target=stage/name;target.parent.mkdir(parents=True,exist_ok=True)
+            shutil.copyfile(ROOT/name,target);assert sha(target)==digest
+        readme=(MAIN/'README.md').read_text(encoding='utf-8-sig')
+        assert '## V112：' in readme and 'FS112-SKILL-SYNC' not in readme
+        first,sep,rest=readme.partition('\n')
+        section='\n<!-- FS112-SKILL-SYNC -->\n### 显式浮点编辑 Skill 同步\n\n'
+        section+='| 编号 | 更新与核验 | 结果 |\n|---|---|---|\n'
+        section+='| FS112-01 | `$video-cut-agent-editor`、`$video-cut-timeline`、`$video-cut-quality` | 明确浮点后端选择、能力发现、1D/组合 LUT 与分层核验；名称保持 `video-cut-` 前缀 |\n'
+        section+='| FS112-02 | 三份 Skill 格式及本地引用 | 3 个原生验证进程通过，准备阶段 316 个引用核对；不是新增产品测试 |\n'
+        section+='| FS112-03 | 产品与发布边界 | 在实际 V112 完整回归和发布后同步；331 产品输入不变，主目录继续由本地 junction 加载 |\n\n'
+        section+='[操作指引]('+GUIDE+') · [格式/链接记录]('+EVIDENCE+'/prepare-r1.json) · [保留的首轮链接失败]('+EVIDENCE+'/prior-failed-r1/prepare-failed-r1.json)\n\n'
+        (stage/'README.md').write_text(first+sep+section+rest,encoding='utf8',newline='\n')
+        index=(MAIN/'docs/README.md').read_text(encoding='utf-8-sig');first,sep,rest=index.partition('\n')
+        (stage/'docs/README.md').write_text(first+sep+'\n- [Agent 显式浮点编辑 Skill 使用指引]('+Path(GUIDE).name+')\n'+rest,encoding='utf8',newline='\n')
+        attrs=(MAIN/'.gitattributes').read_text(encoding='utf-8-sig')
+        attrs+='\n# Preserve original float Skill documentation validation receipts\n'+EVIDENCE+'/** -text\n'+EVIDENCE+'/**/*.txt -diff\n'
+        (stage/'.gitattributes').write_text(attrs,encoding='utf8',newline='\n')
+        rows.update({n:sha(stage/n) for n in ('README.md','docs/README.md','.gitattributes')})
+        links=check_links(rows,stage)
+        result=dict(status='passed-reviewed-skill-documentation-publication',parent_commit=baseline,
+            source_receipt_sha256=sha(ROOT/EVIDENCE/'prepare-r1.json'),prepared_files=len(record['prepared_files']),
+            quick_validate_processes=3,checked_final_local_links=links,product_inputs=len(expected),
+            product_inputs_unchanged=True,product_tests_executed_here=0,full_capcut_parity=False,
+            original_failure_preserved=True,force_push=False,publisher_sha256=publisher_sha)
+        public=EVIDENCE+'/publication-r1.json';save(stage/public,result);rows[public]=sha(stage/public)
+        git(stage,'init','--quiet','--initial-branch=main');git(stage,'config','core.longpaths','true')
+        paths=WORK/'paths.nul';paths.write_bytes(b'\0'.join(n.encode('utf8') for n in sorted(rows))+b'\0')
+        git(stage,'add','--force','--pathspec-from-file='+str(paths),'--pathspec-file-nul')
+        helper=load(MAIN/'scripts/native_index_release_tools.py','float_skill_index')
+        helper.MAIN=stage;staged=helper.staged_rows(rows);git(stage,'diff','--cached','--check')
+        save(WORK/'fresh-staging.json',dict(status='passed-byte-identical-final-native-stage',rows=staged,checked_local_links=links,main_mutated=False))
+        assert frozen.frozen()==expected and git(MAIN,'rev-parse','HEAD').decode().strip()==baseline
+        assert not git(MAIN,'status','--porcelain','-z')
+        verify(record,{n:d for n,d in rows.items() if n in state['prepared_inputs']})
+        state.update(status='integrating-reviewed-skill-documents',main_mutated=True);checkpoint()
+        for name,digest in rows.items():
+            target=MAIN/name
+            if target.exists():
+                backup=WORK/'original-main'/name;backup.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(target,backup)
+            target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(stage/name,target);assert sha(target)==digest
+        git(MAIN,'add','--force','--pathspec-from-file='+str(paths),'--pathspec-file-nul')
+        helper.MAIN=MAIN;helper.staged_rows(rows);git(MAIN,'diff','--cached','--check')
+        assert frozen.frozen()==expected and not git(MAIN,'diff','--name-only')
+        for name in record['original_skill_inputs']:
+            skill=Path(name).parts[1]
+            loaded=Path('C:/Users/carzy/.codex/skills')/skill
+            assert loaded.resolve()==(MAIN/'skills'/skill).resolve()
+            assert sha(loaded/'SKILL.md')==rows[name]
+        git(MAIN,'commit','--quiet','-m','docs: sync explicit float rendering guidance across video-cut skills')
+        commit=git(MAIN,'rev-parse','HEAD').decode().strip();assert git(MAIN,'rev-parse','HEAD^').decode().strip()==baseline
+        state.update(status='committed-awaiting-ordinary-push',commit=commit);checkpoint()
+        git(MAIN,'push','origin','main')
+        remote=git(MAIN,'ls-remote','origin','refs/heads/main').decode().split()[0]
+        assert remote==commit and frozen.frozen()==expected and not git(MAIN,'status','--porcelain','-z')
+        state.update(status='published-three-video-cut-float-skills',published=True,remote_main=remote,main_clean=True)
+        checkpoint()
+    except BaseException as exc:
+        state.update(status='failed-preserved',error=repr(exc));checkpoint();raise
+    finally:
+        print(json.dumps({k:state.get(k) for k in ('status','commit','remote_main','error')},ensure_ascii=False),flush=True)
+
+
+if __name__=='__main__':main()

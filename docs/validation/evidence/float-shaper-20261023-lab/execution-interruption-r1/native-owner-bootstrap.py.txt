@@ -1,0 +1,51 @@
+"""Record and run an owned local process started by the native Windows provider."""
+from datetime import datetime,timezone
+import ctypes
+from ctypes import wintypes
+import hashlib
+import json
+import os
+from pathlib import Path
+import runpy
+import sys
+import traceback
+
+script=Path(sys.argv[1]).resolve()
+receipt=Path(sys.argv[2]).resolve()
+arguments=sys.argv[3:]
+temp_root=Path(__file__).resolve().parents[2]/'product/.runtime/temp'
+temp_root.mkdir(parents=True,exist_ok=True)
+for variable in ('TEMP','TMP','TMPDIR'):os.environ[variable]=str(temp_root)
+kernel=ctypes.WinDLL('kernel32',use_last_error=True)
+kernel.GetCurrentProcess.restype=wintypes.HANDLE
+kernel.IsProcessInJob.argtypes=[wintypes.HANDLE,wintypes.HANDLE,ctypes.POINTER(wintypes.BOOL)]
+kernel.IsProcessInJob.restype=wintypes.BOOL
+inside=wintypes.BOOL()
+assert kernel.IsProcessInJob(kernel.GetCurrentProcess(),None,ctypes.byref(inside))
+assert not inside.value,'native owner unexpectedly inherited a session job'
+data=dict(status='native-independent-owner-entered',pid=os.getpid(),parent_pid=os.getppid(),
+    at_utc=datetime.now(timezone.utc).isoformat(),in_inherited_job=False,virtualization=False,temp_root=str(temp_root),
+    launch_method='local Win32_Process.Create with hidden startup; no persistent scheduled task',
+    command_script=str(script),script_sha256='sha256:'+hashlib.sha256(script.read_bytes()).hexdigest(),
+    bootstrap_sha256='sha256:'+hashlib.sha256(Path(__file__).read_bytes()).hexdigest())
+receipt.parent.mkdir(parents=True,exist_ok=True)
+def save():
+    temporary=receipt.with_name(receipt.name+'.'+str(os.getpid())+'.tmp')
+    temporary.write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n',encoding='utf8',newline='\n')
+    os.replace(temporary,receipt)
+save()
+with receipt.with_suffix('.stdout.log').open('w',encoding='utf8',newline='\n',buffering=1) as out,receipt.with_suffix('.stderr.log').open('w',encoding='utf8',newline='\n',buffering=1) as err:
+    sys.stdout,sys.stderr=out,err
+    sys.path.insert(0,str(script.parent))
+    sys.argv=[str(script),*arguments]
+    try:
+        runpy.run_path(str(script),run_name='__main__')
+        data.update(status='native-independent-owner-returned',exit_code=0)
+    except BaseException as exc:
+        if isinstance(exc,SystemExit) and exc.code in (None,0):
+            data.update(status='native-independent-owner-returned',exit_code=0)
+        else:
+            data.update(status='native-independent-owner-failed',exit_code=exc.code if isinstance(exc,SystemExit) and isinstance(exc.code,int) else 1,error=repr(exc))
+            traceback.print_exc()
+    finally:
+        data['finished_at_utc']=datetime.now(timezone.utc).isoformat();save()

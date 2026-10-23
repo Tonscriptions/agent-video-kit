@@ -1,0 +1,108 @@
+"""One complete candidate regression after its own checks and accepted R111 parent."""
+from datetime import datetime, timezone
+import json
+import os
+from pathlib import Path
+import subprocess
+import sys
+import time
+from run_frozen_regression import frozen,sha
+
+ROOT=Path(__file__).resolve().parents[1]
+MAIN=Path('E:/dev/sandbox/AI广告剪辑')
+PARENT=ROOT.parent/'pipeline-recovery-lab-20261023'
+REL=ROOT/'docs/validation/evidence/float-shaper-20261023-lab'
+WORK=ROOT/'product/.runtime/float-shaper-20261023/complete-r3'
+
+def read(path):
+    for attempt in range(12):
+        try:return json.loads(path.read_bytes())
+        except (OSError,ValueError):
+            if attempt==11:raise
+            time.sleep(.025)
+
+def save(path,value):
+    temporary=path.with_name(path.name+'.'+str(os.getpid())+'.tmp')
+    temporary.write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n',encoding='utf8',newline='\n');os.replace(temporary,path)
+
+def git(*args):
+    result=subprocess.run(['git','-c','gc.auto=0','-c','maintenance.auto=false','-c','core.fsmonitor=false',*args],cwd=MAIN,
+        capture_output=True,timeout=600,creationflags=subprocess.CREATE_NO_WINDOW)
+    assert result.returncode==0,result.stderr.decode('utf8','replace')[-2000:]
+    return result.stdout
+
+def main():
+    WORK.mkdir(parents=True,exist_ok=False);before=frozen();assert len(before)==331
+    scripts={p.relative_to(ROOT).as_posix():sha(p) for p in sorted((ROOT/'scripts').iterdir()) if p.is_file()}
+    foundation=read(REL/'foundation-r1.json');deps=foundation['dependency_artifact_inputs']
+    state=dict(status='waiting-for-actual-own-checks-and-published-R111',pid=os.getpid(),
+        started_at_utc=datetime.now(timezone.utc).isoformat(),frozen_inputs=before,verification_scripts=scripts,
+        expected_methods=2930,suite_launched=False,published=False,native_windows=True,virtualization=False,
+        full_capcut_parity=False,force_push=False)
+    def checkpoint():state['updated_at_utc']=datetime.now(timezone.utc).isoformat();save(WORK/'run.json',state)
+    def verify():
+        assert frozen()==before
+        assert {p.relative_to(ROOT).as_posix():sha(p) for p in sorted((ROOT/'scripts').iterdir()) if p.is_file()}==scripts
+        assert all(sha(ROOT/n)==v for n,v in deps.items())
+    checkpoint()
+    try:
+        deadline=time.monotonic()+28800
+        while True:
+            verify()
+            continuation=ROOT/'product/.runtime/float-shaper-20261023/continuation-r1/run.json'
+            if continuation.is_file():
+                continued=read(continuation)
+                assert not continued['status'].startswith(('failed','aborted')),(continued['status'],continued.get('error'))
+            for name in ('complete-r1','release-r1'):
+                owner=read(PARENT/'product/.runtime/pipeline-recovery-20261023'/name/'run.json')
+                assert not owner['status'].startswith(('failed','aborted')),(name,owner['status'],owner.get('error'))
+            published=read(PARENT/'product/.runtime/pipeline-recovery-20261023/release-r2/run.json')
+            paths=[REL/'native-r2/verification.json',REL/'media-r1/verification.json',REL/'4k-r1/verification.json',REL/'installed-r1/verification.json']
+            accepted=[]
+            for path in paths:
+                if not path.is_file():continue
+                item=read(path);assert not item['status'].startswith(('failed','aborted')),(str(path),item.get('error'))
+                if item['status'].startswith('passed'):
+                    assert item['frozen_before']==item['frozen_after']==before
+                    accepted.append(path)
+            if len(accepted)==4 and published['status']=='published-V111-full2897-installed804':break
+            assert time.monotonic()<deadline,'waiting for accepted parent/candidate exceeded eight hours'
+            time.sleep(10)
+        native=read(paths[0]);installed=read(paths[3]);assert native['methods']==118 and native['skipped']==0
+        assert installed['isolated_methods']['methods']==118 and installed['isolated_methods']['skipped']==0
+        assert len(installed['resource_hashes'])==197
+        baseline=published['commit'];assert git('branch','--show-current').decode().strip()=='main'
+        assert git('remote','get-url','origin').decode().strip()=='git@github.com:Tonscriptions/agent-video-kit.git'
+        assert git('rev-parse','HEAD').decode().strip()==baseline
+        assert git('ls-remote','origin','refs/heads/main').decode().split()[0]==baseline
+        assert not git('status','--porcelain','-z')
+        for name,digest in foundation['parent_frozen_inputs'].items():assert sha(MAIN/name)==digest,name
+        state.update(status='checking-eight-committed-external-fixtures',parent_commit=baseline);checkpoint()
+        env=dict(os.environ,TEMP=str(ROOT/'product/.runtime/temp'),TMP=str(ROOT/'product/.runtime/temp'),TMPDIR=str(ROOT/'product/.runtime/temp'))
+        fixtures=REL/'external-fixtures-r1.json'
+        command=[sys.executable,'-E','-B','-X','utf8',str(ROOT/'scripts/materialize_regression_fixtures.py'),'--ref',baseline,'--output',str(fixtures)]
+        result=subprocess.run(command,cwd=ROOT,env=env,capture_output=True,timeout=600,creationflags=subprocess.CREATE_NO_WINDOW)
+        (WORK/'fixtures.stdout.log').write_bytes(result.stdout);(WORK/'fixtures.stderr.log').write_bytes(result.stderr)
+        assert result.returncode==0,result.stderr.decode('utf8','replace')[-2000:]
+        f=read(fixtures);assert f['status']=='passed' and len(f['fixtures'])==8
+        html=MAIN/'product/.runtime/html-motion-runtime-20261018-e2.json'
+        assert sha(html)=='sha256:9ec90b14285a76803571c58a2c4709a8e493e3a21cbba3c8b329f0aa2162b16e'
+        audio=MAIN/'product/.runtime/rubberband-offline-probe-20261017/native/rubberband-4.0.0-gpl-executable-windows/rubberband.exe'
+        command=[sys.executable,'-E','-B','-X','utf8',str(ROOT/'scripts/run_with_regression_fixtures.py'),
+            '--fixture-manifest',str(fixtures),'--output',str(REL/'full-r1.json'),'--html-runtime',str(html),'--rubberband',str(audio)]
+        verify();state.update(status='running-complete-native-suite',suite_launched=True,command=command,
+            accepted_evidence={str(p.relative_to(ROOT)):sha(p) for p in accepted});checkpoint()
+        with (WORK/'suite.stdout.log').open('wb') as out,(WORK/'suite.stderr.log').open('wb') as err:
+            process=subprocess.Popen(command,cwd=ROOT,env=env,stdout=out,stderr=err,creationflags=subprocess.CREATE_NO_WINDOW)
+            state['suite_owner_pid']=process.pid;checkpoint();code=process.wait()
+        full=read(REL/'full-r1.json')
+        assert code==0 and full['status']=='passed' and full['terminal_ok'],full.get('error')
+        assert full['methods']==2930 and full['skipped']==0
+        assert full['frozen_before']==full['frozen_after']==before
+        assert full['external_fixtures_equal'] and full['verification_scripts_equal']
+        verify();state.update(status='passed-complete-native-suite-not-published',methods=2930,suite_seconds=full['suite_seconds'],
+            skipped=0,full_receipt_sha256=sha(REL/'full-r1.json'));checkpoint()
+    except BaseException as exc:state.update(status='failed-preserved',error=repr(exc));checkpoint();raise
+    finally:print(json.dumps({k:state.get(k) for k in ('status','suite_launched','methods','suite_seconds','error')},ensure_ascii=False),flush=True)
+
+if __name__=='__main__':main()

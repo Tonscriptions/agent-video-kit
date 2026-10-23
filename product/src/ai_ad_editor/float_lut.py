@@ -20,8 +20,10 @@ from .errors import AppError
 from .float_color_signal import ColorSignal, convert_rgba
 from .lut_library import resolve_lut_path, lut_library_file
 
-PROTOCOL = 'explicit-signal-float32-cube-lut-v1'
+PROTOCOL = 'explicit-signal-float32-cube-lut-v2'
 INTERPOLATIONS = ('nearest', 'trilinear', 'tetrahedral', 'pyramid', 'prism')
+INTERPOLATIONS_1D = ('nearest', 'linear', 'cosine', 'cubic', 'spline')
+MAX_1D_SIZE = 65536
 MAX_WORKING_BYTES = 768*1024**2
 MAX_FILE_BYTES = 512*1024**2
 MAX_TILE_PIXELS = 262144
@@ -115,19 +117,34 @@ class Cube:
     domain_max: tuple
     payload: bytes = field(repr=False)
     dependency: Dependency
+    size_1d: int = 0
+    domain_1d_min: tuple = (0., 0., 0.)
+    domain_1d_max: tuple = (1., 1., 1.)
+    dialect: str = 'iridas'
 
     @property
     def table(self):
-        return np.frombuffer(self.payload, '<f4').reshape(self.size, self.size, self.size, 3)
+        if not self.size:
+            raise error('FORMAT', '独立1D LUT没有3D表')
+        return np.frombuffer(self.payload, '<f4', offset=self.size_1d*12).reshape(self.size, self.size, self.size, 3)
+
+    @property
+    def table_1d(self):
+        if not self.size_1d:
+            raise error('FORMAT', '独立3D LUT没有1D表')
+        return np.frombuffer(self.payload, '<f4', count=self.size_1d*3).reshape(self.size_1d, 3)
 
 
 def _parse_cube(path, root, poll, max_working_bytes):
     if path.suffix.lower() != '.cube':
-        raise error('FORMAT', '浮点LUT当前接受完整3D CUBE；其他格式须先显式转换')
+        raise error('FORMAT', '浮点LUT接受完整1D、3D或1D前置shaper的CUBE；其他格式须先显式转换')
     if not 0 < path.stat().st_size <= MAX_FILE_BYTES:
         raise error('BUDGET', 'CUBE文件为空或超过512MiB')
-    digest, total, size, count = hashlib.sha256(), 0, None, 0
-    seen, minima, maxima, storage = set(), (0., 0., 0.), (1., 1., 1.), None
+    digest, total, count = hashlib.sha256(), 0, 0
+    size, size_1d, expected, storage = 0, 0, 0, None
+    seen, minima, maxima, ranges = set(), (0., 0., 0.), (1., 1., 1.), {}
+    headers = {'TITLE','LUT_3D_SIZE','LUT_1D_SIZE','DOMAIN_MIN','DOMAIN_MAX',
+        'LUT_1D_INPUT_RANGE','LUT_3D_INPUT_RANGE'}
     try:
         with path.open('rb') as handle:
             line_index = 0
@@ -151,22 +168,32 @@ def _parse_cube(path, root, poll, max_working_bytes):
                     continue
                 parts = line.split()
                 header = parts[0]
-                if header in ('TITLE', 'LUT_3D_SIZE', 'DOMAIN_MIN', 'DOMAIN_MAX'):
+                if header in headers:
                     if count or header in seen:
                         raise error('FORMAT', 'CUBE头重复或出现在数据之后')
                     seen.add(header)
                     if header == 'TITLE':
                         if not re.fullmatch(r'TITLE\s+"[^"\r\n]*"', line):
                             raise error('FORMAT', 'CUBE TITLE须为带引号的单行字符串')
-                    elif header == 'LUT_3D_SIZE':
+                    elif header in ('LUT_3D_SIZE','LUT_1D_SIZE'):
                         if len(parts) != 2 or not re.fullmatch(r'[0-9]+', parts[1]):
-                            raise error('FORMAT', 'CUBE尺寸须为2到256的整数')
-                        size = int(parts[1])
-                        if not 2 <= size <= 256:
-                            raise error('FORMAT', 'CUBE尺寸须为2到256的整数')
-                        if 2*size**3*12+131072 > max_working_bytes:
+                            raise error('FORMAT', 'CUBE尺寸须为范围内整数')
+                        candidate = int(parts[1])
+                        limit = MAX_1D_SIZE if header=='LUT_1D_SIZE' else 256
+                        if not 2 <= candidate <= limit:
+                            raise error('FORMAT', 'CUBE 1D须2到65536点；3D须每轴2到256点')
+                        if header=='LUT_1D_SIZE': size_1d = candidate
+                        else: size = candidate
+                        expected = size_1d+size**3
+                        if 2*expected*12+131072 > max_working_bytes:
                             raise error('BUDGET', 'CUBE表与冻结副本超过工作区估算')
-                        storage = bytearray(size**3*12)
+                    elif header.endswith('_INPUT_RANGE'):
+                        if len(parts)!=3:
+                            raise error('FORMAT', 'CUBE INPUT_RANGE须为两个有限递增数')
+                        values = tuple(float(v) for v in parts[1:])
+                        if not all(math.isfinite(v) and abs(v)<=1e30 for v in values) or values[1]<=values[0]:
+                            raise error('FORMAT', 'CUBE INPUT_RANGE须为两个有限递增数')
+                        ranges[header] = values
                     else:
                         if len(parts) != 4:
                             raise error('FORMAT', 'CUBE DOMAIN须为三个有限数')
@@ -176,8 +203,10 @@ def _parse_cube(path, root, poll, max_working_bytes):
                         if header == 'DOMAIN_MIN': minima = values
                         else: maxima = values
                     continue
-                if storage is None or len(parts) != 3 or count >= size**3:
-                    raise error('FORMAT', 'CUBE须有完整且无额外扩展的3D样本')
+                if not expected or len(parts) != 3 or count >= expected:
+                    raise error('FORMAT', 'CUBE须有完整且无额外扩展的1D/3D样本')
+                if storage is None:
+                    storage = bytearray(expected*12)
                 values = tuple(float(v) for v in parts)
                 if not all(math.isfinite(v) and abs(v) <= MAX_FLOAT32 for v in values):
                     raise error('FORMAT', 'CUBE样本须为有限Float32')
@@ -185,12 +214,25 @@ def _parse_cube(path, root, poll, max_working_bytes):
                 count += 1
     except (ValueError, UnicodeError, OverflowError, struct.error) as caught:
         raise error('FORMAT', 'CUBE编码、数字或数据格式无效') from caught
-    if size is None or count != size**3 or any(b <= a for a, b in zip(minima, maxima)):
+    if not expected or count != expected or any(b <= a for a, b in zip(minima, maxima)):
         raise error('FORMAT', 'CUBE样本数或DOMAIN范围无效')
+    domains_present = bool(seen & {'DOMAIN_MIN','DOMAIN_MAX'})
+    if domains_present and (ranges or size and size_1d):
+        raise error('FORMAT', 'DOMAIN不能与Resolve INPUT_RANGE或组合shaper混用')
+    if 'LUT_1D_INPUT_RANGE' in ranges and not size_1d or 'LUT_3D_INPUT_RANGE' in ranges and not size:
+        raise error('FORMAT', 'INPUT_RANGE没有对应维度的LUT')
+    minima_1d, maxima_1d = (0.,0.,0.), (1.,1.,1.)
+    if size_1d:
+        if domains_present: minima_1d,maxima_1d = minima,maxima
+        elif 'LUT_1D_INPUT_RANGE' in ranges:
+            a,b = ranges['LUT_1D_INPUT_RANGE'];minima_1d,maxima_1d = (a,)*3,(b,)*3
+    if 'LUT_3D_INPUT_RANGE' in ranges:
+        a,b = ranges['LUT_3D_INPUT_RANGE'];minima,maxima = (a,)*3,(b,)*3
+    dialect = 'resolve' if ranges or size and size_1d else 'iridas'
     dependency = Dependency(str(path), str(root), total, 'sha256:'+digest.hexdigest())
     verify_dependencies((dependency,), cancel=poll)
     poll()
-    return Cube(size, minima, maxima, bytes(storage), dependency)
+    return Cube(size, minima, maxima, bytes(storage), dependency, size_1d, minima_1d, maxima_1d, dialect)
 
 
 def _signal(value):
@@ -246,6 +288,7 @@ class LUTPlan:
     interpolation: str
     tracks_json: str
     dependencies: tuple
+    interpolation_1d: str = 'linear'
 
 
 def compile_lut(effect, *, resource_root, cache=None, max_working_bytes=MAX_WORKING_BYTES, cancel=None):
@@ -259,12 +302,15 @@ def compile_lut(effect, *, resource_root, cache=None, max_working_bytes=MAX_WORK
     if not isinstance(effect,dict) or set(effect)-{'type','id','enabled','parameters','keyframes'}:
         raise error('ARGUMENT', '浮点LUT包含未知字段；参数须置于parameters')
     parameters = effect.get('parameters',{})
-    allowed = {'path','file','lut','lut_id','interpolation','intensity','input_signal','output_signal','keyframes'}
+    allowed = {'path','file','lut','lut_id','interpolation','interpolation_1d','intensity','input_signal','output_signal','keyframes'}
     if not isinstance(parameters,dict) or set(parameters)-allowed:
         raise error('ARGUMENT', '浮点LUT参数包含未知字段')
     interpolation = parameters.get('interpolation','tetrahedral')
     if interpolation not in INTERPOLATIONS:
         raise error('ARGUMENT', 'LUT插值须为已声明的五种之一')
+    interpolation_1d = parameters.get('interpolation_1d','linear')
+    if interpolation_1d not in INTERPOLATIONS_1D:
+        raise error('ARGUMENT', '1D LUT插值须为nearest、linear、cosine、cubic或spline')
     intensity = number(parameters.get('intensity',1),0,1)
     input_signal, output_signal = _signal(parameters.get('input_signal')), _signal(parameters.get('output_signal'))
     tracks_json = _tracks(effect,parameters)
@@ -300,8 +346,37 @@ def compile_lut(effect, *, resource_root, cache=None, max_working_bytes=MAX_WORK
         cache[key] = cube
     if expected is not None and cube.dependency.sha256 != expected:
         raise error('RESOURCE_CHANGED', '登记LUT的SHA-256与实际文件不符')
+    if 'interpolation_1d' in parameters and not cube.size_1d:
+        raise error('ARGUMENT', 'interpolation_1d要求文件含1D LUT或shaper')
     dependencies.append(cube.dependency)
-    return LUTPlan(cube,input_signal,output_signal,intensity,interpolation,tracks_json,tuple(dependencies))
+    return LUTPlan(cube,input_signal,output_signal,intensity,interpolation,tracks_json,tuple(dependencies),interpolation_1d)
+
+
+def _lookup_1d(cube, rgb, method):
+    """Independent channel weights; replicated endpoints, unclipped outputs.
+
+    Cubic uses unit finite-difference tangents, spline uses half tangents.
+    Domain normalization is explicit even when minima are nonzero, unlike
+    legacy filters that scale values without subtracting the domain origin.
+    """
+    n = cube.size_1d
+    q = (np.clip((rgb-np.asarray(cube.domain_1d_min))/
+        (np.asarray(cube.domain_1d_max)-cube.domain_1d_min),0,1).astype(np.float32)*np.float32(n-1)).astype(np.float64)
+    channels = np.arange(3)[None,:]
+    if method=='nearest':
+        return cube.table_1d[np.floor(q+.5).astype(np.int64),channels].astype(np.float64)
+    low = np.floor(q).astype(np.int64);high = np.minimum(low+1,n-1);t = q-low
+    def sample(index): return cube.table_1d[index,channels].astype(np.float64)
+    if method in ('linear','cosine'):
+        u = t if method=='linear' else (1-np.cos(np.pi*t))*.5
+        return sample(low)*(1-u)+sample(high)*u
+    t2,t3 = t*t,t*t*t
+    if method=='cubic':
+        weights = (-t3+2*t2-t, t3-2*t2+1, -t3+t2+t, t3-t2)
+    else:
+        weights = (-.5*t3+t2-.5*t, 1.5*t3-2.5*t2+1, -1.5*t3+2*t2+.5*t, .5*t3-.5*t2)
+    indexes = (np.maximum(low-1,0),low,high,np.minimum(high+1,n-1))
+    return sum(sample(index)*weight for index,weight in zip(indexes,weights))
 
 
 def _lookup(cube, rgb, method):
@@ -411,7 +486,13 @@ def apply_lut(surface, plan, author_tick, *, working_signal, tile_pixels=65536,
         transformed,_ = convert_rgba(value.reshape(1,len(value),4),working_signal,plan.input_signal,
             tile_pixels=tile_pixels,max_working_bytes=max_working_bytes,cancel=poll)
         with np.errstate(over='ignore',invalid='ignore'):
-            transformed.reshape(-1,4)[:,:3] = _lookup(plan.cube,transformed.reshape(-1,4)[:,:3].astype(np.float64),plan.interpolation)
+            if plan.cube.size_1d:
+                transformed.reshape(-1,4)[:,:3] = _lookup_1d(plan.cube,transformed.reshape(-1,4)[:,:3].astype(np.float64),plan.interpolation_1d)
+                if not np.isfinite(transformed).all():
+                    raise error('VALUES', '1D LUT插值输出超出Float32有限范围')
+            if plan.cube.size:
+                poll()
+                transformed.reshape(-1,4)[:,:3] = _lookup(plan.cube,transformed.reshape(-1,4)[:,:3].astype(np.float64),plan.interpolation)
         if not np.isfinite(transformed).all():
             raise error('VALUES', 'LUT插值输出超出Float32有限范围')
         graded,_ = convert_rgba(transformed,plan.output_signal,working_signal,
@@ -424,6 +505,10 @@ def apply_lut(surface, plan, author_tick, *, working_signal, tile_pixels=65536,
             raise error('VALUES', 'LUT混合超出Float32有限范围')
     poll()
     return output.reshape(surface.shape),{'protocol':PROTOCOL,'interpolation':plan.interpolation,'intensity':intensity,
+        'interpolation_1d':plan.interpolation_1d if plan.cube.size_1d else None,
+        'table_1d_size':plan.cube.size_1d,'table_dialect':plan.cube.dialect,
+        'stages':(['1D'] if plan.cube.size_1d else [])+(['3D'] if plan.cube.size else []),
+        'domain_1d_min':list(plan.cube.domain_1d_min),'domain_1d_max':list(plan.cube.domain_1d_max),
         'author_tick':str(author_tick),'table_sha256':plan.cube.dependency.sha256,'table_size':plan.cube.size,
         'domain_min':list(plan.cube.domain_min),'domain_max':list(plan.cube.domain_max),
         'input_signal':vars(plan.input_signal),'output_signal':vars(plan.output_signal),'working_signal':vars(working_signal),

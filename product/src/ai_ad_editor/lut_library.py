@@ -86,6 +86,8 @@ def parse_lut_metadata(path: Path) -> dict[str, Any]:
         return metadata
     title: str | None = None
     size: int | None = None
+    size_1d: int | None = None
+    input_ranges: dict[str, list[float]] = {}
     domain_min: list[float] | None = None
     domain_max: list[float] | None = None
     sample_count = 0
@@ -106,6 +108,17 @@ def parse_lut_metadata(path: Path) -> dict[str, Any]:
                         candidate = 0
                     if 2 <= candidate <= 256:
                         size = candidate
+                elif key == "LUT_1D_SIZE" and len(parts) == 2:
+                    try:
+                        candidate = int(parts[1])
+                    except ValueError:
+                        candidate = 0
+                    if 2 <= candidate <= 65536:
+                        size_1d = candidate
+                elif key in {"LUT_1D_INPUT_RANGE", "LUT_3D_INPUT_RANGE"} and len(parts) == 3:
+                    values = [_parse_number(item) for item in parts[1:]]
+                    if all(value is not None and math.isfinite(value) for value in values) and values[0] < values[1]:
+                        input_ranges[key.lower()] = [float(value) for value in values]
                 elif key in {"DOMAIN_MIN", "DOMAIN_MAX"} and len(parts) == 4:
                     values = [_parse_number(item) for item in parts[1:]]
                     if all(value is not None for value in values):
@@ -121,9 +134,14 @@ def parse_lut_metadata(path: Path) -> dict[str, Any]:
         metadata["title"] = title
     if size is not None:
         metadata["lut_3d_size"] = size
-        metadata["expected_samples"] = size**3
+    if size_1d is not None:
+        metadata["lut_1d_size"] = size_1d
+    if size is not None or size_1d is not None:
+        expected = (size**3 if size is not None else 0)+(size_1d or 0)
+        metadata["expected_samples"] = expected
         metadata["sample_count"] = sample_count
-        metadata["sample_count_valid"] = sample_count == size**3
+        metadata["sample_count_valid"] = sample_count == expected
+    metadata.update(input_ranges)
     if domain_min is not None:
         metadata["domain_min"] = domain_min
     if domain_max is not None:

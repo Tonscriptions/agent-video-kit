@@ -785,3 +785,10 @@ manifest `sequence-projection-budget` 保存可达节点与分量，`sequence-co
 `html-render --layout-check off|strict`：省略继承既有配方，未配置/旧配方 off。strict 在编码之前重新执行同计划的全帧门禁，与编码共享总期限；失败/未核验返回 `HTML_QUALITY_FAILED` 退出 2，实际报告和 PNG 在事务回滚后仍保留，工程/台账/新编码资产不变。运行/超时错误 6、取消 8。成功输出保存 layout_check 和绑定摘要的 layout_evidence；不把系统字体 fallback 自动登记为有商业权利。
 
 [范围/预算契约](./HTML文字布局与字体覆盖核验契约_v0.1_2026-10-18.md)、[实际缺字/裁切/继承/发行](../validation/HTML文字布局与字体覆盖实测_2026-10-18.md)。
+
+
+## V112：1D LUT 与组合 shaper
+
+新增独立 1D CUBE（每通道 2–65,536 点）与 Resolve 1D→3D 组合 shaper，复用项目 LUT 注册、明确输入/输出信号、原作者强度关键帧、线性混合及共享正式/预览内核。支持 1D nearest/linear/cosine/cubic/spline，3D 保留原五种插值；输入范围明确归一化，输出保留 Float32 过冲与 alpha 位。
+
+[本轮实际状态与证据](../validation/连续浮点1D-LUT与组合shaper实测_2026-10-23.md)；[契约](连续浮点1D-LUT与组合shaper契约_v0.1_2026-10-23.md)。独立 1D、明确两级范围、五种 1D 插值和共享正式/预览能力纳入当前候选；未验收项继续保留，不以编码或方法数量宣称剪映等价。
