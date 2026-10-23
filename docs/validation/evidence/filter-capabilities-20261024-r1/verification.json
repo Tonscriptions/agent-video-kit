@@ -1,0 +1,54 @@
+{
+  "status": "passed",
+  "checked_at_utc": "2026-10-23T20:48:22.672786+00:00",
+  "release": "v0.1.0-alpha.1",
+  "scope": "Installed CLI catalog/help and installed source review; no new render or model inference.",
+  "commands": [
+    {
+      "argv": [
+        "powershell.exe",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "C:\\Users\\carzy\\.codex\\skills\\agent-ffmpeg-local-editor\\scripts\\run.ps1",
+        "effects",
+        "list"
+      ],
+      "exit_code": 0,
+      "stdout": "effects.stdout.txt",
+      "stdout_sha256": "db49c87375f204375132ae7bfa70dc7ee7da25fb91c4e91da765bdcedaaca1e4"
+    },
+    {
+      "argv": [
+        "powershell.exe",
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "C:\\Users\\carzy\\.codex\\skills\\agent-ffmpeg-local-editor\\scripts\\run.ps1",
+        "lut",
+        "register",
+        "--help"
+      ],
+      "exit_code": 0,
+      "stdout": "lut-register-help.stdout.txt",
+      "stdout_sha256": "8b452453e056dbe3322605dbdea50abba3e06640c50901a73101ce25bdebe090"
+    }
+  ],
+  "effects_count": 46,
+  "catalog_version": "0.9.0",
+  "registered_extensions": [
+    ".cube",
+    ".3dl",
+    ".csp",
+    ".dat"
+  ],
+  "float_LUT_formats": "complete .cube: 1D, 3D, or 1D then 3D shaper",
+  "legacy_encoded_renderer_gains_1D_support": false,
+  "dynamic_intensity": "lut3d advertised intensity 0..1; encoded RGB mix in default path, linear working mix in explicit Float32 path",
+  "capability_source": "docs/validation/evidence/local-install-20261024-r1/cases/capabilities.stdout.json",
+  "new_render_executions": 0,
+  "new_model_inferences": 0,
+  "historical_float_render_evidence": "docs/validation/evidence/float-shaper-20261023-lab/installed-r1/verification.json"
+}

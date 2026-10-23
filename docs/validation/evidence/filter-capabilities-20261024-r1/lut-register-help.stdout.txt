@@ -1,0 +1,30 @@
+usage: ai-ad-editor lut register [-h] [--format {json,text}]
+                                 [--request-id REQUEST_ID]
+                                 [--idempotency-key IDEMPOTENCY_KEY]
+                                 [--dry-run] [--no-network]
+                                 [--progress {none,jsonl}] --project PROJECT
+                                 --input INPUT [--lut-id LUT_ID] [--name NAME]
+                                 [--license-spdx LICENSE_SPDX]
+                                 [--license-url LICENSE_URL]
+                                 [--permitted-use PERMITTED_USE]
+                                 [--verification-status {unverified,verified,restricted}]
+                                 [--evidence EVIDENCE] [--creator CREATOR]
+
+options:
+  -h, --help            show this help message and exit
+  --format {json,text}  输出格式
+  --request-id REQUEST_ID
+  --idempotency-key IDEMPOTENCY_KEY
+  --dry-run
+  --no-network
+  --progress {none,jsonl}
+  --project PROJECT
+  --input INPUT         本地 .cube/.3dl/.csp/.dat 文件
+  --lut-id LUT_ID       稳定 LUT ID；默认由 SHA-256 派生
+  --name NAME
+  --license-spdx LICENSE_SPDX
+  --license-url LICENSE_URL
+  --permitted-use PERMITTED_USE
+  --verification-status {unverified,verified,restricted}
+  --evidence EVIDENCE
+  --creator CREATOR

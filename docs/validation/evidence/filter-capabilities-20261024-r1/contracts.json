@@ -1,0 +1,344 @@
+{
+  "effects": {
+    "status": "implemented",
+    "features": [
+      "grayscale",
+      "sepia",
+      "blur",
+      "boxblur",
+      "sharpen",
+      "brightness",
+      "contrast",
+      "saturation",
+      "hue",
+      "hsl",
+      "gamma",
+      "color_temperature",
+      "color_balance",
+      "color_wheel",
+      "rgb_curves",
+      "vignette",
+      "noise",
+      "invert",
+      "posterize",
+      "edgedetect",
+      "deband",
+      "deshake",
+      "histeq",
+      "gradfun",
+      "chroma_key",
+      "hflip",
+      "vflip",
+      "exposure",
+      "color_levels",
+      "curves",
+      "hqdn3d",
+      "smartblur",
+      "avgblur",
+      "tmix",
+      "tblend",
+      "lens_correction",
+      "draw_box",
+      "color_contrast",
+      "solarize",
+      "threshold",
+      "deflicker",
+      "dctdnoiz",
+      "frame_interpolation",
+      "effect_catalog_cli",
+      "effect_parameter_keyframes",
+      "sequence_adjustments",
+      "interval_adjustments",
+      "lut3d_project_local",
+      "lut3d_static_intensity"
+    ],
+    "catalog_version": "0.9.0",
+    "catalog_features": [
+      "avgblur",
+      "blur",
+      "box_blur",
+      "brightness",
+      "chroma_key",
+      "color_balance",
+      "color",
+      "color_contrast",
+      "color_levels",
+      "color_temperature",
+      "color_wheel",
+      "contrast",
+      "curves",
+      "deband",
+      "deflicker",
+      "deshake",
+      "dctdnoiz",
+      "draw_box",
+      "edgedetect",
+      "exposure",
+      "frame_interpolation",
+      "gamma",
+      "gradfun",
+      "grayscale",
+      "hsl",
+      "hqdn3d",
+      "histeq",
+      "hflip",
+      "hue",
+      "invert",
+      "lens_correction",
+      "lut3d",
+      "noise",
+      "posterize",
+      "rgb_curves",
+      "selective_hsl",
+      "sepia",
+      "sharpen",
+      "smartblur",
+      "solarize",
+      "saturation",
+      "tblend",
+      "threshold",
+      "tmix",
+      "vflip",
+      "vignette"
+    ],
+    "catalog_source": "ffmpeg-local",
+    "catalog_contract": "effects.list_and_effects.inspect_return_local_ffmpeg_backend_parameter_limits_and_keyframe_contract",
+    "unknown_effect_policy": "RENDER_FEATURE_UNSUPPORTED",
+    "effect_keyframe_contract": "brightness_contrast_saturation_hue_hsl_gamma_vignette_use_local_eq_eval_frame_and_hue_frame_expressions",
+    "selective_hsl": {
+      "status": "implemented_with_limits",
+      "engine": "encoded-rgb-eight-band-hsl-v1",
+      "backend": "ffmpeg:frei0r",
+      "fallback_backends": [
+        "ffmpeg:geq"
+      ],
+      "numeric_channels": 25,
+      "native_pixel_kernel": {
+        "program_format": "AVKHSL01",
+        "policy": "verified-native-auto",
+        "distribution": "bundled_Windows_amd64_hash_named_DLL_with_C_source_and_MIT_notice",
+        "runtime_compilation": false,
+        "program_depth_limit": 128,
+        "program_bytes_limit": 32256,
+        "parallel_policy": "up_to_three_shared_Windows_background_workers_plus_the_calling_thread",
+        "selection_env": "AI_AD_EDITOR_HSL_BACKEND=auto|native|expression"
+      },
+      "bands_degrees": {
+        "red": 0,
+        "orange": 30,
+        "yellow": 60,
+        "green": 120,
+        "cyan": 180,
+        "blue": 240,
+        "purple": 270,
+        "magenta": 300
+      },
+      "features": [
+        "independent_hue_saturation_lightness_per_band",
+        "animated_final_RGB_intensity",
+        "original_hue_circular_triangular_weights",
+        "author_clock_expressions_at_actual_frame_PTS",
+        "preserve_achromatic_pixels_and_exact_input_alpha",
+        "editable_package_and_fragment_transfer"
+      ],
+      "limits": [
+        "encoded_RGB_8bit",
+        "64KiB_single_kernel_16MiB_root_expression_bytes",
+        "shared_1024_effect_instances_and_2000000_state_samples",
+        "no_vendor_algorithm_or_full_CapCut_parity_acceptance"
+      ]
+    },
+    "curve_point_automation": {
+      "status": "implemented_with_limits",
+      "engine": "native-curve-points-cfr-v1",
+      "effects": [
+        "curves",
+        "rgb_curves"
+      ],
+      "channels": [
+        "all",
+        "red",
+        "green",
+        "blue"
+      ],
+      "property_pattern": "<channel>.<zero_based_point_index>.<x|y>",
+      "point_count_per_channel": [
+        1,
+        256
+      ],
+      "coordinate_range": [
+        0,
+        1
+      ],
+      "features": [
+        "whole_channel_atomic_commands",
+        "explicit_RGB_preserved_when_all_animates",
+        "complete_author_clock_at_actual_CFR",
+        "recursive_shared_effect_budgets",
+        "editable_project_package_fragment_rebuild",
+        "input_alpha_preserved"
+      ],
+      "limits": [
+        "fixed_topology",
+        "six_decimal_8bit_x_bins_must_strictly_increase",
+        "natural_cubic_spatial_curve",
+        "master_is_all_alias_only_for_curves",
+        "animated_channel_forks_static_all_if_no_own_points",
+        "not_HDR_or_vendor_color_equivalence"
+      ]
+    },
+    "numeric_effect_automation": {
+      "status": "implemented_with_limits",
+      "engine": "native-color-command-cfr-v1",
+      "effects": [
+        "blur",
+        "chroma_key",
+        "color_balance",
+        "color_contrast",
+        "color_levels",
+        "color_temperature",
+        "color_wheel",
+        "exposure",
+        "lens_correction",
+        "lut3d"
+      ],
+      "numeric_channels": 34,
+      "clock": "complete_author_output_sampled_on_actual_CFR_grid",
+      "features": [
+        "blur_both_axes",
+        "lens_k1_k2_center",
+        "colorkey_similarity_blend",
+        "input_alpha_times_RGB_key_coverage",
+        "root_unique_static_and_dynamic_key_alpha_compositors",
+        "colorcontrast_seven_numeric_channels",
+        "recursive_unique_targets",
+        "native_runtime_option_gate",
+        "content_addressed_command_files",
+        "editable_project_package_fragment_rebuild",
+        "shared_recursive_budgets"
+      ],
+      "limits": [
+        "color_tokens_enums_and_plane_selection_remain_static",
+        "1024_additional_key_alpha_compositors_per_recursive_root",
+        "blur_filters_RGB_and_alpha_planes",
+        "colorkey_uses_RGB_distance_not_semantic_matting_or_despill",
+        "lens_correction_uses_native_sampling_and_fill",
+        "six_decimal_native_values",
+        "Bezier_overshoot_clamped",
+        "2000000_state_samples_200000_commands_16MiB_1024_targets_per_recursive_root",
+        "not_HDR_or_full_CapCut_effect_equivalence"
+      ]
+    },
+    "numeric_color_automation": {
+      "status": "implemented_with_limits",
+      "engine": "native-color-command-cfr-v1",
+      "effects": [
+        "color_balance",
+        "color_contrast",
+        "color_levels",
+        "color_temperature",
+        "color_wheel",
+        "exposure",
+        "lut3d"
+      ],
+      "numeric_channels": 27,
+      "clock": "complete_author_output_sampled_on_actual_CFR_grid",
+      "features": [
+        "recursive_unique_targets",
+        "native_runtime_option_gate",
+        "content_addressed_command_files",
+        "editable_project_and_package_rebuild",
+        "independent_text_group_and_interval_adjustments"
+      ],
+      "limits": [
+        "numeric_channels_only",
+        "six_decimal_native_values",
+        "Bezier_overshoot_clamped",
+        "2000000_state_samples_200000_commands_16MiB_1024_targets_per_recursive_root",
+        "existing_Kelvin_shadow_RGB_mapping_not_physical_white_balance",
+        "not_HDR_color_management_or_CapCut_color_algorithm_equivalence"
+      ]
+    },
+    "adjustment_contract": "settings.adjustments_are_applied_after_track_compositing_in_declared_order; start_tick_and_duration_tick_define_optional_sequence_clock_intervals",
+    "limits": [
+      "other_unsupported_effect_parameters_use_static_value_with_warning",
+      "unlisted_native_filter_automation_remains_static_with_warning",
+      "hsl_lightness_maps_to_ffmpeg_hue_brightness",
+      "rgb_curves_use_fixed_topology_coordinate_animation",
+      "color_wheel_maps_to_ffmpeg_colorbalance_three_way_wheel",
+      "curves_accept_one_whitelist_validated_all_master_curve",
+      "interval_adjustments_are_video_only_and_reassembled_with_trim_concat",
+      "lut_intensity_requires_project_local_cube_for_partial_strength",
+      "frame_interpolation_uses_local_minterpolate_and_can_be_cpu_expensive",
+      "frame_interpolation_scene_change_detection_is_heuristic"
+    ]
+  },
+  "lut_library": {
+    "status": "implemented",
+    "features": [
+      "project_local_registration",
+      "sha256_identity",
+      "cube_metadata",
+      "list",
+      "inspect",
+      "rights_ledger_registration",
+      "lut_id_effect_reference",
+      "hash_mismatch_gate",
+      "cube_static_intensity_blend",
+      "deterministic_intensity_cache"
+    ],
+    "library_version": "0.1.0",
+    "path": "assets/lut-library.json",
+    "extensions": [
+      ".cube",
+      ".3dl",
+      ".csp",
+      ".dat"
+    ],
+    "limits": [
+      "non_cube_metadata_is_extension_only",
+      "non_cube_intensity_unsupported",
+      "dynamic_intensity_uses_static_value",
+      "snapshot_restore_does_not_delete_newly_copied_asset_files"
+    ]
+  },
+  "timeline_native_float_lut": {
+    "status": "implemented_with_limits",
+    "protocol": "explicit-signal-float32-cube-lut-v2",
+    "selection": "settings.pixel_pipeline.engine=float32-native-v1",
+    "commands": [
+      "render",
+      "preview.range",
+      "preview.frame"
+    ],
+    "features": [
+      "project_local_path_or_registered_sha256",
+      "immutable_red_fastest_cube",
+      "nearest_trilinear_tetrahedral_pyramid_prism",
+      "explicit_input_output_RGB_signals",
+      "linear_working_domain_intensity_mix",
+      "six_author_intensity_interpolations",
+      "original_author_windows_and_nested_clock",
+      "ordered_exposure_lut_chain",
+      "source_alpha_bits_preserved",
+      "bounded_tiles_and_cancellation",
+      "standalone_1D_CUBE_or_Resolve_1D_then_3D_shaper",
+      "independent_nearest_linear_cosine_cubic_spline_1D_interpolation",
+      "explicit_Iridas_RGB_domain_or_Resolve_per_stage_input_ranges",
+      "combined_table_registry_metadata_and_immutable_SHA256"
+    ],
+    "limits": [
+      "complete_3D_CUBE_2_to_256_or_1D_2_to_65536",
+      "explicit_table_and_workspace_admission",
+      "domain_normalization_then_boundary_clamp",
+      "native_strict_pyramid_axis_ties",
+      "no_3dl_csp_dat_or_runtime_format_guessing",
+      "combined_shaper_rejects_ambiguous_DOMAIN_headers",
+      "1D_cubic_spline_may_overshoot_without_output_clip",
+      "legacy_encoded_lut3d_does_not_gain_1D_support",
+      "no_HDR_ICC_nits_gamut_mapping_or_natural_quality_acceptance",
+      "workspace_estimate_not_total_RSS",
+      "full_CapCut_parity_unaccepted"
+    ]
+  }
+}
