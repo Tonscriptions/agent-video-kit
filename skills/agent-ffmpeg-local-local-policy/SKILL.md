@@ -5,12 +5,12 @@ description: "Audit local-only Agent video execution, project references and off
 
 # Agent FFmpeg Local / local-policy
 
-离线运行与远程引用审计. Local release: `v0.1.0-alpha.1`.
+离线运行与远程引用审计. Local release: `v0.1.0-alpha.2`.
 
 ## Installed runtime
 
 Use the installed release, not `ai-ad-editor.ps1` or `product/src`. The shared launcher pins
-`v0.1.0-alpha.1`, checks the installation receipt and launcher hash, and starts native Python with `-I -S`.
+`v0.1.0-alpha.2`, checks the installation receipt and launcher hash, and starts native Python with `-I -S`.
 
 ```powershell
 $avkSkills = if ($env:CODEX_HOME) { Join-Path $env:CODEX_HOME 'skills' } else { Join-Path $env:USERPROFILE '.codex/skills' }

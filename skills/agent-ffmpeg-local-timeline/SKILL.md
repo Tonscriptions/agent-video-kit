@@ -1,16 +1,16 @@
 ---
 name: agent-ffmpeg-local-timeline
-description: "Compose local video timelines, keyframes, camera presets, transitions, masks, speed curves, nested sequences, captions and audio automation using the installed CLI."
+description: "Compose local video timelines, keyframes, camera presets, transitions, masks, speed curves and apply 100 built-in style/filter presets to clips or global adjustments using the installed CLI."
 ---
 
 # Agent FFmpeg Local / timeline
 
-时间线、关键帧、运镜、转场、嵌套. Local release: `v0.1.0-alpha.1`.
+时间线、关键帧、运镜、转场、嵌套. Local release: `v0.1.0-alpha.2`.
 
 ## Installed runtime
 
 Use the installed release, not `ai-ad-editor.ps1` or `product/src`. The shared launcher pins
-`v0.1.0-alpha.1`, checks the installation receipt and launcher hash, and starts native Python with `-I -S`.
+`v0.1.0-alpha.2`, checks the installation receipt and launcher hash, and starts native Python with `-I -S`.
 
 ```powershell
 $avkSkills = if ($env:CODEX_HOME) { Join-Path $env:CODEX_HOME 'skills' } else { Join-Path $env:USERPROFILE '.codex/skills' }
@@ -39,3 +39,7 @@ Use `preview frame` or `preview range` to inspect actual results before renderin
 - Author audio explicitly. `render --publish` checks local rights; it does not upload media.
 - Inspect capabilities before effects or Float32 work; do not substitute unsupported features silently.
 - Close unused browser tabs after any separately authorized browser operation.
+
+## Offline look presets
+
+Use `look list`, `look inspect`, `look preview` and `look apply` for 100 installed MIT style presets. Read [the look workflow](../agent-ffmpeg-local-editor/references/looks.md) before choosing a target, strength or publication settings. These are creative SDR looks; they do not establish official branded-filter or CapCut equivalence.

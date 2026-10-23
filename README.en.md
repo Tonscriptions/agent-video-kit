@@ -6,9 +6,11 @@
 
 **Release: `v0.1.0-alpha.1` — a native Windows CLI preview.** This milestone closes offline installation, structured editing, previews, rendering, checks and delivery. Full CapCut feature coverage, its asset ecosystem and perceptual equivalence remain future goals. [Release decision and open requirements](docs/releases/v0.1.0-alpha.1/RELEASE.md).
 
-![Actual case and CLI response replay](docs/assets/release-v0.1.0-alpha.1-r2/workflow.gif)
+**Current local update: `v0.1.0-alpha.2`, 100 presets.** The new package is stored in this repository and installed on E:. No new GitHub Release has been created; the public release link still targets alpha.1.
 
-This is the local case documentation page replaying actual CLI logs. The product is a CLI; the page documents cases and responses. [Recording](docs/assets/release-v0.1.0-alpha.1-r2/workflow.mp4) · [Desktop screenshot](docs/assets/release-v0.1.0-alpha.1-r2/desktop.png) · [Mobile screenshot](docs/assets/release-v0.1.0-alpha.1-r2/mobile.png).
+![Actual original/three-look video comparison](docs/assets/look-presets-20261024-r1/motion-comparison.gif)
+
+The silent comparison combines decoded frames from the original and three actual rendered videos. [100 numbered looks](docs/local/LOOK_PRESETS.md) · [New local package](docs/releases/v0.1.0-alpha.2/artifacts/agent-video-kit-v0.1.0-alpha.2-cp313-win_amd64.zip). The earlier documentation-page [response replay](docs/assets/release-v0.1.0-alpha.1-r2/workflow.gif), [recording](docs/assets/release-v0.1.0-alpha.1-r2/workflow.mp4) and [screenshot](docs/assets/release-v0.1.0-alpha.1-r2/desktop.png) remain historical evidence. The product is a CLI.
 
 ## Architecture and operation
 
@@ -42,28 +44,36 @@ An Agent uses Skills to turn a brief into an edit plan, reads `capabilities` and
 | F10 | Optional ASR/OCR/tracking/matting/repair adapters | Model registration and related commands | Weights and large inference runtimes are not bundled |
 | F11 | Frame/range previews, queues, cancellation, scopes | `preview` / `queue` / `quality` | Budgets are not peak-RSS or real-time guarantees |
 | F12 | Project packages, JSON, OTIO, MLT/plain draft exchange | `convert import/export` | Format-specific Exact/Approximate/Unsupported/Failed reports |
+| F13 | 100 offline MIT looks (alpha.2) | `look list/inspect/preview/apply` | Creative SDR RGB; measured Hald resampling, no official branded-filter parity |
 
 Use bundled `capabilities`, `schema show` and `COMMAND --help` for the exact supported contract. Plain draft adapters operate on existing authorized local JSON, do not run CapCut, and do not promise lossless compatibility with every proprietary effect. [Detailed manual](docs/releases/v0.1.0-alpha.1/USAGE.md).
 
 ## Installed local package and Skills (2026-10-24)
 
-**Ready-made looks are still missing:** no named Leica/Fuji/Kodak preset library ships with the base app, and it contains zero creative LUT files. The 46 entries are operators; external LUT support does not supply a finished look library. [Inventory and gap](docs/local/FILTERS.md).
+**The local installation is now `v0.1.0-alpha.2` (CLI `0.1.1`) with 100 offline MIT looks.** Categories: 12 B&W, 24 negative-film, 15 slide-film, eight cinema eras, ten landscape, 24 creative, five Lomo and two infrared. Each has a stable ID, distinct LUT, preview, source and notice. [Complete catalog](docs/local/LOOK_PRESETS.md) · [Usage](docs/releases/v0.1.0-alpha.2/USAGE.md).
 
-**Open-library feasibility now includes a real probe:** ten community projects were reviewed with stars, pinned revisions and notices. One MIT CUBE rendered through the installed Skill at 0.65 strength, producing three seconds/36 frames and a comparison GIF. A first curated 50–100-look library is estimated at 7–12 engineer-days; it is not integrated. Leica candidates require separate input/provenance review. [Sources, design, estimates and evidence](docs/research/OPEN_LOOK_LIBRARY_20261024.md) · [Original](docs/assets/lut-research-20261024-r1/original.mp4) · [Output](docs/assets/lut-research-20261024-r1/edited.mp4) · [Comparison GIF](docs/assets/lut-research-20261024-r1/comparison.gif).
+**The implementation uses 51 t3mujinpack Hald looks and 49 Striped Purple CUBEs.** Source commits/blobs are pinned and hashed. Original CUBE grids are retained; native-depth Hald data is resampled to 33³ with disclosed error. All 17 local Skills now pin the new installed build. The earlier [research and single-LUT probe](docs/research/OPEN_LOOK_LIBRARY_20261024.md) remain dated evidence.
+
+![Actual original/look comparisons](docs/assets/look-presets-20261024-r1/comparison.gif)
+
+[Actual video comparison GIF](docs/assets/look-presets-20261024-r1/motion-comparison.gif) · [100 native previews](docs/assets/look-presets-20261024-r1/contact-sheet.jpg) · [Original video](docs/assets/look-presets-20261024-r1/original.mp4) · [Individual previews/videos](docs/local/LOOK_PRESETS.md) · [Current checks](docs/validation/LOOK_PRESETS_20261024.md). Inputs and audio are synthetic; these checks do not establish natural-footage quality or full CapCut parity.
 
 **Filters are included:** register local LUTs (`.cube/.3dl/.csp/.dat`), use grayscale, sepia, grain, vignette and grading effects, and animate advertised parameters. The catalog has 46 effects; format, strength and 1D support depend on the renderer. [Loading workflow, limits and historical comparison GIF](docs/local/FILTERS.md).
 
-The verified release ZIP is installed at `E:/dev/sandbox/AI广告剪辑/local/agent-ffmpeg/v0.1.0-alpha.1/installed/`. All 17 local Skills are registered with the requested **`$agent-ffmpeg-local-xxx`** prefix. Invoke **`$agent-ffmpeg-local-editor`** on the next turn.
+The verified release ZIP is installed at `E:/dev/sandbox/AI广告剪辑/local/agent-ffmpeg/v0.1.0-alpha.2/installed/`. All 17 local Skills are registered with the requested **`$agent-ffmpeg-local-xxx`** prefix. Invoke **`$agent-ffmpeg-local-editor`** on the next turn.
 
 ```powershell
 $avk = 'E:/dev/sandbox/AI广告剪辑/skills/agent-ffmpeg-local-editor/scripts/run.ps1'
 & $avk doctor
 & $avk capabilities
+& $avk look list --query '黑白'
+& $avk look preview --id t3-kodak-gold-200 --output 'E:/video-work/gold-preview.png'
+& $avk look apply --project 'E:/video-work/my-ad' --id t3-kodak-gold-200 --global --strength 0.65
 ```
 
-The launcher checks the release pin, receipt and launcher digest, then runs the installed app with `-I -S`. Existing native Python/FFmpeg are available. Installed files occupy 81.8 MB; temporary files stay on E:. [Paths, all Skills and reproduction](docs/local/INSTALLATION.md) · [Local release ZIP](docs/releases/v0.1.0-alpha.1/artifacts/agent-video-kit-v0.1.0-alpha.1-cp313-win_amd64.zip).
+The launcher checks the release pin, receipt and launcher digest, then runs the installed app with `-I -S`. Existing native Python/FFmpeg are available. Installed files occupy 221 MB; temporary files stay on E:. [Paths, all Skills and reproduction](docs/local/INSTALLATION.md) · [Local release ZIP](docs/releases/v0.1.0-alpha.2/artifacts/agent-video-kit-v0.1.0-alpha.2-cp313-win_amd64.zip).
 
-This fresh installation completed 28 case commands and eight commands through the Skill launcher, including actual rendering, Chinese/space path forwarding and expected refusal. [Fresh input](docs/assets/local-install-20261024-r1/input.mp4) · [Output](docs/assets/local-install-20261024-r1/field.mp4) · [GIF](docs/assets/local-install-20261024-r1/field.gif) · [Template variant](docs/assets/local-install-20261024-r1/variant.gif) · [Launcher receipt](docs/validation/evidence/local-install-20261024-r1/skills/verification.json). See R10–R12 for scope.
+The historical alpha.1 installation completed 28 case commands and eight commands through the Skill launcher, including actual rendering, Chinese/space path forwarding and expected refusal. [Fresh input](docs/assets/local-install-20261024-r1/input.mp4) · [Output](docs/assets/local-install-20261024-r1/field.mp4) · [GIF](docs/assets/local-install-20261024-r1/field.gif) · [Template variant](docs/assets/local-install-20261024-r1/variant.gif) · [Launcher receipt](docs/validation/evidence/local-install-20261024-r1/skills/verification.json). See R10–R12 for scope.
 
 ## Installation
 
@@ -71,14 +81,14 @@ The verified profile is **native Windows x64 with CPython 3.13**. Existing `ffmp
 
 ```powershell
 # Existing native CPython 3.13 x64 and ffmpeg/ffprobe on PATH are required.
-# Extract the Windows release asset into E:\tools\agent-video-kit-v0.1.0-alpha.1.
-Set-Location E:\tools\agent-video-kit-v0.1.0-alpha.1
+# Extract the Windows release asset into E:\tools\agent-video-kit-v0.1.0-alpha.2.
+Set-Location E:\tools\agent-video-kit-v0.1.0-alpha.2
 $avkPython = 'C:\Python313\python.exe'
 # Copy the exact manifest digest from the release's version.json / SHA256SUMS.txt.
 $avkManifest = (Get-Content .\version.json -Raw | ConvertFrom-Json).manifest_sha256
-& $avkPython -I -B -X utf8 .\bundle\install.py --target E:\tools\avk-alpha1 --manifest-sha256 $avkManifest
-& $avkPython -I -S -B -X utf8 E:\tools\avk-alpha1\run.py doctor
-& $avkPython -I -S -B -X utf8 E:\tools\avk-alpha1\run.py capabilities
+& $avkPython -I -B -X utf8 .\bundle\install.py --target E:\tools\avk-alpha2 --manifest-sha256 $avkManifest
+& $avkPython -I -S -B -X utf8 E:\tools\avk-alpha2\run.py doctor
+& $avkPython -I -S -B -X utf8 E:\tools\avk-alpha2\run.py capabilities
 ```
 
 Verify the ZIP and `version.json` against `SHA256SUMS.txt` on the release page first. A manifest digest detects changed contents; it is **not an author signature**. Other ABIs and platforms are unverified even where package metadata allows a lower Python version.
@@ -88,7 +98,7 @@ With development dependencies already installed, `./ai-ad-editor.ps1 doctor` run
 ## Minimal workflow
 
 ```powershell
-$avkRun = 'E:\tools\avk-alpha1\run.py'
+$avkRun = 'E:\tools\avk-alpha2\run.py'
 $avkProject = 'E:\video-work\first-ad'
 & $avkPython -I -S -B -X utf8 $avkRun project init $avkProject --name 'First ad'
 & $avkPython -I -S -B -X utf8 $avkRun media ingest --project $avkProject --input E:\media\product.mp4
@@ -149,7 +159,7 @@ Install the local release before registration. Windows junctions expose Skill so
 
 | ID | Check | Observed result | Evidence and limits |
 |---|---|---|---|
-| R01 | Baseline full regression | **2,930 passed; 0 skipped**, 6991.508 s | [2026-10-23 receipt](docs/validation/evidence/float-shaper-20261023-lab/full-r1.json); this release rechecks identical 331 frozen inputs, rather than claiming a new full run |
+| R01 | Baseline full regression | **2,930 passed; 0 skipped**, 6991.508 s | [2026-10-23 receipt](docs/validation/evidence/float-shaper-20261023-lab/full-r1.json); this release rechecks identical 331 frozen inputs, rather than claiming a new full run  Frozen alpha.1 scope only; the new code has the separate checks below. |
 | R02 | Previous V112 fresh installation | **118 methods; 197 product resources** | [Receipt](docs/validation/evidence/float-shaper-20261023-lab/installed-r1/verification.json); overlaps the full suite, not additive |
 | R03 | Newly rebuilt and installed release | Eight pinned wheels, isolated `-I -S` launch | [Release gate](docs/validation/evidence/release-v0.1.0-alpha.1-r2/release-verification.json); Windows/CPython 3.13 x64 |
 | R04 | New ad and template cases | Real inputs, encoded outputs, GIFs, responses and package round trip | [New case receipt](docs/validation/evidence/release-v0.1.0-alpha.1-r2/verification.json); synthetic media, zero new inference |
@@ -162,9 +172,12 @@ Install the local release before registration. Windows junctions expose Skill so
 | R11 | New namespace and actual Skill execution | **17 Skills registered/validated; eight launcher commands: seven successes, one expected refusal** | [Skill receipt](docs/validation/evidence/local-install-20261024-r1/skills/verification.json); Codex junction calls the installed release, Chinese/space path render is byte-identical to direct execution; not a full Agent behavior benchmark |
 | R12 | Fresh installed-case reproduction | **28 commands: 27 successes, one expected refusal; ad/template renders and project-package round trip** | [Case receipt](docs/validation/evidence/local-install-20261024-r1/cases/verification.json) · [GIF](docs/assets/local-install-20261024-r1/field.gif) · [Static review](docs/validation/evidence/local-install-20261024-r1/review.json); zero new inference, no continuous playback or human listening; separate from historical suite counts |
 | R13 | Installed filter/LUT capability review | **46 catalog entries; registration help lists four extensions** | [Current query receipt](docs/validation/evidence/filter-capabilities-20261024-r1/verification.json) · [Workflow and limits](docs/local/FILTERS.md); 2026-10-24, catalog/help/source review only, zero new renders; 1D shaper requires explicit Float32, with dated render evidence linked separately |
-| R14 | Named looks and bundled LUT inventory | **No Leica/Fuji/Kodak named presets; zero LUT assets in the installed app** | [Inventory](docs/validation/evidence/filter-library-20261024-r1/inventory.json); 2026-10-24, excludes project assets/test fixtures; nine stylize operators are not a finished look library; zero new renders |
+| R14 | Historical alpha.1 look inventory | **No Leica/Fuji/Kodak named presets; zero LUT assets in the installed app** | [Inventory](docs/validation/evidence/filter-library-20261024-r1/inventory.json); 2026-10-24, excludes project assets/test fixtures; nine stylize operators are not a finished look library; zero new renders |
 | R15 | Open LUT/look source research | **Ten projects, captured stars/commits/trees/notices** | [Ranking and assessment](docs/research/OPEN_LOOK_LIBRARY_20261024.md) · [Snapshots](docs/validation/evidence/lut-research-20261024-r1/upstreams.json); 2026-10-24, file counts are not deduplicated, cleared or accepted looks |
 | R16 | Installed-release community MIT CUBE probe | **13 successful CLI calls in the final workflow; three seconds/36 actual frames** | [Verification and warnings](docs/validation/evidence/lut-research-20261024-r1/probe/verification.json) · [GIF](docs/assets/lut-research-20261024-r1/comparison.gif); 2026-10-24, 0.65 strength, decode/quality/silent PCM checks pass, approximation warning and prior check failures retained; synthetic input/first-frame inspection, no continuous playback or natural-footage acceptance, no integrated catalog/Hald conversion |
+| R17 | Alpha.2 look catalog and targeted regressions | **100 distinct transforms; 83 methods passed** | [Tests](docs/validation/evidence/look-presets-20261024-r1/unit-tests.txt); catalog/assets, native-depth Hald axes, apply semantics, transactions, package portability, LUT and offline installer regressions; no new full 2,930-method run |
+| R18 | New local package and registered Skills | **Eight wheels installed; 17 Skills validated; 14 real launcher calls: 13 successes + one expected refusal** | [Install](docs/validation/evidence/look-presets-20261024-r1/install/installation.json) · [Skill receipt](docs/validation/evidence/look-presets-20261024-r1/skills/verification.json); E: installation, real look preview/apply/render, retained alpha.1 |
+| R19 | All-100 installed native rendering | **100 previews + 100 videos; 425 isolated CLI calls, two expected refusals** | [Receipt](docs/validation/evidence/look-presets-20261024-r1/installed/verification.json) · [GIF](docs/assets/look-presets-20261024-r1/motion-comparison.gif); every video decodes to 12 frames / 1 s / 480×300; 100 distinct preview/frame hashes; upstream comparisons and package first-frame pixels checked; synthetic inputs, no natural-footage/listening acceptance |
 
 
 ## Limitations and next milestones

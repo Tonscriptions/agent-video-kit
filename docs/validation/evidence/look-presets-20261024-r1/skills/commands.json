@@ -1,0 +1,293 @@
+[
+  {
+    "id": "version",
+    "argv": [
+      "powershell.exe",
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      "C:\\Users\\carzy\\.codex\\skills\\agent-ffmpeg-local-editor\\scripts\\run.ps1",
+      "version"
+    ],
+    "exit_code": 0,
+    "expected": 0,
+    "seconds": 2.067
+  },
+  {
+    "id": "look-list",
+    "argv": [
+      "powershell.exe",
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      "C:\\Users\\carzy\\.codex\\skills\\agent-ffmpeg-local-editor\\scripts\\run.ps1",
+      "look",
+      "list"
+    ],
+    "exit_code": 0,
+    "expected": 0,
+    "seconds": 1.831
+  },
+  {
+    "id": "look-search",
+    "argv": [
+      "powershell.exe",
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      "C:\\Users\\carzy\\.codex\\skills\\agent-ffmpeg-local-editor\\scripts\\run.ps1",
+      "look",
+      "list",
+      "--query",
+      "黑白"
+    ],
+    "exit_code": 0,
+    "expected": 0,
+    "seconds": 2.669
+  },
+  {
+    "id": "look-inspect",
+    "argv": [
+      "powershell.exe",
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      "C:\\Users\\carzy\\.codex\\skills\\agent-ffmpeg-local-editor\\scripts\\run.ps1",
+      "look",
+      "inspect",
+      "--id",
+      "t3-kodak-gold-200"
+    ],
+    "exit_code": 0,
+    "expected": 0,
+    "seconds": 1.845
+  },
+  {
+    "id": "project-init",
+    "argv": [
+      "powershell.exe",
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      "C:\\Users\\carzy\\.codex\\skills\\agent-ffmpeg-local-editor\\scripts\\run.ps1",
+      "project",
+      "init",
+      "E:\\dev\\sandbox\\AI广告剪辑\\local\\agent-ffmpeg\\look-skill-check-20261024",
+      "--name",
+      "Skill 风格 100"
+    ],
+    "exit_code": 0,
+    "expected": 0,
+    "seconds": 2.679
+  },
+  {
+    "id": "ingest",
+    "argv": [
+      "powershell.exe",
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      "C:\\Users\\carzy\\.codex\\skills\\agent-ffmpeg-local-editor\\scripts\\run.ps1",
+      "media",
+      "ingest",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\local\\agent-ffmpeg\\look-skill-check-20261024",
+      "--input",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\look-presets-20261024-r1\\original.mp4",
+      "--source-url",
+      "local://look-preset-generated/original.mp4",
+      "--license-spdx",
+      "CC0-1.0",
+      "--license-url",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\look-presets-20261024-r1\\LICENSE.txt",
+      "--evidence",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\look-presets-20261024-r1\\LICENSE.txt",
+      "--verification-status",
+      "verified",
+      "--permitted-use",
+      "commercial_ad"
+    ],
+    "exit_code": 0,
+    "expected": 0,
+    "seconds": 2.383
+  },
+  {
+    "id": "compose",
+    "argv": [
+      "powershell.exe",
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      "C:\\Users\\carzy\\.codex\\skills\\agent-ffmpeg-local-editor\\scripts\\run.ps1",
+      "timeline",
+      "compose",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\local\\agent-ffmpeg\\look-skill-check-20261024",
+      "--input",
+      "E:\\dev\\sandbox\\AI广告剪辑\\local\\agent-ffmpeg\\look-skill-check-20261024\\changes.json"
+    ],
+    "exit_code": 0,
+    "expected": 0,
+    "seconds": 2.334
+  },
+  {
+    "id": "look-preview",
+    "argv": [
+      "powershell.exe",
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      "C:\\Users\\carzy\\.codex\\skills\\agent-ffmpeg-local-editor\\scripts\\run.ps1",
+      "look",
+      "preview",
+      "--id",
+      "t3-kodak-gold-200",
+      "--output",
+      "E:\\dev\\sandbox\\AI广告剪辑\\local\\agent-ffmpeg\\look-skill-check-20261024\\gold-preview.png",
+      "--strength",
+      ".65"
+    ],
+    "exit_code": 0,
+    "expected": 0,
+    "seconds": 2.983
+  },
+  {
+    "id": "look-dry",
+    "argv": [
+      "powershell.exe",
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      "C:\\Users\\carzy\\.codex\\skills\\agent-ffmpeg-local-editor\\scripts\\run.ps1",
+      "look",
+      "apply",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\local\\agent-ffmpeg\\look-skill-check-20261024",
+      "--id",
+      "t3-kodak-gold-200",
+      "--global",
+      "--strength",
+      ".65",
+      "--dry-run"
+    ],
+    "exit_code": 0,
+    "expected": 0,
+    "seconds": 2.31
+  },
+  {
+    "id": "look-apply",
+    "argv": [
+      "powershell.exe",
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      "C:\\Users\\carzy\\.codex\\skills\\agent-ffmpeg-local-editor\\scripts\\run.ps1",
+      "look",
+      "apply",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\local\\agent-ffmpeg\\look-skill-check-20261024",
+      "--id",
+      "t3-kodak-gold-200",
+      "--global",
+      "--strength",
+      ".65"
+    ],
+    "exit_code": 0,
+    "expected": 0,
+    "seconds": 16.935
+  },
+  {
+    "id": "validate",
+    "argv": [
+      "powershell.exe",
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      "C:\\Users\\carzy\\.codex\\skills\\agent-ffmpeg-local-editor\\scripts\\run.ps1",
+      "validate",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\local\\agent-ffmpeg\\look-skill-check-20261024"
+    ],
+    "exit_code": 0,
+    "expected": 0,
+    "seconds": 3.327
+  },
+  {
+    "id": "render",
+    "argv": [
+      "powershell.exe",
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      "C:\\Users\\carzy\\.codex\\skills\\agent-ffmpeg-local-editor\\scripts\\run.ps1",
+      "render",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\local\\agent-ffmpeg\\look-skill-check-20261024",
+      "--output",
+      "E:\\dev\\sandbox\\AI广告剪辑\\local\\agent-ffmpeg\\look-skill-check-20261024\\renders\\Skill 核验 成片.mp4",
+      "--width",
+      "360",
+      "--height",
+      "640",
+      "--publish"
+    ],
+    "exit_code": 0,
+    "expected": 0,
+    "seconds": 28.482
+  },
+  {
+    "id": "quality",
+    "argv": [
+      "powershell.exe",
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      "C:\\Users\\carzy\\.codex\\skills\\agent-ffmpeg-local-editor\\scripts\\run.ps1",
+      "quality",
+      "check",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\local\\agent-ffmpeg\\look-skill-check-20261024",
+      "--input",
+      "E:\\dev\\sandbox\\AI广告剪辑\\local\\agent-ffmpeg\\look-skill-check-20261024\\renders\\Skill 核验 成片.mp4",
+      "--width",
+      "360",
+      "--height",
+      "640",
+      "--require-audio"
+    ],
+    "exit_code": 0,
+    "expected": 0,
+    "seconds": 4.136
+  },
+  {
+    "id": "unknown-refused",
+    "argv": [
+      "powershell.exe",
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      "C:\\Users\\carzy\\.codex\\skills\\agent-ffmpeg-local-editor\\scripts\\run.ps1",
+      "look",
+      "inspect",
+      "--id",
+      "unknown"
+    ],
+    "exit_code": 3,
+    "expected": 3,
+    "seconds": 3.452
+  }
+]

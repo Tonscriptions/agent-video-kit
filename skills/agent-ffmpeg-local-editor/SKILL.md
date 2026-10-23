@@ -1,16 +1,16 @@
 ---
 name: agent-ffmpeg-local-editor
-description: "Edit advertising videos or assemble a local Agent Project using the installed Agent Video Kit CLI. Use for project setup, editing, previews, renders and package delivery."
+description: "Edit local advertising videos with the installed Agent Video Kit CLI, including 100 offline style/filter presets. Use for setup, look search, previews, editing, rendering and delivery."
 ---
 
 # Agent FFmpeg Local / editor
 
-总入口：计划、项目创建与交付. Local release: `v0.1.0-alpha.1`.
+总入口：计划、项目创建与交付. Local release: `v0.1.0-alpha.2`.
 
 ## Installed runtime
 
 Use the installed release, not `ai-ad-editor.ps1` or `product/src`. The shared launcher pins
-`v0.1.0-alpha.1`, checks the installation receipt and launcher hash, and starts native Python with `-I -S`.
+`v0.1.0-alpha.2`, checks the installation receipt and launcher hash, and starts native Python with `-I -S`.
 
 ```powershell
 $avkSkills = if ($env:CODEX_HOME) { Join-Path $env:CODEX_HOME 'skills' } else { Join-Path $env:USERPROFILE '.codex/skills' }
@@ -40,3 +40,7 @@ to the corresponding `agent-ffmpeg-local-` Skills.
 - Author audio explicitly. `render --publish` checks local rights; it does not upload media.
 - Inspect capabilities before effects or Float32 work; do not substitute unsupported features silently.
 - Close unused browser tabs after any separately authorized browser operation.
+
+## Offline look presets
+
+Use `look list`, `look inspect`, `look preview` and `look apply` for 100 installed MIT style presets. Read [the look workflow](../agent-ffmpeg-local-editor/references/looks.md) before choosing a target, strength or publication settings. These are creative SDR looks; they do not establish official branded-filter or CapCut equivalence.

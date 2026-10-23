@@ -1,16 +1,16 @@
 ---
 name: agent-ffmpeg-local-quality
-description: "Review locally rendered video, pixels, masks, audio presence, scopes and render manifests. Use for output verification, quality reports and comparing source with actual encoded output."
+description: "Review locally rendered video, pixels, masks, audio, scopes and manifests. Compare previews of the 100 offline style/filter presets and verify their actual rendered output."
 ---
 
 # Agent FFmpeg Local / quality
 
-成片、像素、蒙版、Scope 与证据核验. Local release: `v0.1.0-alpha.1`.
+成片、像素、蒙版、Scope 与证据核验. Local release: `v0.1.0-alpha.2`.
 
 ## Installed runtime
 
 Use the installed release, not `ai-ad-editor.ps1` or `product/src`. The shared launcher pins
-`v0.1.0-alpha.1`, checks the installation receipt and launcher hash, and starts native Python with `-I -S`.
+`v0.1.0-alpha.2`, checks the installation receipt and launcher hash, and starts native Python with `-I -S`.
 
 ```powershell
 $avkSkills = if ($env:CODEX_HOME) { Join-Path $env:CODEX_HOME 'skills' } else { Join-Path $env:USERPROFILE '.codex/skills' }
@@ -40,3 +40,7 @@ does not establish natural quality or full CapCut parity.
 - Author audio explicitly. `render --publish` checks local rights; it does not upload media.
 - Inspect capabilities before effects or Float32 work; do not substitute unsupported features silently.
 - Close unused browser tabs after any separately authorized browser operation.
+
+## Offline look presets
+
+Use `look list`, `look inspect`, `look preview` and `look apply` for 100 installed MIT style presets. Read [the look workflow](../agent-ffmpeg-local-editor/references/looks.md) before choosing a target, strength or publication settings. These are creative SDR looks; they do not establish official branded-filter or CapCut equivalence.

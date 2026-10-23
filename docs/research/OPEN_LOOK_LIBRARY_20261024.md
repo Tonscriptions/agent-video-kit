@@ -1,5 +1,7 @@
 # 开源 LUT 与风格库补齐评估 / Open look-library feasibility
 
+**后续实施状态 / Subsequent implementation:** 本报告保留最初研究与单 LUT 小样的时间边界。后续已将 51 个 Hald 与 49 个 CUBE 整合为 `alpha.2` 的 100 预设，并更新本地 Skills；请看[实际目录](../local/LOOK_PRESETS.md)、[新使用逻辑](../releases/v0.1.0-alpha.2/USAGE.md)与[新核验](../validation/LOOK_PRESETS_20261024.md)。The assessment below is historical; follow these links for the implemented catalog and its actual acceptance boundaries.
+
 日期：**2026-10-24，Asia/Taipei**。对象：Agent Video Kit 已安装的 `v0.1.0-alpha.1`。本轮为来源研究和单个社区 LUT 接入小样，未发布新的产品功能或修改已发布安装包。
 
 ## 结论 / Decision

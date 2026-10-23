@@ -26,7 +26,7 @@ PROJECT_PACKAGE_ROOT_FILES = ("project.json", "rights-ledger.json", "project.loc
 # rewritten into the portable package namespace.  The remaining directories
 # are small project-owned support payloads; render/cache/operation/history
 # trees stay machine-local and are excluded.
-PROJECT_PACKAGE_DIRECTORIES = ("fonts", "templates", "validation")
+PROJECT_PACKAGE_DIRECTORIES = ("fonts", "templates", "validation", "assets/look-evidence")
 
 
 def report_item(capability: str, status: str, source: str, target: str | None = None, detail: str = "") -> dict[str, Any]:
@@ -185,6 +185,14 @@ def _export_project_package(root: Path, project: dict[str, Any], output: Path) -
         raise ValueError(f"项目包输出必须是文件: {output}")
     source_files: dict[str, bytes] = {}
     source_files["project.json"] = _package_json_bytes(packaged_project)
+    # Built-in look IDs retain their project-local registry identity, so
+    # imported projects can inspect/reapply them and keep relative evidence.
+    from .lut_library import load_lut_library
+    library = load_lut_library(root)
+    portable_records = [row for row in library['records'] if row.get('uri') in asset_files]
+    if portable_records:
+        portable_library = dict(library, records=portable_records)
+        source_files['assets/lut-library.json'] = _package_json_bytes(portable_library)
     ledger_path = root / "rights-ledger.json"
     if ledger_path.is_file():
         source_files["rights-ledger.json"] = ledger_path.read_bytes()
@@ -273,10 +281,13 @@ def _package_luts(root: Path, project: dict[str, Any], files: dict[str, Path]) -
                 if not path.is_relative_to(root.resolve()) or not path.is_file():
                     raise ValueError('LUT 必须是项目内实际文件，无法生成可移植项目包')
                 digest = sha256_file(path)
-                relative = f'assets/luts/{digest}{path.suffix.lower()}'
+                builtin = bool(lut_id and isinstance(value.get('source'), dict)
+                               and value['source'].get('look_catalog') == 'avk-looks-1.0.0')
+                relative = str(found[1]['uri']) if builtin else f'assets/luts/{digest}{path.suffix.lower()}'
                 files[relative] = path
-                for key in ('path','file','lut','lut_id'): parameters.pop(key, None)
-                parameters['path'] = relative
+                if not builtin:
+                    for key in ('path','file','lut','lut_id'): parameters.pop(key, None)
+                    parameters['path'] = relative
                 count += 1
             for item in list(value.values()): visit(item)
     visit(project)

@@ -18,7 +18,10 @@ import time
 import zipfile
 from email.parser import BytesParser
 
-MAX_BYTES=64*1024**2
+# The 100 hash-pinned, compressed creative LUTs make the application wheel
+# larger than the first alpha. Keep a finite per-file bound; ZIP member and
+# expanded-wheel limits still apply independently.
+MAX_BYTES=96*1024**2
 CORE_WHEELS={'ai-ad-editor','jsonschema','attrs','jsonschema-specifications','referencing','rpds-py'}
 RUNTIME_PROFILES={
     'core-v1':CORE_WHEELS,

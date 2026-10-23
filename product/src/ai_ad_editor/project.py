@@ -69,7 +69,7 @@ def _transaction_metadata_files(root: Path) -> list[Path]:
     or deleting large user files.
     """
     candidates: list[Path] = []
-    for fixed in (project_file(root), ledger_file(root), lock_file(root), *(root/name for name in MODEL_REGISTRY_FILES)):
+    for fixed in (project_file(root), ledger_file(root), lock_file(root), root/'assets/lut-library.json', *(root/name for name in MODEL_REGISTRY_FILES)):
         if fixed.is_file():
             candidates.append(fixed)
     for directory_name in ("operations", "history", "validation", "exports"):

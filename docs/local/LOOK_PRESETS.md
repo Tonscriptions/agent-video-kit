@@ -1,0 +1,140 @@
+# 100 个内置风格预设 / 100 built-in style presets
+
+目录版本 `1.0.0`，随本地构建 `v0.1.0-alpha.2`（CLI `0.1.1`）离线安装。100 个 ID、数值色彩变换及实际预览分别去重；不是同一个 LUT 的 100 档强度。
+Catalog 1.0.0 ships offline with the alpha.2 local build. IDs, numerical transforms and preview outputs are independently distinct. These are not 100 strengths of one LUT.
+
+[使用与安装 / Usage](../releases/v0.1.0-alpha.2/USAGE.md) · [验证与完整响应 / Verification](../validation/LOOK_PRESETS_20261024.md) · [许可 / Notices](../releases/v0.1.0-alpha.2/THIRD_PARTY.md)
+
+![100 个实际 FFmpeg 预览 / 100 native FFmpeg previews](../assets/look-presets-20261024-r1/contact-sheet.jpg)
+
+编号与下表一致。测试卡是合成色彩渐变、肤色色块和虚构产品，不能代替自然素材验收。上游名称原样保留；社区胶片模拟不代表品牌官方效果。
+Contact-sheet numbers match this table. The reference contains synthetic gradients, skin-color swatches and fictional product art. It is not natural-footage acceptance or an official branded filter.
+
+| 类别 / Category | 数量 / Count |
+|---|---:|
+| 黑白胶片 / B&W film (`film-bw`) | 12 |
+| 彩色负片 / Negative film (`film-negative`) | 24 |
+| 反转片 / Slide film (`film-slide`) | 15 |
+| 电影年代 / Cinema eras (`cinema`) | 8 |
+| 创意色彩 / Creative (`creative`) | 24 |
+| 红外 / Infrared (`infrared`) | 2 |
+| Lomo (`lomography`) | 5 |
+| 风景 / Landscape (`landscape`) | 10 |
+
+## 全部预设 / All presets
+
+每条预设均为 MIT；`t3-` 来源为 João Almeida 的 t3mujinpack，`sp-` 来源为 Nixua / Striped Purple。`look inspect --id ID` 返回原始仓库、固定提交、文件 SHA-256、许可哈希、网格、预览与转换误差。
+Every preset is MIT. Inspect its ID for pinned provenance, file/notice hashes, grid and conversion error.
+
+| # | 稳定 ID / ID | 上游风格名 / Look | 类别 / Category | 网格 / Grid | 预览 / Preview |
+|---|---|---|---|---:|---|
+| 001 | `sp-1910s` | 1910s | `cinema` | 64³ | [PNG](../assets/look-presets-20261024-r1/previews/sp-1910s.png) / [MP4](../assets/look-presets-20261024-r1/videos/sp-1910s.mp4) |
+| 002 | `sp-1920s` | 1920s | `cinema` | 64³ | [PNG](../assets/look-presets-20261024-r1/previews/sp-1920s.png) / [MP4](../assets/look-presets-20261024-r1/videos/sp-1920s.mp4) |
+| 003 | `sp-1930s` | 1930s | `cinema` | 64³ | [PNG](../assets/look-presets-20261024-r1/previews/sp-1930s.png) / [MP4](../assets/look-presets-20261024-r1/videos/sp-1930s.mp4) |
+| 004 | `sp-1940s` | 1940s | `cinema` | 64³ | [PNG](../assets/look-presets-20261024-r1/previews/sp-1940s.png) / [MP4](../assets/look-presets-20261024-r1/videos/sp-1940s.mp4) |
+| 005 | `sp-1950s` | 1950s | `cinema` | 64³ | [PNG](../assets/look-presets-20261024-r1/previews/sp-1950s.png) / [MP4](../assets/look-presets-20261024-r1/videos/sp-1950s.mp4) |
+| 006 | `sp-1960s` | 1960s | `cinema` | 64³ | [PNG](../assets/look-presets-20261024-r1/previews/sp-1960s.png) / [MP4](../assets/look-presets-20261024-r1/videos/sp-1960s.mp4) |
+| 007 | `sp-1970s` | 1970s | `cinema` | 64³ | [PNG](../assets/look-presets-20261024-r1/previews/sp-1970s.png) / [MP4](../assets/look-presets-20261024-r1/videos/sp-1970s.mp4) |
+| 008 | `sp-1980-s` | 1980_s | `cinema` | 64³ | [PNG](../assets/look-presets-20261024-r1/previews/sp-1980-s.png) / [MP4](../assets/look-presets-20261024-r1/videos/sp-1980-s.mp4) |
+| 009 | `sp-amber-haze` | Amber Haze | `creative` | 32³ | [PNG](../assets/look-presets-20261024-r1/previews/sp-amber-haze.png) / [MP4](../assets/look-presets-20261024-r1/videos/sp-amber-haze.mp4) |
+| 010 | `sp-ara` | Ara | `creative` | 64³ | [PNG](../assets/look-presets-20261024-r1/previews/sp-ara.png) / [MP4](../assets/look-presets-20261024-r1/videos/sp-ara.mp4) |
+| 011 | `sp-arcade-dayz` | Arcade Dayz | `creative` | 32³ | [PNG](../assets/look-presets-20261024-r1/previews/sp-arcade-dayz.png) / [MP4](../assets/look-presets-20261024-r1/videos/sp-arcade-dayz.mp4) |
+| 012 | `sp-aricha-blend` | Aricha Blend | `creative` | 32³ | [PNG](../assets/look-presets-20261024-r1/previews/sp-aricha-blend.png) / [MP4](../assets/look-presets-20261024-r1/videos/sp-aricha-blend.mp4) |
+| 013 | `sp-blow-me-down` | Blow Me Down | `creative` | 32³ | [PNG](../assets/look-presets-20261024-r1/previews/sp-blow-me-down.png) / [MP4](../assets/look-presets-20261024-r1/videos/sp-blow-me-down.mp4) |
+| 014 | `sp-blue-lagoon` | Blue Lagoon | `creative` | 64³ | [PNG](../assets/look-presets-20261024-r1/previews/sp-blue-lagoon.png) / [MP4](../assets/look-presets-20261024-r1/videos/sp-blue-lagoon.mp4) |
+| 015 | `sp-boa` | Boa | `creative` | 64³ | [PNG](../assets/look-presets-20261024-r1/previews/sp-boa.png) / [MP4](../assets/look-presets-20261024-r1/videos/sp-boa.mp4) |
+| 016 | `sp-caramel-plum-cake` | Caramel Plum Cake | `creative` | 32³ | [PNG](../assets/look-presets-20261024-r1/previews/sp-caramel-plum-cake.png) / [MP4](../assets/look-presets-20261024-r1/videos/sp-caramel-plum-cake.mp4) |
+| 017 | `sp-cherry-champagne` | Cherry Champagne | `creative` | 32³ | [PNG](../assets/look-presets-20261024-r1/previews/sp-cherry-champagne.png) / [MP4](../assets/look-presets-20261024-r1/videos/sp-cherry-champagne.mp4) |
+| 018 | `sp-december-greens` | December Greens | `landscape` | 64³ | [PNG](../assets/look-presets-20261024-r1/previews/sp-december-greens.png) / [MP4](../assets/look-presets-20261024-r1/videos/sp-december-greens.mp4) |
+| 019 | `sp-dodo` | Dodo | `creative` | 64³ | [PNG](../assets/look-presets-20261024-r1/previews/sp-dodo.png) / [MP4](../assets/look-presets-20261024-r1/videos/sp-dodo.mp4) |
+| 020 | `sp-emerald-malaise` | Emerald Malaise | `landscape` | 16³ | [PNG](../assets/look-presets-20261024-r1/previews/sp-emerald-malaise.png) / [MP4](../assets/look-presets-20261024-r1/videos/sp-emerald-malaise.mp4) |
+| 021 | `sp-great-auk` | Great Auk | `creative` | 64³ | [PNG](../assets/look-presets-20261024-r1/previews/sp-great-auk.png) / [MP4](../assets/look-presets-20261024-r1/videos/sp-great-auk.mp4) |
+| 022 | `sp-grey-matter` | Grey Matter | `creative` | 32³ | [PNG](../assets/look-presets-20261024-r1/previews/sp-grey-matter.png) / [MP4](../assets/look-presets-20261024-r1/videos/sp-grey-matter.mp4) |
+| 023 | `sp-horchata` | Horchata | `creative` | 32³ | [PNG](../assets/look-presets-20261024-r1/previews/sp-horchata.png) / [MP4](../assets/look-presets-20261024-r1/videos/sp-horchata.mp4) |
+| 024 | `sp-infrared` | Infrared | `infrared` | 32³ | [PNG](../assets/look-presets-20261024-r1/previews/sp-infrared.png) / [MP4](../assets/look-presets-20261024-r1/videos/sp-infrared.mp4) |
+| 025 | `sp-infrared-2` | Infrared 2 | `infrared` | 64³ | [PNG](../assets/look-presets-20261024-r1/previews/sp-infrared-2.png) / [MP4](../assets/look-presets-20261024-r1/videos/sp-infrared-2.mp4) |
+| 026 | `sp-irish-uprising` | Irish Uprising | `landscape` | 32³ | [PNG](../assets/look-presets-20261024-r1/previews/sp-irish-uprising.png) / [MP4](../assets/look-presets-20261024-r1/videos/sp-irish-uprising.mp4) |
+| 027 | `sp-kraken` | Kraken | `creative` | 64³ | [PNG](../assets/look-presets-20261024-r1/previews/sp-kraken.png) / [MP4](../assets/look-presets-20261024-r1/videos/sp-kraken.mp4) |
+| 028 | `sp-lobster` | Lobster | `creative` | 16³ | [PNG](../assets/look-presets-20261024-r1/previews/sp-lobster.png) / [MP4](../assets/look-presets-20261024-r1/videos/sp-lobster.mp4) |
+| 029 | `sp-lomochrome-purple` | Lomochrome Purple | `lomography` | 64³ | [PNG](../assets/look-presets-20261024-r1/previews/sp-lomochrome-purple.png) / [MP4](../assets/look-presets-20261024-r1/videos/sp-lomochrome-purple.mp4) |
+| 030 | `sp-lomochrome-purple-2` | Lomochrome Purple 2 | `lomography` | 64³ | [PNG](../assets/look-presets-20261024-r1/previews/sp-lomochrome-purple-2.png) / [MP4](../assets/look-presets-20261024-r1/videos/sp-lomochrome-purple-2.mp4) |
+| 031 | `sp-lomochrome-purple-3` | Lomochrome Purple 3 | `lomography` | 64³ | [PNG](../assets/look-presets-20261024-r1/previews/sp-lomochrome-purple-3.png) / [MP4](../assets/look-presets-20261024-r1/videos/sp-lomochrome-purple-3.mp4) |
+| 032 | `sp-lomochrome-purple-4` | Lomochrome Purple 4 | `lomography` | 64³ | [PNG](../assets/look-presets-20261024-r1/previews/sp-lomochrome-purple-4.png) / [MP4](../assets/look-presets-20261024-r1/videos/sp-lomochrome-purple-4.mp4) |
+| 033 | `sp-lomochrome-purple-5` | Lomochrome Purple 5 | `lomography` | 64³ | [PNG](../assets/look-presets-20261024-r1/previews/sp-lomochrome-purple-5.png) / [MP4](../assets/look-presets-20261024-r1/videos/sp-lomochrome-purple-5.mp4) |
+| 034 | `sp-moa` | Moa | `creative` | 64³ | [PNG](../assets/look-presets-20261024-r1/previews/sp-moa.png) / [MP4](../assets/look-presets-20261024-r1/videos/sp-moa.mp4) |
+| 035 | `sp-pendleton` | Pendleton | `creative` | 32³ | [PNG](../assets/look-presets-20261024-r1/previews/sp-pendleton.png) / [MP4](../assets/look-presets-20261024-r1/videos/sp-pendleton.mp4) |
+| 036 | `sp-philly-fog` | Philly Fog | `landscape` | 16³ | [PNG](../assets/look-presets-20261024-r1/previews/sp-philly-fog.png) / [MP4](../assets/look-presets-20261024-r1/videos/sp-philly-fog.mp4) |
+| 037 | `sp-polaroid-mint-cream` | Polaroid Mint Cream | `creative` | 32³ | [PNG](../assets/look-presets-20261024-r1/previews/sp-polaroid-mint-cream.png) / [MP4](../assets/look-presets-20261024-r1/videos/sp-polaroid-mint-cream.mp4) |
+| 038 | `sp-sea-turtle` | Sea Turtle | `landscape` | 64³ | [PNG](../assets/look-presets-20261024-r1/previews/sp-sea-turtle.png) / [MP4](../assets/look-presets-20261024-r1/videos/sp-sea-turtle.mp4) |
+| 039 | `sp-seagull-cove` | Seagull Cove | `landscape` | 64³ | [PNG](../assets/look-presets-20261024-r1/previews/sp-seagull-cove.png) / [MP4](../assets/look-presets-20261024-r1/videos/sp-seagull-cove.mp4) |
+| 040 | `sp-snowy-blues` | Snowy Blues | `landscape` | 32³ | [PNG](../assets/look-presets-20261024-r1/previews/sp-snowy-blues.png) / [MP4](../assets/look-presets-20261024-r1/videos/sp-snowy-blues.mp4) |
+| 041 | `sp-spring-water` | Spring Water | `landscape` | 16³ | [PNG](../assets/look-presets-20261024-r1/previews/sp-spring-water.png) / [MP4](../assets/look-presets-20261024-r1/videos/sp-spring-water.mp4) |
+| 042 | `sp-sugar-plums` | Sugar Plums | `creative` | 32³ | [PNG](../assets/look-presets-20261024-r1/previews/sp-sugar-plums.png) / [MP4](../assets/look-presets-20261024-r1/videos/sp-sugar-plums.mp4) |
+| 043 | `sp-teal-embers` | Teal Embers | `landscape` | 64³ | [PNG](../assets/look-presets-20261024-r1/previews/sp-teal-embers.png) / [MP4](../assets/look-presets-20261024-r1/videos/sp-teal-embers.mp4) |
+| 044 | `sp-teal-supreme` | Teal Supreme | `landscape` | 32³ | [PNG](../assets/look-presets-20261024-r1/previews/sp-teal-supreme.png) / [MP4](../assets/look-presets-20261024-r1/videos/sp-teal-supreme.mp4) |
+| 045 | `sp-tiger` | Tiger | `creative` | 64³ | [PNG](../assets/look-presets-20261024-r1/previews/sp-tiger.png) / [MP4](../assets/look-presets-20261024-r1/videos/sp-tiger.mp4) |
+| 046 | `sp-turquoise` | Turquoise | `creative` | 32³ | [PNG](../assets/look-presets-20261024-r1/previews/sp-turquoise.png) / [MP4](../assets/look-presets-20261024-r1/videos/sp-turquoise.mp4) |
+| 047 | `sp-vanilla-bean` | Vanilla Bean | `creative` | 32³ | [PNG](../assets/look-presets-20261024-r1/previews/sp-vanilla-bean.png) / [MP4](../assets/look-presets-20261024-r1/videos/sp-vanilla-bean.mp4) |
+| 048 | `sp-veggie-crisps` | Veggie Crisps | `creative` | 32³ | [PNG](../assets/look-presets-20261024-r1/previews/sp-veggie-crisps.png) / [MP4](../assets/look-presets-20261024-r1/videos/sp-veggie-crisps.mp4) |
+| 049 | `sp-woelfelly-neon` | Woelfelly Neon | `creative` | 32³ | [PNG](../assets/look-presets-20261024-r1/previews/sp-woelfelly-neon.png) / [MP4](../assets/look-presets-20261024-r1/videos/sp-woelfelly-neon.mp4) |
+| 050 | `t3-agfa-apx-100` | AGFA APX 100 | `film-bw` | 33³ | [PNG](../assets/look-presets-20261024-r1/previews/t3-agfa-apx-100.png) / [MP4](../assets/look-presets-20261024-r1/videos/t3-agfa-apx-100.mp4) |
+| 051 | `t3-agfa-apx-25` | AGFA APX 25 | `film-bw` | 33³ | [PNG](../assets/look-presets-20261024-r1/previews/t3-agfa-apx-25.png) / [MP4](../assets/look-presets-20261024-r1/videos/t3-agfa-apx-25.mp4) |
+| 052 | `t3-agfa-vista-100` | Agfa Vista 100 | `film-negative` | 33³ | [PNG](../assets/look-presets-20261024-r1/previews/t3-agfa-vista-100.png) / [MP4](../assets/look-presets-20261024-r1/videos/t3-agfa-vista-100.mp4) |
+| 053 | `t3-agfa-vista-200` | Agfa Vista 200 | `film-negative` | 33³ | [PNG](../assets/look-presets-20261024-r1/previews/t3-agfa-vista-200.png) / [MP4](../assets/look-presets-20261024-r1/videos/t3-agfa-vista-200.mp4) |
+| 054 | `t3-agfa-vista-400` | Agfa Vista 400 | `film-negative` | 33³ | [PNG](../assets/look-presets-20261024-r1/previews/t3-agfa-vista-400.png) / [MP4](../assets/look-presets-20261024-r1/videos/t3-agfa-vista-400.mp4) |
+| 055 | `t3-fuji-astia-100f` | Fuji Astia 100F | `film-slide` | 33³ | [PNG](../assets/look-presets-20261024-r1/previews/t3-fuji-astia-100f.png) / [MP4](../assets/look-presets-20261024-r1/videos/t3-fuji-astia-100f.mp4) |
+| 056 | `t3-fuji-fortia-sp-50` | Fuji Fortia SP 50 | `film-slide` | 33³ | [PNG](../assets/look-presets-20261024-r1/previews/t3-fuji-fortia-sp-50.png) / [MP4](../assets/look-presets-20261024-r1/videos/t3-fuji-fortia-sp-50.mp4) |
+| 057 | `t3-fuji-neopan-1600` | Fuji Neopan 1600 | `film-bw` | 33³ | [PNG](../assets/look-presets-20261024-r1/previews/t3-fuji-neopan-1600.png) / [MP4](../assets/look-presets-20261024-r1/videos/t3-fuji-neopan-1600.mp4) |
+| 058 | `t3-fuji-neopan-acros-100` | Fuji Neopan Acros 100 | `film-bw` | 33³ | [PNG](../assets/look-presets-20261024-r1/previews/t3-fuji-neopan-acros-100.png) / [MP4](../assets/look-presets-20261024-r1/videos/t3-fuji-neopan-acros-100.mp4) |
+| 059 | `t3-fuji-pro-160c` | Fuji Pro 160C | `film-negative` | 33³ | [PNG](../assets/look-presets-20261024-r1/previews/t3-fuji-pro-160c.png) / [MP4](../assets/look-presets-20261024-r1/videos/t3-fuji-pro-160c.mp4) |
+| 060 | `t3-fuji-pro-400h` | Fuji Pro 400H | `film-negative` | 33³ | [PNG](../assets/look-presets-20261024-r1/previews/t3-fuji-pro-400h.png) / [MP4](../assets/look-presets-20261024-r1/videos/t3-fuji-pro-400h.mp4) |
+| 061 | `t3-fuji-pro-800z` | Fuji Pro 800Z | `film-negative` | 33³ | [PNG](../assets/look-presets-20261024-r1/previews/t3-fuji-pro-800z.png) / [MP4](../assets/look-presets-20261024-r1/videos/t3-fuji-pro-800z.mp4) |
+| 062 | `t3-fuji-provia-100f` | Fuji Provia 100F | `film-slide` | 33³ | [PNG](../assets/look-presets-20261024-r1/previews/t3-fuji-provia-100f.png) / [MP4](../assets/look-presets-20261024-r1/videos/t3-fuji-provia-100f.mp4) |
+| 063 | `t3-fuji-provia-400f` | Fuji Provia 400F | `film-slide` | 33³ | [PNG](../assets/look-presets-20261024-r1/previews/t3-fuji-provia-400f.png) / [MP4](../assets/look-presets-20261024-r1/videos/t3-fuji-provia-400f.mp4) |
+| 064 | `t3-fuji-provia-400x` | Fuji Provia 400X | `film-slide` | 33³ | [PNG](../assets/look-presets-20261024-r1/previews/t3-fuji-provia-400x.png) / [MP4](../assets/look-presets-20261024-r1/videos/t3-fuji-provia-400x.mp4) |
+| 065 | `t3-fuji-sensia-100` | Fuji Sensia 100 | `film-slide` | 33³ | [PNG](../assets/look-presets-20261024-r1/previews/t3-fuji-sensia-100.png) / [MP4](../assets/look-presets-20261024-r1/videos/t3-fuji-sensia-100.mp4) |
+| 066 | `t3-fuji-superia-100` | Fuji Superia 100 | `film-negative` | 33³ | [PNG](../assets/look-presets-20261024-r1/previews/t3-fuji-superia-100.png) / [MP4](../assets/look-presets-20261024-r1/videos/t3-fuji-superia-100.mp4) |
+| 067 | `t3-fuji-superia-1600` | Fuji Superia 1600 | `film-negative` | 33³ | [PNG](../assets/look-presets-20261024-r1/previews/t3-fuji-superia-1600.png) / [MP4](../assets/look-presets-20261024-r1/videos/t3-fuji-superia-1600.mp4) |
+| 068 | `t3-fuji-superia-200` | Fuji Superia 200 | `film-negative` | 33³ | [PNG](../assets/look-presets-20261024-r1/previews/t3-fuji-superia-200.png) / [MP4](../assets/look-presets-20261024-r1/videos/t3-fuji-superia-200.mp4) |
+| 069 | `t3-fuji-superia-400` | Fuji Superia 400 | `film-negative` | 33³ | [PNG](../assets/look-presets-20261024-r1/previews/t3-fuji-superia-400.png) / [MP4](../assets/look-presets-20261024-r1/videos/t3-fuji-superia-400.mp4) |
+| 070 | `t3-fuji-superia-800` | Fuji Superia 800 | `film-negative` | 33³ | [PNG](../assets/look-presets-20261024-r1/previews/t3-fuji-superia-800.png) / [MP4](../assets/look-presets-20261024-r1/videos/t3-fuji-superia-800.mp4) |
+| 071 | `t3-fuji-superia-hg-1600` | Fuji Superia HG 1600 | `film-negative` | 33³ | [PNG](../assets/look-presets-20261024-r1/previews/t3-fuji-superia-hg-1600.png) / [MP4](../assets/look-presets-20261024-r1/videos/t3-fuji-superia-hg-1600.mp4) |
+| 072 | `t3-fuji-velvia-100` | Fuji Velvia 100 | `film-slide` | 33³ | [PNG](../assets/look-presets-20261024-r1/previews/t3-fuji-velvia-100.png) / [MP4](../assets/look-presets-20261024-r1/videos/t3-fuji-velvia-100.mp4) |
+| 073 | `t3-fuji-velvia-50` | Fuji Velvia 50 | `film-slide` | 33³ | [PNG](../assets/look-presets-20261024-r1/previews/t3-fuji-velvia-50.png) / [MP4](../assets/look-presets-20261024-r1/videos/t3-fuji-velvia-50.mp4) |
+| 074 | `t3-ilford-delta-100` | Ilford Delta 100 | `film-bw` | 33³ | [PNG](../assets/look-presets-20261024-r1/previews/t3-ilford-delta-100.png) / [MP4](../assets/look-presets-20261024-r1/videos/t3-ilford-delta-100.mp4) |
+| 075 | `t3-ilford-delta-3200` | Ilford Delta 3200 | `film-bw` | 33³ | [PNG](../assets/look-presets-20261024-r1/previews/t3-ilford-delta-3200.png) / [MP4](../assets/look-presets-20261024-r1/videos/t3-ilford-delta-3200.mp4) |
+| 076 | `t3-ilford-delta-400` | Ilford Delta 400 | `film-bw` | 33³ | [PNG](../assets/look-presets-20261024-r1/previews/t3-ilford-delta-400.png) / [MP4](../assets/look-presets-20261024-r1/videos/t3-ilford-delta-400.mp4) |
+| 077 | `t3-ilford-fp4-125` | Ilford FP4 125 | `film-bw` | 33³ | [PNG](../assets/look-presets-20261024-r1/previews/t3-ilford-fp4-125.png) / [MP4](../assets/look-presets-20261024-r1/videos/t3-ilford-fp4-125.mp4) |
+| 078 | `t3-ilford-hp5-plus-400` | Ilford HP5 Plus 400 | `film-bw` | 33³ | [PNG](../assets/look-presets-20261024-r1/previews/t3-ilford-hp5-plus-400.png) / [MP4](../assets/look-presets-20261024-r1/videos/t3-ilford-hp5-plus-400.mp4) |
+| 079 | `t3-ilford-xp2` | Ilford XP2 | `film-bw` | 33³ | [PNG](../assets/look-presets-20261024-r1/previews/t3-ilford-xp2.png) / [MP4](../assets/look-presets-20261024-r1/videos/t3-ilford-xp2.mp4) |
+| 080 | `t3-kodak-colorplus-200` | Kodak ColorPlus 200 | `film-negative` | 33³ | [PNG](../assets/look-presets-20261024-r1/previews/t3-kodak-colorplus-200.png) / [MP4](../assets/look-presets-20261024-r1/videos/t3-kodak-colorplus-200.mp4) |
+| 081 | `t3-kodak-ektachrome-100-g` | Kodak Ektachrome 100 G | `film-slide` | 33³ | [PNG](../assets/look-presets-20261024-r1/previews/t3-kodak-ektachrome-100-g.png) / [MP4](../assets/look-presets-20261024-r1/videos/t3-kodak-ektachrome-100-g.mp4) |
+| 082 | `t3-kodak-ektachrome-100-gx` | Kodak Ektachrome 100 GX | `film-slide` | 33³ | [PNG](../assets/look-presets-20261024-r1/previews/t3-kodak-ektachrome-100-gx.png) / [MP4](../assets/look-presets-20261024-r1/videos/t3-kodak-ektachrome-100-gx.mp4) |
+| 083 | `t3-kodak-ektachrome-100-vs` | Kodak Ektachrome 100 VS | `film-slide` | 33³ | [PNG](../assets/look-presets-20261024-r1/previews/t3-kodak-ektachrome-100-vs.png) / [MP4](../assets/look-presets-20261024-r1/videos/t3-kodak-ektachrome-100-vs.mp4) |
+| 084 | `t3-kodak-ektar-100` | Kodak Ektar 100 | `film-negative` | 33³ | [PNG](../assets/look-presets-20261024-r1/previews/t3-kodak-ektar-100.png) / [MP4](../assets/look-presets-20261024-r1/videos/t3-kodak-ektar-100.mp4) |
+| 085 | `t3-kodak-elite-chrome-400` | Kodak Elite Chrome 400 | `film-slide` | 33³ | [PNG](../assets/look-presets-20261024-r1/previews/t3-kodak-elite-chrome-400.png) / [MP4](../assets/look-presets-20261024-r1/videos/t3-kodak-elite-chrome-400.mp4) |
+| 086 | `t3-kodak-gold-200` | Kodak Gold 200 | `film-negative` | 33³ | [PNG](../assets/look-presets-20261024-r1/previews/t3-kodak-gold-200.png) / [MP4](../assets/look-presets-20261024-r1/videos/t3-kodak-gold-200.mp4) |
+| 087 | `t3-kodak-kodakchrome-200` | Kodak Kodakchrome 200 | `film-slide` | 33³ | [PNG](../assets/look-presets-20261024-r1/previews/t3-kodak-kodakchrome-200.png) / [MP4](../assets/look-presets-20261024-r1/videos/t3-kodak-kodakchrome-200.mp4) |
+| 088 | `t3-kodak-kodakchrome-25` | Kodak Kodakchrome 25 | `film-slide` | 33³ | [PNG](../assets/look-presets-20261024-r1/previews/t3-kodak-kodakchrome-25.png) / [MP4](../assets/look-presets-20261024-r1/videos/t3-kodak-kodakchrome-25.mp4) |
+| 089 | `t3-kodak-kodakchrome-64` | Kodak Kodakchrome 64 | `film-slide` | 33³ | [PNG](../assets/look-presets-20261024-r1/previews/t3-kodak-kodakchrome-64.png) / [MP4](../assets/look-presets-20261024-r1/videos/t3-kodak-kodakchrome-64.mp4) |
+| 090 | `t3-kodak-portra-160` | Kodak Portra 160 | `film-negative` | 33³ | [PNG](../assets/look-presets-20261024-r1/previews/t3-kodak-portra-160.png) / [MP4](../assets/look-presets-20261024-r1/videos/t3-kodak-portra-160.mp4) |
+| 091 | `t3-kodak-portra-160-nc` | Kodak Portra 160 NC | `film-negative` | 33³ | [PNG](../assets/look-presets-20261024-r1/previews/t3-kodak-portra-160-nc.png) / [MP4](../assets/look-presets-20261024-r1/videos/t3-kodak-portra-160-nc.mp4) |
+| 092 | `t3-kodak-portra-160-vc` | Kodak Portra 160 VC | `film-negative` | 33³ | [PNG](../assets/look-presets-20261024-r1/previews/t3-kodak-portra-160-vc.png) / [MP4](../assets/look-presets-20261024-r1/videos/t3-kodak-portra-160-vc.mp4) |
+| 093 | `t3-kodak-portra-400` | Kodak Portra 400 | `film-negative` | 33³ | [PNG](../assets/look-presets-20261024-r1/previews/t3-kodak-portra-400.png) / [MP4](../assets/look-presets-20261024-r1/videos/t3-kodak-portra-400.mp4) |
+| 094 | `t3-kodak-portra-400-nc` | Kodak Portra 400 NC | `film-negative` | 33³ | [PNG](../assets/look-presets-20261024-r1/previews/t3-kodak-portra-400-nc.png) / [MP4](../assets/look-presets-20261024-r1/videos/t3-kodak-portra-400-nc.mp4) |
+| 095 | `t3-kodak-portra-400-uc` | Kodak Portra 400 UC | `film-negative` | 33³ | [PNG](../assets/look-presets-20261024-r1/previews/t3-kodak-portra-400-uc.png) / [MP4](../assets/look-presets-20261024-r1/videos/t3-kodak-portra-400-uc.mp4) |
+| 096 | `t3-kodak-portra-400-vc` | Kodak Portra 400 VC | `film-negative` | 33³ | [PNG](../assets/look-presets-20261024-r1/previews/t3-kodak-portra-400-vc.png) / [MP4](../assets/look-presets-20261024-r1/videos/t3-kodak-portra-400-vc.mp4) |
+| 097 | `t3-kodak-portra-800` | Kodak Portra 800 | `film-negative` | 33³ | [PNG](../assets/look-presets-20261024-r1/previews/t3-kodak-portra-800.png) / [MP4](../assets/look-presets-20261024-r1/videos/t3-kodak-portra-800.mp4) |
+| 098 | `t3-kodak-t-max-3200` | Kodak T-Max 3200 | `film-bw` | 33³ | [PNG](../assets/look-presets-20261024-r1/previews/t3-kodak-t-max-3200.png) / [MP4](../assets/look-presets-20261024-r1/videos/t3-kodak-t-max-3200.mp4) |
+| 099 | `t3-kodak-tri-x-400` | Kodak Tri-X 400 | `film-bw` | 33³ | [PNG](../assets/look-presets-20261024-r1/previews/t3-kodak-tri-x-400.png) / [MP4](../assets/look-presets-20261024-r1/videos/t3-kodak-tri-x-400.mp4) |
+| 100 | `t3-kodak-ultra-max-400` | Kodak Ultra Max 400 | `film-negative` | 33³ | [PNG](../assets/look-presets-20261024-r1/previews/t3-kodak-ultra-max-400.png) / [MP4](../assets/look-presets-20261024-r1/videos/t3-kodak-ultra-max-400.mp4) |
+
+## 输入与转换 / Inputs and conversion
+
+仅用于预先准备好的 SDR encoded RGB 内容。49 个 CUBE 保留原始网格；51 个 Hald 按原生 RGB8 位深读取，四面体插值转换到 33³。预设不是相机 Log/HDR 校准 LUT；`look apply` 会拒绝 Log/HDR/Float32 项目。
+Use prepared SDR encoded RGB content. Original CUBE grids are retained; RGB8 Hald data is resampled to 33³ using tetrahedral interpolation. These are not calibrated Log/HDR LUTs. The apply command rejects Log/HDR/Float32 projects.
+
+8,192 个随机 RGB 样本的转换误差均写入目录。全部预设中最大的单通道采样绝对误差为 **0.064490**（归一化 0–1），最大的单预设平均绝对误差为 **0.001164**；这些采样统计不是全色域最大误差保证。不能以预设数量宣称剪映等价。
+The largest sampled channel error is 0.064490 on normalized 0–1 RGB; the largest per-preset mean error is 0.001164 across 8,192 random samples. These sampled measurements do not bound every possible input. No CapCut or official film-profile equivalence is claimed.
+
+本轮范围是色彩 LUT；空间颗粒、光晕、美颜及 AI 效果不包含在这 100 个预设的计数中。This catalog counts color transforms; spatial grain, bloom, beauty and AI effects are separate capabilities.

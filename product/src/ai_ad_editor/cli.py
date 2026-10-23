@@ -17,6 +17,7 @@ from typing import Any, Callable
 
 from . import ENGINE_ID, SCHEMA_VERSION, VERSION
 from . import schema_contract
+from . import looks
 from .clip_windows import apply_operation as apply_window_operation, OPERATIONS as WINDOW_OPERATIONS
 from .ad_plan import build_ad_plan
 from .captions import parse_caption_file, validate_cues, write_srt_file
@@ -1187,6 +1188,28 @@ def build_parser() -> argparse.ArgumentParser:
     lut_inspect = _leaf_common(luts.add_parser("inspect", help="检查 LUT 文件、哈希和元数据"))
     lut_inspect.add_argument("--project", required=True)
     lut_inspect.add_argument("--lut-id", required=True)
+
+    look = subs.add_parser('look', help='100 个离线开源风格预设')
+    look_sub = look.add_subparsers(dest='action', required=True)
+    look_list = _leaf_common(look_sub.add_parser('list', help='按中文/英文/类别搜索风格'))
+    look_list.add_argument('--query', default='')
+    look_list.add_argument('--category', default=None)
+    look_inspect = _leaf_common(look_sub.add_parser('inspect', help='检查来源、许可及完整性'))
+    look_inspect.add_argument('--id', required=True)
+    look_preview = _leaf_common(look_sub.add_parser('preview', help='用本地图片或内置测试卡实际渲染 PNG'))
+    look_preview.add_argument('--id', required=True)
+    look_preview.add_argument('--input', default=None)
+    look_preview.add_argument('--output', required=True)
+    look_preview.add_argument('--strength', type=float, default=1.)
+    look_apply = _leaf_common(look_sub.add_parser('apply', help='复制 LUT/许可到项目并应用预设'))
+    look_apply.add_argument('--project', required=True)
+    look_apply.add_argument('--id', required=True)
+    look_target = look_apply.add_mutually_exclusive_group(required=True)
+    look_target.add_argument('--clip-id')
+    look_target.add_argument('--global', dest='global_scope', action='store_true', help='应用到项目全局调整链')
+    look_apply.add_argument('--sequence-id', default='seq_main')
+    look_apply.add_argument('--strength', type=float, default=1.)
+    look_apply.add_argument('--append', action='store_true', help='保留并叠加既有内置风格；默认替换内置风格')
 
     schema = subs.add_parser('schema',help='查看/原字节导出随包固定的 Agent Project 合同')
     schema_sub = schema.add_subparsers(dest='action',required=True)
@@ -6805,6 +6828,49 @@ def command_library_similar(args: argparse.Namespace) -> dict[str, Any]:
     )
 
 
+def command_look(args: argparse.Namespace) -> dict[str, Any]:
+    try:
+        return _handle_look(args)
+    except OSError as exc:
+        raise AppError('LOOK_IO_FAILED', '本地风格文件操作失败', exit_code=5, cause=str(exc)) from exc
+
+
+def _handle_look(args: argparse.Namespace) -> dict[str, Any]:
+    command = 'look.' + args.action
+    status = 'planned' if args.dry_run else 'succeeded'
+    if args.action == 'list':
+        return _envelope(command, args, status=status, data=looks.list_looks(args.query, args.category))
+    if args.action == 'inspect':
+        return _envelope(command, args, status=status, data=looks.inspect_look(args.id))
+    if args.action == 'preview':
+        data = looks.preview(args.id, args.output, input_path=args.input, strength=args.strength, dry_run=args.dry_run)
+        return _envelope(command, args, status=status, data=data, warnings=[{'code':'LOOK_PARTIAL_STRENGTH', 'message':w} for w in data.get('warnings', [])])
+    root, project = load_project(args.project)
+    candidate, plan = looks.plan_apply(project, args.id, args.strength, clip_id=args.clip_id,
+        sequence_id=args.sequence_id, global_scope=args.global_scope, append=args.append)
+    warnings = [{'code':'LOOK_CREATIVE_SDR', 'message':looks.catalog()['color_contract']}]
+    if 0 < args.strength < 1:
+        warnings.append({'code':'LOOK_PARTIAL_STRENGTH', 'message':'静态强度在 encoded RGB 中混合 identity LUT；不是线性光像素混合'})
+    if args.dry_run:
+        return _envelope(command, args, status=status, data=plan, warnings=warnings)
+    snapshot = create_snapshot(root, project, label='before-look-apply')
+    ledger = load_ledger(root)
+    resource = looks.install_in_project(root, args.id, ledger)
+    validation = validate_project(root, candidate, rights_ledger=ledger)
+    if not validation['ok']:
+        raise AppError('LOOK_PROJECT_INVALID', '应用风格后的项目未通过验证', exit_code=3, cause=json.dumps(validation['errors'], ensure_ascii=False))
+    operation_id = new_id('op')
+    candidate.setdefault('provenance', {}).setdefault('change_log', []).append({
+        'operation_id':operation_id, 'command':command, 'look_id':args.id,
+        'before_snapshot_id':snapshot['snapshot_id'], 'at':now_iso()})
+    save_project(root, candidate)
+    save_ledger(root, ledger)
+    _operation(root, operation_id, {'operation_id':operation_id, 'command':command, 'status':'succeeded',
+        'look_id':args.id, 'snapshot_id':snapshot['snapshot_id'], 'created_at':now_iso()})
+    return _envelope(command, args, data={**plan, 'resource':resource, 'snapshot':snapshot},
+                     warnings=warnings, operation_id=operation_id)
+
+
 def command_lut_register(args: argparse.Namespace) -> dict[str, Any]:
     root, project = load_project(args.project)
     source = Path(args.input).expanduser().resolve()
@@ -7109,6 +7175,10 @@ COMMANDS: dict[tuple[str, str | None], Callable[[argparse.Namespace], dict[str, 
     ('fragment', 'list'): command_fragment,
     ('fragment', 'inspect'): command_fragment,
     ("lut", "register"): command_lut_register,
+    ('look', 'list'): command_look,
+    ('look', 'inspect'): command_look,
+    ('look', 'preview'): command_look,
+    ('look', 'apply'): command_look,
     ("lut", "list"): command_lut_list,
     ("lut", "inspect"): command_lut_inspect,
     ("doctor", None): command_doctor,

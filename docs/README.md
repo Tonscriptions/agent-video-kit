@@ -2,10 +2,13 @@
 
 [中文 README](../README.md) · [English README](../README.en.md) · [Release](https://github.com/Tonscriptions/agent-video-kit/releases/tag/v0.1.0-alpha.1)
 
-当前入口以 `v0.1.0-alpha.1` 为准。首版关闭本地 CLI 试用闭环；完整剪映等价仍未验收。Release-specific onboarding is bilingual; historical research and specifications are mainly Chinese.
+公开首版是 `v0.1.0-alpha.1`；本机后续构建已升级到 `v0.1.0-alpha.2`（CLI `0.1.1`），新增 100 个离线风格预设和本地 Skill 更新。完整剪映等价仍未验收。The public release remains alpha.1; the current local build is alpha.2 with 100 offline looks. New onboarding is bilingual.
 
 | 阅读目标 / Goal | Document |
 |---|---|
+| 100 预设完整编号、分类与实际预览 / Numbered look catalog | [100 looks](local/LOOK_PRESETS.md) |
+| 新包安装、检索、预览与应用 / Alpha.2 usage | [Alpha.2 manual](releases/v0.1.0-alpha.2/USAGE.md) |
+| 100 预设实测、单元回归、Skill 与项目包 / Current verification | [Look verification](validation/LOOK_PRESETS_20261024.md) |
 | 本机正式安装、17 个新名称与实际 Skill 调用 / Installed app and new Skill namespace | [Local installation](local/INSTALLATION.md) |
 | 滤镜、LUT 格式、调色与关键帧 / Filters, LUTs and grading | [Filters](local/FILTERS.md) |
 | 开源风格库来源、Star、许可、工程量与社区 LUT 实测 / Open looks: sources, licenses, effort and real probe | [Open look-library assessment](research/OPEN_LOOK_LIBRARY_20261024.md) |

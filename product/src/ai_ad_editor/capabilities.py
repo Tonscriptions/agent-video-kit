@@ -729,6 +729,16 @@ def build_capability_manifest() -> dict[str, Any]:
                 "visual_similarity_contract": "optional_ffmpeg_ahash_v1_samples_with_hamming_distance_candidate_groups",
                 "limits": ["no_vlm_embeddings", "no_content_understanding_without_local_model", "duplicate_detection_is_exact_hash_only", "visual_similarity_is_a_review_candidate_not_content_understanding", "incremental_refresh_trusts_file_stat_and_sidecar_signatures", "subtitle_sidecar_requires_matching_relative_stem"],
             },
+            "look_presets": {
+                "status":"implemented_with_limits", "catalog_version":"1.0.0", "count":100,
+                "commands":["look.list", "look.inspect", "look.preview", "look.apply"],
+                "features":["Chinese_English_search", "hash_verified_MIT_resources", "offline_previews",
+                    "clip_or_global_application", "replace_or_append", "static_strength_0_to_1",
+                    "project_portable_LUT_license_provenance_and_rights", "dry_run", "idempotency"],
+                "limits":["creative_SDR_encoded_RGB_only", "upstream_camera_transfer_not_calibrated",
+                    "Float32_Log_HDR_apply_rejected", "not_official_proprietary_or_Leica_filters",
+                    "normalized_grid_approximation_measured_per_preset", "no_spatial_film_grain_or_AI_beauty"]
+            },
             "lut_library": {
                 "status": "implemented",
                 "features": ["project_local_registration", "sha256_identity", "cube_metadata", "list", "inspect", "rights_ledger_registration", "lut_id_effect_reference", "hash_mismatch_gate", "cube_static_intensity_blend", "deterministic_intensity_cache"],
@@ -745,7 +755,7 @@ def build_capability_manifest() -> dict[str, Any]:
                 "write_lock_contract": "operations/project-write.lock_serializes_cooperating_cli_read_modify_write_operations_and_returns_retryable_PROJECT_WRITE_LOCKED",
                 "transaction_contract": "operations/project-transaction.json_journals_project_rights_lock_and_metadata_records_before_cooperating_cli_mutations;_prepared_journal_is_rolled_back_on_next_start_or_project_recover",
                 "failure_diagnostic_contract": "normal_exception_rollback_preserves_explicitly_referenced_versioned_failed_validation_JSON_and_failed_cancelled_partial_operation_records;_crash_recovery_does_not_infer_exception_diagnostics",
-                "transaction_scope": ["project.json", "rights-ledger.json", "project.lock.json", "operations_metadata", "history_metadata", "validation_metadata", "exports_metadata"],
+                "transaction_scope": ["project.json", "rights-ledger.json", "project.lock.json", "assets/lut-library.json", "operations_metadata", "history_metadata", "validation_metadata", "exports_metadata"],
                 "limits": ["media_and_render_side_effect_files_are_reported_but_not_copied_or_deleted_by_recovery", "direct_external_json_editors_do_not_join_cli_lock_or_transaction", "cross_version_snapshot_migration_is_limited_to_known_legacy_shapes"],
             },
             "timeline": {
