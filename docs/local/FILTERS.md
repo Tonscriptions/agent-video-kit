@@ -15,6 +15,27 @@ The installed release supports local LUT loading, built-in effects, grading, ord
 | FL06 | 强度与关键帧 / Strength and animation | `lut3d` 的 `intensity` 为 `0..1`，可关键帧；其他效果以各自公布参数为准 / LUT intensity and advertised per-effect parameters |
 | FL07 | 预览与导出 / Preview and output | 效果进入预览、渲染和可编辑工程；实际输出仍需质量核验 / Effects feed preview, render and editable projects; verify actual outputs |
 
+## 现成风格库的实际状态 / Ready-made look library
+
+**当前没有内置徕卡、富士、柯达等命名风格预设，也没有随基础安装包分发创意 LUT 库。** 核对已安装应用资源，`.cube/.3dl/.csp/.dat` 文件数量为 **0**；用户工程登记的外部 LUT、开发测试文件不计入随包资源。
+**No ready-made Leica, Fuji, Kodak or equivalent named look library is shipped.** The installed application contains **zero** LUT resource files with those supported extensions; external project LUTs and development fixtures are separate.
+
+46 项是调色、模糊、修复、变换等基础效果目录总数，其中 `stylize` 类有 9 个算子：边缘、黑白、反相、颗粒、色阶分离、复古棕、曝光反转、阈值、暗角。这些算子可构造风格，但并非 46 套完成了调色设计和实拍验收的成品滤镜。
+The catalog totals 46 operators across categories. Its nine stylize operators are edgedetect, grayscale, invert, noise, posterize, sepia, solarize, threshold and vignette. Operators can form looks; they are not a curated library of 46 finished, verified looks.
+
+| 层级 / Layer | 当前状态 / Current state |
+|---|---|
+| 加载自有本地 LUT / Load supplied LUTs | 已实现，受格式与路径契约约束 / Implemented with renderer limits |
+| 组合参数实现自定义风格 / Author a custom look | 可用现有调色与效果组合；具体效果需设计和验收 / Possible using supported operators; requires authoring and review |
+| 一键选择命名风格 / Select a ready-made named look | 未提供成体系的命名风格库 / No curated named-look library |
+| 徕卡等品牌效果一致性 / Match a branded algorithm | 未实现或验收，不承诺一致 / Not implemented or accepted |
+| 剪映专属滤镜包 / Proprietary CapCut packs | 无直接加载适配器 / No direct loader |
+
+因此当前产品具备滤镜处理与加载内核，丰富的成品风格库仍是缺口。补齐需增加具备来源和许可记录的预设/LUT、组合效果定义、预览缩略图、检索与应用入口，以及人像、风景、夜景等素材的效果核验；单纯给参数组合冠以品牌名不能构成等价验收。
+The engine exists, while a finished look library remains missing. Closing this gap requires presets/LUTs with provenance, effect definitions, previews, discovery/application and material-specific review. A brand-like name alone does not establish visual equivalence.
+
+[已安装资源核对 / Installed inventory](../validation/evidence/filter-library-20261024-r1/inventory.json)。本轮仅资源和目录检查，0 新渲染 / Inventory/catalog review only; no new render.
+
 ## 格式与渲染路径边界 / Format and renderer boundaries
 
 - 默认 FFmpeg 路径的 `lut3d` 主要用于 3D LUT。静态部分强度需完整 3D `.cube`；动态强度使用 8-bit 编码 RGB 混合。非 `.cube` 的元数据只记录扩展名，不能宣称全部格式均支持同等强度处理。

@@ -47,6 +47,8 @@ Use bundled `capabilities`, `schema show` and `COMMAND --help` for the exact sup
 
 ## Installed local package and Skills (2026-10-24)
 
+**Ready-made looks are still missing:** no named Leica/Fuji/Kodak preset library ships with the base app, and it contains zero creative LUT files. The 46 entries are operators; external LUT support does not supply a finished look library. [Inventory and gap](docs/local/FILTERS.md).
+
 **Filters are included:** register local LUTs (`.cube/.3dl/.csp/.dat`), use grayscale, sepia, grain, vignette and grading effects, and animate advertised parameters. The catalog has 46 effects; format, strength and 1D support depend on the renderer. [Loading workflow, limits and historical comparison GIF](docs/local/FILTERS.md).
 
 The verified release ZIP is installed at `E:/dev/sandbox/AI广告剪辑/local/agent-ffmpeg/v0.1.0-alpha.1/installed/`. All 17 local Skills are registered with the requested **`$agent-ffmpeg-local-xxx`** prefix. Invoke **`$agent-ffmpeg-local-editor`** on the next turn.
@@ -158,6 +160,8 @@ Install the local release before registration. Windows junctions expose Skill so
 | R11 | New namespace and actual Skill execution | **17 Skills registered/validated; eight launcher commands: seven successes, one expected refusal** | [Skill receipt](docs/validation/evidence/local-install-20261024-r1/skills/verification.json); Codex junction calls the installed release, Chinese/space path render is byte-identical to direct execution; not a full Agent behavior benchmark |
 | R12 | Fresh installed-case reproduction | **28 commands: 27 successes, one expected refusal; ad/template renders and project-package round trip** | [Case receipt](docs/validation/evidence/local-install-20261024-r1/cases/verification.json) · [GIF](docs/assets/local-install-20261024-r1/field.gif) · [Static review](docs/validation/evidence/local-install-20261024-r1/review.json); zero new inference, no continuous playback or human listening; separate from historical suite counts |
 | R13 | Installed filter/LUT capability review | **46 catalog entries; registration help lists four extensions** | [Current query receipt](docs/validation/evidence/filter-capabilities-20261024-r1/verification.json) · [Workflow and limits](docs/local/FILTERS.md); 2026-10-24, catalog/help/source review only, zero new renders; 1D shaper requires explicit Float32, with dated render evidence linked separately |
+
+| R14 | Named looks and bundled LUT inventory | **No Leica/Fuji/Kodak named presets; zero LUT assets in the installed app** | [Inventory](docs/validation/evidence/filter-library-20261024-r1/inventory.json); 2026-10-24, excludes project assets/test fixtures; nine stylize operators are not a finished look library; zero new renders |
 
 
 ## Limitations and next milestones
