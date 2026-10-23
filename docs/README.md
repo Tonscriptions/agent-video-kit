@@ -8,6 +8,7 @@
 |---|---|
 | 本机正式安装、17 个新名称与实际 Skill 调用 / Installed app and new Skill namespace | [Local installation](local/INSTALLATION.md) |
 | 滤镜、LUT 格式、调色与关键帧 / Filters, LUTs and grading | [Filters](local/FILTERS.md) |
+| 开源风格库来源、Star、许可、工程量与社区 LUT 实测 / Open looks: sources, licenses, effort and real probe | [Open look-library assessment](research/OPEN_LOOK_LIBRARY_20261024.md) |
 | 安装、结构、命令、渲染路径、故障与恢复 / Install and operate | [USAGE](releases/v0.1.0-alpha.1/USAGE.md) |
 | 发行时的 17 个旧名 Skill / Original release Skill names | [SKILLS](releases/v0.1.0-alpha.1/SKILLS.md) |
 | 原视频、输出、GIF、响应与复现 / Complete examples | [CASES](releases/v0.1.0-alpha.1/CASES.md) |

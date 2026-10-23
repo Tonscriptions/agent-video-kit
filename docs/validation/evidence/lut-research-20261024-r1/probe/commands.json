@@ -1,0 +1,472 @@
+[
+  {
+    "label": "version",
+    "argv": [
+      "powershell.exe",
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      "C:/Users/carzy/.codex/skills/agent-ffmpeg-local-editor/scripts/run.ps1",
+      "version"
+    ],
+    "exit_code": 0,
+    "status": "succeeded",
+    "warnings": [],
+    "errors": []
+  },
+  {
+    "label": "doctor",
+    "argv": [
+      "powershell.exe",
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      "C:/Users/carzy/.codex/skills/agent-ffmpeg-local-editor/scripts/run.ps1",
+      "doctor"
+    ],
+    "exit_code": 0,
+    "status": "succeeded",
+    "warnings": [],
+    "errors": []
+  },
+  {
+    "label": "capabilities",
+    "argv": [
+      "powershell.exe",
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      "C:/Users/carzy/.codex/skills/agent-ffmpeg-local-editor/scripts/run.ps1",
+      "capabilities"
+    ],
+    "exit_code": 0,
+    "status": "succeeded",
+    "warnings": [],
+    "errors": []
+  },
+  {
+    "label": "schema",
+    "argv": [
+      "powershell.exe",
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      "C:/Users/carzy/.codex/skills/agent-ffmpeg-local-editor/scripts/run.ps1",
+      "schema",
+      "show"
+    ],
+    "exit_code": 0,
+    "status": "succeeded",
+    "warnings": [],
+    "errors": []
+  },
+  {
+    "label": "lut-effect",
+    "argv": [
+      "powershell.exe",
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      "C:/Users/carzy/.codex/skills/agent-ffmpeg-local-editor/scripts/run.ps1",
+      "effects",
+      "inspect",
+      "--name",
+      "lut3d"
+    ],
+    "exit_code": 0,
+    "status": "succeeded",
+    "warnings": [],
+    "errors": []
+  },
+  {
+    "label": "read-community-cube",
+    "argv": [
+      "git",
+      "-c",
+      "gc.auto=0",
+      "-c",
+      "maintenance.auto=false",
+      "-C",
+      "E:\\dev\\sandbox\\AI广告剪辑\\sources\\lut-research-20261024\\stripedpurple--color-grading-luts",
+      "show",
+      "9757e8b5147693cab49c3fd674bf23dbe28d6c8e:Avant Garde/Striped Purple - Amber Haze.cube"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "make-synthetic-input",
+    "argv": [
+      "ffmpeg",
+      "-hide_banner",
+      "-nostdin",
+      "-f",
+      "lavfi",
+      "-i",
+      "testsrc2=size=320x180:rate=12:duration=3",
+      "-an",
+      "-c:v",
+      "libx264",
+      "-crf",
+      "16",
+      "-pix_fmt",
+      "yuv420p",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\lut-research-20261024-r1\\original.mp4"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "project-init",
+    "argv": [
+      "powershell.exe",
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      "C:/Users/carzy/.codex/skills/agent-ffmpeg-local-editor/scripts/run.ps1",
+      "project",
+      "init",
+      "E:\\dev\\sandbox\\AI广告剪辑\\local\\agent-ffmpeg\\lut-research-20261024-r1\\project",
+      "--name",
+      "Community LUT feasibility / synthetic silent"
+    ],
+    "exit_code": 0,
+    "status": "succeeded",
+    "warnings": [],
+    "errors": []
+  },
+  {
+    "label": "ingest",
+    "argv": [
+      "powershell.exe",
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      "C:/Users/carzy/.codex/skills/agent-ffmpeg-local-editor/scripts/run.ps1",
+      "media",
+      "ingest",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\local\\agent-ffmpeg\\lut-research-20261024-r1\\project",
+      "--input",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\lut-research-20261024-r1\\original.mp4",
+      "--license-spdx",
+      "CC0-1.0",
+      "--license-url",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\lut-research-20261024-r1\\LICENSE.txt",
+      "--evidence",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\lut-research-20261024-r1\\LICENSE.txt",
+      "--creator",
+      "Agent Video Kit contributors",
+      "--verification-status",
+      "verified",
+      "--permitted-use",
+      "commercial_ad"
+    ],
+    "exit_code": 0,
+    "status": "succeeded",
+    "warnings": [],
+    "errors": []
+  },
+  {
+    "label": "lut-register",
+    "argv": [
+      "powershell.exe",
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      "C:/Users/carzy/.codex/skills/agent-ffmpeg-local-editor/scripts/run.ps1",
+      "lut",
+      "register",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\local\\agent-ffmpeg\\lut-research-20261024-r1\\project",
+      "--input",
+      "E:\\dev\\sandbox\\AI广告剪辑\\sources\\lut-research-20261024\\samples\\striped-purple-amber-haze.cube",
+      "--lut-id",
+      "lut_community_amber_haze",
+      "--name",
+      "Striped Purple / Amber Haze / research sample",
+      "--license-spdx",
+      "MIT",
+      "--license-url",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\validation\\evidence\\lut-research-20261024-r1\\stripedpurple--color-grading-luts\\LICENSE",
+      "--evidence",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\validation\\evidence\\lut-research-20261024-r1\\stripedpurple--color-grading-luts\\LICENSE",
+      "--creator",
+      "Striped Purple / Nixua",
+      "--verification-status",
+      "verified",
+      "--permitted-use",
+      "commercial_ad"
+    ],
+    "exit_code": 0,
+    "status": "succeeded",
+    "warnings": [],
+    "errors": []
+  },
+  {
+    "label": "compose",
+    "argv": [
+      "powershell.exe",
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      "C:/Users/carzy/.codex/skills/agent-ffmpeg-local-editor/scripts/run.ps1",
+      "timeline",
+      "compose",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\local\\agent-ffmpeg\\lut-research-20261024-r1\\project",
+      "--input",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\validation\\evidence\\lut-research-20261024-r1\\probe\\changes.json"
+    ],
+    "exit_code": 0,
+    "status": "succeeded",
+    "warnings": [],
+    "errors": []
+  },
+  {
+    "label": "validate",
+    "argv": [
+      "powershell.exe",
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      "C:/Users/carzy/.codex/skills/agent-ffmpeg-local-editor/scripts/run.ps1",
+      "validate",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\local\\agent-ffmpeg\\lut-research-20261024-r1\\project"
+    ],
+    "exit_code": 0,
+    "status": "succeeded",
+    "warnings": [],
+    "errors": []
+  },
+  {
+    "label": "rights",
+    "argv": [
+      "powershell.exe",
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      "C:/Users/carzy/.codex/skills/agent-ffmpeg-local-editor/scripts/run.ps1",
+      "rights",
+      "check",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\local\\agent-ffmpeg\\lut-research-20261024-r1\\project"
+    ],
+    "exit_code": 0,
+    "status": "succeeded",
+    "warnings": [],
+    "errors": []
+  },
+  {
+    "label": "render",
+    "argv": [
+      "powershell.exe",
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      "C:/Users/carzy/.codex/skills/agent-ffmpeg-local-editor/scripts/run.ps1",
+      "render",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\local\\agent-ffmpeg\\lut-research-20261024-r1\\project",
+      "--output",
+      "E:\\dev\\sandbox\\AI广告剪辑\\local\\agent-ffmpeg\\lut-research-20261024-r1\\project\\renders\\amber-haze-065.mp4",
+      "--publish"
+    ],
+    "exit_code": 0,
+    "status": "succeeded",
+    "warnings": [
+      {
+        "code": "RENDER_FEATURE_APPROXIMATE",
+        "clip_id": "clip_20261023222926_edddc1d7",
+        "feature": "lut_intensity",
+        "message": "静态强度由 red-fastest identity 混合 CUBE 执行；域外/非线性和舍入结果可能与像素混合不同"
+      }
+    ],
+    "errors": []
+  },
+  {
+    "label": "quality",
+    "argv": [
+      "powershell.exe",
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      "C:/Users/carzy/.codex/skills/agent-ffmpeg-local-editor/scripts/run.ps1",
+      "quality",
+      "check",
+      "--project",
+      "E:\\dev\\sandbox\\AI广告剪辑\\local\\agent-ffmpeg\\lut-research-20261024-r1\\project",
+      "--input",
+      "E:\\dev\\sandbox\\AI广告剪辑\\local\\agent-ffmpeg\\lut-research-20261024-r1\\project\\renders\\amber-haze-065.mp4",
+      "--width",
+      "320",
+      "--height",
+      "180"
+    ],
+    "exit_code": 0,
+    "status": "succeeded",
+    "warnings": [],
+    "errors": []
+  },
+  {
+    "label": "decode",
+    "argv": [
+      "ffmpeg",
+      "-hide_banner",
+      "-v",
+      "error",
+      "-i",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\lut-research-20261024-r1\\edited.mp4",
+      "-f",
+      "null",
+      "-"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "probe",
+    "argv": [
+      "ffprobe",
+      "-v",
+      "error",
+      "-count_frames",
+      "-show_streams",
+      "-show_format",
+      "-of",
+      "json",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\lut-research-20261024-r1\\edited.mp4"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "decode",
+    "argv": [
+      "ffmpeg",
+      "-hide_banner",
+      "-v",
+      "error",
+      "-i",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\lut-research-20261024-r1\\edited.mp4",
+      "-f",
+      "null",
+      "-"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "probe",
+    "argv": [
+      "ffprobe",
+      "-v",
+      "error",
+      "-count_frames",
+      "-show_streams",
+      "-show_format",
+      "-of",
+      "json",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\lut-research-20261024-r1\\edited.mp4"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "silence-pcm",
+    "argv": [
+      "ffmpeg",
+      "-v",
+      "error",
+      "-i",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\lut-research-20261024-r1\\edited.mp4",
+      "-map",
+      "0:a:0",
+      "-ac",
+      "1",
+      "-f",
+      "f32le",
+      "-"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "pixels-original",
+    "argv": [
+      "ffmpeg",
+      "-v",
+      "error",
+      "-i",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\lut-research-20261024-r1\\original.mp4",
+      "-frames:v",
+      "1",
+      "-f",
+      "rawvideo",
+      "-pix_fmt",
+      "rgb24",
+      "-"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "pixels-edited",
+    "argv": [
+      "ffmpeg",
+      "-v",
+      "error",
+      "-i",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\lut-research-20261024-r1\\edited.mp4",
+      "-frames:v",
+      "1",
+      "-f",
+      "rawvideo",
+      "-pix_fmt",
+      "rgb24",
+      "-"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "comparison-gif",
+    "argv": [
+      "ffmpeg",
+      "-hide_banner",
+      "-nostdin",
+      "-i",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\lut-research-20261024-r1\\original.mp4",
+      "-i",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\lut-research-20261024-r1\\edited.mp4",
+      "-filter_complex",
+      "[0:v][1:v]hstack=inputs=2,fps=6,split[a][b];[a]palettegen[p];[b][p]paletteuse",
+      "-an",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\lut-research-20261024-r1\\comparison.gif"
+    ],
+    "exit_code": 0
+  },
+  {
+    "label": "comparison-still",
+    "argv": [
+      "ffmpeg",
+      "-hide_banner",
+      "-nostdin",
+      "-i",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\lut-research-20261024-r1\\original.mp4",
+      "-i",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\lut-research-20261024-r1\\edited.mp4",
+      "-filter_complex",
+      "[0:v][1:v]hstack=inputs=2",
+      "-frames:v",
+      "1",
+      "E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\lut-research-20261024-r1\\comparison.png"
+    ],
+    "exit_code": 0
+  }
+]

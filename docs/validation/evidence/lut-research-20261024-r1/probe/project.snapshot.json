@@ -1,0 +1,283 @@
+{
+  "schema_version": "0.1.0",
+  "project": {
+    "id": "proj_20261023222920_69909caf",
+    "name": "Community LUT feasibility / synthetic silent",
+    "created_at": "2026-10-23T22:29:20.027025Z",
+    "updated_at": "2026-10-23T22:29:34.229206Z",
+    "creator": "ai-ad-editor",
+    "source_revision": "local"
+  },
+  "settings": {
+    "timebase": {
+      "ticks_per_second": 90000,
+      "display_fps": {
+        "num": 12,
+        "den": 1
+      }
+    },
+    "canvas": {
+      "width": 320,
+      "height": 180,
+      "pixel_aspect": {
+        "num": 1,
+        "den": 1
+      }
+    },
+    "color": {
+      "primaries": "bt709",
+      "transfer": "bt709",
+      "matrix": "bt709",
+      "range": "limited"
+    },
+    "audio": {
+      "sample_rate": 48000,
+      "channels": 2
+    },
+    "output": {
+      "container": "mp4",
+      "video": {
+        "codec": "libx264",
+        "preset": "medium",
+        "crf": 18,
+        "pixel_format": "yuv420p"
+      },
+      "audio": {
+        "codec": "aac",
+        "bitrate": "192k"
+      }
+    }
+  },
+  "assets": [
+    {
+      "id": "asset_20261023222921_5b6c81a7",
+      "kind": "video",
+      "uri": "assets/asset_20261023222921_5b6c81a7_original.mp4",
+      "sha256": "sha256:d41d4575ac442e11866b849acaa420ad25094757ce9ae12114ed8022e4a49be4",
+      "probe": {
+        "duration_seconds": 3.0,
+        "duration_tick": 270000,
+        "format": "mov,mp4,m4a,3gp,3g2,mj2",
+        "format_long_name": "QuickTime / MOV",
+        "streams": [
+          {
+            "index": 0,
+            "codec_name": "h264",
+            "codec_long_name": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10",
+            "profile": "High",
+            "codec_type": "video",
+            "codec_tag_string": "avc1",
+            "codec_tag": "0x31637661",
+            "mime_codec_string": "avc1.64000c",
+            "width": 320,
+            "height": 180,
+            "coded_width": 320,
+            "coded_height": 180,
+            "has_b_frames": 2,
+            "sample_aspect_ratio": "1:1",
+            "display_aspect_ratio": "16:9",
+            "pix_fmt": "yuv420p",
+            "level": 12,
+            "chroma_location": "left",
+            "field_order": "progressive",
+            "is_avc": "true",
+            "nal_length_size": "4",
+            "id": "0x1",
+            "r_frame_rate": "12/1",
+            "avg_frame_rate": "12/1",
+            "time_base": "1/12288",
+            "start_pts": 0,
+            "start_time": "0.000000",
+            "duration_ts": 36864,
+            "duration": "3.000000",
+            "bit_rate": "242440",
+            "bits_per_raw_sample": "8",
+            "nb_frames": "36",
+            "extradata_size": 47,
+            "disposition": {
+              "default": 1,
+              "dub": 0,
+              "original": 0,
+              "comment": 0,
+              "lyrics": 0,
+              "karaoke": 0,
+              "forced": 0,
+              "hearing_impaired": 0,
+              "visual_impaired": 0,
+              "clean_effects": 0,
+              "attached_pic": 0,
+              "timed_thumbnails": 0,
+              "non_diegetic": 0,
+              "captions": 0,
+              "descriptions": 0,
+              "metadata": 0,
+              "dependent": 0,
+              "still_image": 0,
+              "multilayer": 0
+            },
+            "tags": {
+              "language": "und",
+              "handler_name": "VideoHandler",
+              "encoder": "Lavc62.28.100 libx264"
+            }
+          }
+        ],
+        "video": {
+          "codec": "h264",
+          "width": 320,
+          "height": 180,
+          "pix_fmt": "yuv420p",
+          "fps": "12/1",
+          "color_space": null,
+          "duration_seconds": 3.0,
+          "start_time_seconds": 0.0
+        },
+        "audio": {
+          "codec": null,
+          "sample_rate": 0,
+          "channels": 0,
+          "duration_seconds": 0.0,
+          "start_time_seconds": 0.0
+        }
+      },
+      "rights_ref": "asset_20261023222921_5b6c81a7",
+      "source": {
+        "source_url": "local://E:\\dev\\sandbox\\AI广告剪辑\\docs\\assets\\lut-research-20261024-r1\\original.mp4",
+        "retrieved_at": "2026-10-23T22:29:21.962797Z",
+        "original_name": "original.mp4"
+      }
+    }
+  ],
+  "sequences": [
+    {
+      "id": "seq_main",
+      "name": "Main",
+      "duration_tick": 270000,
+      "tracks": [
+        {
+          "id": "track_video_1",
+          "kind": "video",
+          "order": 0,
+          "muted": false,
+          "locked": false,
+          "clips": [
+            {
+              "id": "clip_20261023222926_edddc1d7",
+              "timeline_start_tick": 0,
+              "duration_tick": 270000,
+              "source_in_tick": 0,
+              "source_out_tick": 270000,
+              "asset_id": "asset_20261023222921_5b6c81a7",
+              "effects": [
+                {
+                  "type": "lut3d",
+                  "parameters": {
+                    "lut_id": "lut_community_amber_haze",
+                    "intensity": 0.65,
+                    "interpolation": "tetrahedral"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "track_audio_1",
+          "kind": "audio",
+          "order": 0,
+          "muted": false,
+          "locked": false,
+          "clips": []
+        }
+      ],
+      "markers": []
+    }
+  ],
+  "templates": [],
+  "outputs": [
+    {
+      "id": "output_20261023222934_83d7ec9d",
+      "path": "E:\\dev\\sandbox\\AI广告剪辑\\local\\agent-ffmpeg\\lut-research-20261024-r1\\project\\renders\\amber-haze-065.mp4",
+      "container": "mp4",
+      "profile": null,
+      "canvas": {
+        "width": 320,
+        "height": 180,
+        "pixel_aspect": {
+          "num": 1,
+          "den": 1
+        }
+      },
+      "video": {
+        "codec": "libx264",
+        "preset": "medium",
+        "crf": 18,
+        "pixel_format": "yuv420p"
+      },
+      "audio": {
+        "codec": "aac",
+        "bitrate": "192k"
+      },
+      "target_platform": "generic"
+    }
+  ],
+  "provenance": {
+    "cli_version": "0.1.0",
+    "engine_version": "ffmpeg-local",
+    "model_versions": [],
+    "input_hashes": [],
+    "change_log": [
+      {
+        "operation_id": "op_20261023222921_a941a3d6",
+        "command": "media.ingest",
+        "asset_id": "asset_20261023222921_5b6c81a7",
+        "at": "2026-10-23T22:29:21.963211Z"
+      },
+      {
+        "operation_id": "op_20261023222924_5c61b9f5",
+        "command": "lut.register",
+        "lut_id": "lut_community_amber_haze",
+        "sha256": "sha256:e44462286b40a8f9be2b25a6566c635c857ed9ddf56e547306362ae7e978934b",
+        "before_snapshot_id": "snap_20261023222924_70d722d1",
+        "at": "2026-10-23T22:29:24.184755Z"
+      },
+      {
+        "operation_id": "op_20261023222926_fb27e5c1",
+        "command": "timeline.compose",
+        "input": "E:\\dev\\sandbox\\AI广告剪辑\\docs\\validation\\evidence\\lut-research-20261024-r1\\probe\\changes.json",
+        "at": "2026-10-23T22:29:26.591365Z",
+        "changes": [
+          {
+            "op": "append_clip",
+            "track_id": "track_video_1",
+            "clip": {
+              "id": "clip_20261023222926_edddc1d7",
+              "timeline_start_tick": 0,
+              "duration_tick": 270000,
+              "source_in_tick": 0,
+              "source_out_tick": 270000,
+              "asset_id": "asset_20261023222921_5b6c81a7",
+              "effects": [
+                {
+                  "type": "lut3d",
+                  "parameters": {
+                    "lut_id": "lut_community_amber_haze",
+                    "intensity": 0.65,
+                    "interpolation": "tetrahedral"
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "before_snapshot_id": "snap_20261023222926_62989e52"
+      },
+      {
+        "command": "render",
+        "at": "2026-10-23T22:29:34.229198Z",
+        "output": "E:\\dev\\sandbox\\AI广告剪辑\\local\\agent-ffmpeg\\lut-research-20261024-r1\\project\\renders\\amber-haze-065.mp4",
+        "manifest": "E:\\dev\\sandbox\\AI广告剪辑\\local\\agent-ffmpeg\\lut-research-20261024-r1\\project\\renders\\amber-haze-065.mp4.manifest.json"
+      }
+    ]
+  }
+}

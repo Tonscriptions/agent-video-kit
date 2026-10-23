@@ -1,0 +1,41 @@
+Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'E:\dev\sandbox\AI广告剪辑\docs\assets\lut-research-20261024-r1\original.mp4':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    encoder         : Lavf62.12.100
+  Duration: 00:00:03.00, start: 0.000000, bitrate: 245 kb/s
+  Stream #0:0[0x1](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(progressive), 320x180 [SAR 1:1 DAR 16:9], 242 kb/s, 12 fps, 12 tbr, 12288 tbn (default)
+    Metadata:
+      handler_name    : VideoHandler
+      encoder         : Lavc62.28.100 libx264
+Input #1, mov,mp4,m4a,3gp,3g2,mj2, from 'E:\dev\sandbox\AI广告剪辑\docs\assets\lut-research-20261024-r1\edited.mp4':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    encoder         : Lavf62.12.100
+  Duration: 00:00:03.00, start: 0.000000, bitrate: 219 kb/s
+  Stream #1:0[0x1](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(tv, bt709/unknown/unknown, progressive), 320x180 [SAR 1:1 DAR 16:9], 210 kb/s, 12 fps, 12 tbr, 12288 tbn (default)
+    Metadata:
+      handler_name    : VideoHandler
+      encoder         : Lavc62.28.100 libx264
+  Stream #1:1[0x2](und): Audio: aac (LC) (mp4a / 0x6134706D), 48000 Hz, stereo, fltp, 2 kb/s (default)
+    Metadata:
+      handler_name    : SoundHandler
+Stream mapping:
+  Stream #0:0 (h264) -> hstack
+  Stream #1:0 (h264) -> hstack
+  paletteuse:default -> Stream #0:0 (gif)
+[Parsed_palettegen_3 @ 00000200938a5cc0] 255(+1) colors generated out of 81570 colors; ratio=0.003126
+Output #0, gif, to 'E:\dev\sandbox\AI广告剪辑\docs\assets\lut-research-20261024-r1\comparison.gif':
+  Metadata:
+    major_brand     : isom
+    minor_version   : 512
+    compatible_brands: isomiso2avc1mp41
+    encoder         : Lavf62.12.100
+  Stream #0:0: Video: gif, pal8(pc, gbr/unknown/unknown, progressive), 640x180 [SAR 1:1 DAR 32:9], q=2-31, 200 kb/s, 6 fps, 100 tbn
+    Metadata:
+      encoder         : Lavc62.28.100 gif
+[out#0/gif @ 00000200931d3340] video:380KiB audio:0KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 0.005137%
+frame=   18 fps=0.0 q=-0.0 Lsize=     380KiB time=00:00:03.00 bitrate=1038.2kbits/s speed=6.24x elapsed=0:00:00.48    

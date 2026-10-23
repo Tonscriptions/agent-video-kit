@@ -34,6 +34,9 @@ The catalog totals 46 operators across categories. Its nine stylize operators ar
 因此当前产品具备滤镜处理与加载内核，丰富的成品风格库仍是缺口。补齐需增加具备来源和许可记录的预设/LUT、组合效果定义、预览缩略图、检索与应用入口，以及人像、风景、夜景等素材的效果核验；单纯给参数组合冠以品牌名不能构成等价验收。
 The engine exists, while a finished look library remains missing. Closing this gap requires presets/LUTs with provenance, effect definitions, previews, discovery/application and material-specific review. A brand-like name alone does not establish visual equivalence.
 
+**补齐可行性已研究 / Expansion assessed:** 已检查 10 个社区项目，优先考虑 MIT 的 t3mujinpack（51 个 Hald PNG）、Striped Purple（49 个 CUBE）和 CC0 FilmSim（4 个 Hald TIFF）。另已通过安装版 Skill 对其中 1 个 MIT CUBE 实际渲染，强度 0.65；这是外部工程小样，基础包库存仍为 0，Hald 转换和命名风格库尚未实现。[Star 排序、许可、工程量、原片/输出/GIF](../research/OPEN_LOOK_LIBRARY_20261024.md)。
+Ten upstream projects were reviewed; a single external MIT CUBE was rendered through the installed Skill. This is a research probe, not an installed catalog or accepted Hald conversion. See the linked assessment for sources, estimates and evidence.
+
 [已安装资源核对 / Installed inventory](../validation/evidence/filter-library-20261024-r1/inventory.json)。本轮仅资源和目录检查，0 新渲染 / Inventory/catalog review only; no new render.
 
 ## 格式与渲染路径边界 / Format and renderer boundaries
@@ -42,7 +45,7 @@ The engine exists, while a finished look library remains missing. Closing this g
   The default path uses 3D LUTs. Static partial strength requires a complete 3D CUBE; dynamic mixing uses encoded 8-bit RGB. Non-CUBE formats have limited metadata and strength support.
 - 显式 `float32-native-v1` 路径支持完整 `.cube` 的独立 1D、3D，以及 1D shaper 后接 3D。需要按 schema 声明色彩信号、域与预算；该路径不读取 `.3dl/.csp/.dat`，也不会让默认路径自动获得 1D 支持。
   The explicit Float32 path supports complete 1D/3D/combined CUBE tables with declared signal/domain/budget settings, not the other registration formats. This does not extend default-renderer 1D support.
-- 内置效果目录、LUT 登记器和 Float32 能力契约是三个不同层级。当前 `lut_library` 部分旧限制字段仍写静态强度；动态能力应结合 `effects inspect lut3d`、`effects.numeric_effect_automation` 和所选渲染路径核对。
+- 内置效果目录、LUT 登记器和 Float32 能力契约是三个不同层级。当前 `lut_library` 部分旧限制字段仍写静态强度；动态能力应结合 `effects inspect --name lut3d`、`effects.numeric_effect_automation` 和所选渲染路径核对。
   The registry and renderer contracts have distinct scopes. Some older registry limit fields describe static handling; inspect the effect automation contract and selected renderer for dynamic behavior.
 - 当前没有剪映专有滤镜包的直接兼容加载器，也没有随基础包提供在线滤镜商店或完整商业风格库。可使用自己拥有相应使用权的本地标准 LUT；任意第三方插件并不自动兼容。
   Proprietary CapCut packs, a commercial look store and arbitrary third-party plugins are not supported package formats. Use compatible local LUTs with appropriate rights evidence.
@@ -57,7 +60,7 @@ $agent-ffmpeg-local-editor 给本地视频加载我提供的 .cube LUT，
 ```powershell
 $avk = 'E:/dev/sandbox/AI广告剪辑/skills/agent-ffmpeg-local-editor/scripts/run.ps1'
 & $avk effects list
-& $avk effects inspect lut3d
+& $avk effects inspect --name lut3d
 & $avk lut register --help
 & $avk lut register --project 'E:/video-work/my-project' --input 'E:/looks/cinematic.cube' --name 'My look'
 # Use the returned lut_id in a supported timeline effect. Inspect the schema/edit command before authoring JSON.
