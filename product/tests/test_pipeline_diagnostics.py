@@ -363,7 +363,15 @@ class NativeDiagnosticIntegrationTests(unittest.TestCase):
     def test_cancel_and_timeout_keep_trigger_and_original_metadata(self):
         for mode in ('cancel', 'wait'):
             cancel = self.case.base / ('cancel-' + mode); before = self.case.metadata()
-            with self.case.fake_command(mode, str(cancel)):
+            original_popen = subprocess.Popen
+            def notify_worker_started(command, **kwargs):
+                process = original_popen(command, **kwargs)
+                # Cancellation must actually arrive before the deadline. Import
+                # speed of the fake NumPy worker is not a cancellation clock.
+                if mode == 'cancel' and str(self.case.worker) in list(map(str,command)):
+                    cancel.write_text('cancel after worker start',encoding='utf8')
+                return process
+            with self.case.fake_command(mode, str(cancel)), patch('ai_ad_editor.local_matting.subprocess.Popen',side_effect=notify_worker_started):
                 code, result = invoke(*self.case.options_for_matting(), '--cancel-file', str(cancel), '--timeout-seconds', '2')
             manifest = self.inspect_failure(code, result, 8)
             self.assertEqual(manifest['error']['code'], 'CANCELLED' if mode == 'cancel' else 'TIMEOUT')

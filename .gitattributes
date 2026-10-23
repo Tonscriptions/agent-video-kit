@@ -1294,3 +1294,11 @@ scripts/*openfilm_r17* -text whitespace=cr-at-eol
 docs/OpenFilm当前复用建议与导出恢复增量_2026-10-22.md text eol=lf
 
 scripts/publish_research_recovery_20261023.py -text whitespace=cr-at-eol
+
+# R111 final snapshot: preserve source, native failures, raw media and drivers.
+product/** -text whitespace=cr-at-eol
+docs/specs/agent-project.schema.json -text whitespace=cr-at-eol
+scripts/* -text whitespace=cr-at-eol
+docs/validation/evidence/float-*/** -text -whitespace
+docs/validation/evidence/pipeline-recovery-20261023/** -text -whitespace
+docs/assets/float-*/** -text -whitespace

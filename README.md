@@ -1,5 +1,26 @@
 # Agent Video Kit
 
+<!-- R111-FLOAT-COLOR-KEYER-DIAGNOSTICS -->
+### R111 共同浮点调色、抠像与诊断恢复：最终快照核验
+
+合并色阶/动态曝光、三向色轮/色温、分区 HSL、基础调色、Gaussian/均值/方框模糊、4K 自适应转换、YCbCr 锐化和 RGB/色度抠像/去溢色；原片 `render` 与浮点 `preview` 共用效果链和作者时钟。显式选择 `float32-native-v1`。完整剪映功能及观感等价仍未完成。
+
+| 编号 | 功能性核验 | 本快照实际状态 | 证据 |
+|---|---|---|---|
+| MR111-01 | 准备期限、取消、事务后诊断、真实浏览器后代清理 | 实际 8 项，66.297 秒，0 跳过；保留此前 156 项的 1 错误与首次 0 方法加载失败 | [最终源码](docs/validation/evidence/pipeline-recovery-20261023/native-r3/verification.json) · [保留失败](docs/validation/evidence/pipeline-recovery-20261023/native-r2/verification.json) |
+| MR111-02 | 本地八轮包、197 资源逐字节一致，隔离安装态执行 | 实际 804 项，3870.651 秒，0 跳过 | [安装核验](docs/validation/evidence/pipeline-recovery-20261023/installed-r1/verification.json) |
+| MR111-03 | 最终同一 330 输入、完整原生回归和八项外部夹具 | 实际 2897 项，6886.667 秒，0 跳过 | [全量收据](docs/validation/evidence/pipeline-recovery-20261023/full-r2.json) |
+| MR111-04 | 当前 CLI 两秒五场景、原片/输出、PCM/PNG16/缓存 | 20 调用/33 核验，2,419,200 RGB 值；两次正式 render、三次 preview | [实片收据](docs/validation/evidence/float-keyer-20261023-lab/media-recovery-source-r2/verification.json) |
+| MR111-05 | 默认 768 MiB 算子预算下的 4K 三组单帧 | 19 调用/33 核验，99,532,800 RGBA 分量；不代表长片或峰值 RSS 验收 | [4K 收据](docs/validation/evidence/float-keyer-20261023-lab/4k-r3/verification.json) |
+| MR111-06 | 分项历史及未执行回归 | V103 全量实际 2,537 项/1 失败/1 错误；后续旧完整回归未启动，均不补登记通过 | [保留来源](docs/validation/evidence/pipeline-recovery-20261023/lineage-r1.json) · [分项与限制](docs/validation/浮点调色抠像合并验收与诊断恢复_2026-10-23.md) |
+
+[当前输入 MP4](docs/assets/float-keyer-20261023-recovery-source-r2/original.mp4) · [输出 MP4](docs/assets/float-keyer-20261023-recovery-source-r2/edited.mp4) · [作者契约及失败口径](docs/specs/浮点调色抠像合并交付与诊断恢复契约_v0.1_2026-10-23.md)。以下为程序生成的实际选定帧，不能替代自然人物、HDR、连续播放或听音验收。
+
+![当前 CLI 原片与输出](docs/assets/float-keyer-20261023-recovery-source-r2/comparison.gif)
+
+<!-- /R111-FLOAT-COLOR-KEYER-DIAGNOSTICS -->
+
+
 <!-- R17-OPENFILM-REUSE-RECOVERY -->
 ### R17 OpenFilm 复用清单与导出恢复增量（研究）
 

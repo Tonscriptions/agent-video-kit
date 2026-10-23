@@ -1,0 +1,72 @@
+{
+  "status": "passed-pinned-source-native-version-help-and-failures-recorded",
+  "at_utc": "2026-10-22T16:36:18.716333+00:00",
+  "native_windows": true,
+  "virtualization": false,
+  "network_in_this_consolidation": false,
+  "runtime_network": false,
+  "reference": {
+    "path": "libavfilter/vf_unsharp.c",
+    "url": "https://api.github.com/repos/FFmpeg/FFmpeg/contents/libavfilter/vf_unsharp.c?ref=n8.1",
+    "git_blob": "71d40447c0e8c314e93746157ee5c489431c3e9f",
+    "sha256": "sha256:47fb8b1e330186576993319f6f8dd4edf1839e7ffd6b427b9d30820b9094ac21",
+    "bytes": 21421
+  },
+  "source_sha256": "sha256:47fb8b1e330186576993319f6f8dd4edf1839e7ffd6b427b9d30820b9094ac21",
+  "license_origin": "E:\\dev\\sandbox\\AI广告剪辑\\sources\\upstream\\ffmpeg\\COPYING.GPLv2",
+  "license_sha256": "sha256:189b1af95d661151e054cea10c91b3d754e4de4d3fecfb074c1fb29476f7167b",
+  "runtime_C_copied": false,
+  "native_binary": "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.exe",
+  "native_binary_sha256": "sha256:d1e2a156261ecc675081943197a85f08f2868784a0af499171ede89353edad31",
+  "calls": [
+    {
+      "name": "version",
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.exe",
+        "-version"
+      ],
+      "exit_code": 0,
+      "stdout_sha256": "sha256:40cbd764aa9f5e9ae10b41da9e53fc901c606832f05af38f67ec763a580020c5",
+      "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "unsharp-help",
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.exe",
+        "-hide_banner",
+        "-h",
+        "filter=unsharp"
+      ],
+      "exit_code": 0,
+      "stdout_sha256": "sha256:cc176c59d2d2628a303fe3891fd2daa0a12397d1977f0effd7cc2faeb7a5d87a",
+      "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "earlier_failures": [
+    {
+      "revision": "source-reference-r1",
+      "cause": "valid n8.1 vf_unsharp.c succeeded; nonexistent libavfilter/unsharp.h returned404"
+    },
+    {
+      "revision": "source-reference-r2",
+      "cause": "valid n8.0 vf_unsharp.c succeeded with identical hash; nonexistent unsharp.h returned404"
+    },
+    {
+      "revision": "source-reference-r3",
+      "cause": "COPYING.GPLv2 request DNS getaddrinfo11001; existing copied C retained; inline exit1 without receipt"
+    },
+    {
+      "revision": "exploratory-14bit-native",
+      "cause": "yuva444p14le is not an accepted native format; inline exit1 after first four formats, not a six-format pass"
+    }
+  ],
+  "findings": {
+    "native_alpha_nonzero_reference_accepted": false,
+    "native_alpha_observation": "native-r1 retained three Windows access violations3221225477 with nonzero alpha_amount; source config_input initializes luma/chroma but not alpha scratch",
+    "native_14bit_pixel_format": false,
+    "native_uint16_amount_extra_shift_bits": 8,
+    "native_fixedpoint_overflow_reproduced": false,
+    "native_pixel_bit_equivalence": false,
+    "natural_or_HDR_acceptance": false
+  }
+}

@@ -1,0 +1,115 @@
+"""Record actual source/media, viewed contact, scoped sentinels and discovery."""
+import argparse
+import ast
+from datetime import datetime,timezone
+import json
+from pathlib import Path
+import subprocess
+import sys
+
+ROOT=Path(__file__).resolve().parents[3]
+MAIN=ROOT.parents[2]
+PARENT=ROOT.parent/'float-tone-lab-20261022'
+REL=ROOT/'docs/validation/evidence/float-gaussian-20261022-lab'
+ASSETS=ROOT/'docs/assets/float-gaussian-20261022-r1'
+sys.path.insert(0,str(ROOT/'scripts'))
+from run_frozen_regression import frozen,sha
+
+
+def read(path):return json.loads(path.read_bytes())
+
+
+def save(path,value):
+    assert not path.exists(),path
+    path.write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n',encoding='utf8',newline='\n')
+
+
+def main():
+    parser=argparse.ArgumentParser();parser.add_argument('--contact-viewed',action='store_true',required=True);parser.parse_args()
+    inputs=frozen();assert len(inputs)==323
+    native=read(REL/'native-r2/verification.json');media=read(REL/'media-r1/verification.json')
+    assert native['status']=='passed' and native['methods']==420 and native['skipped']==0
+    assert native['frozen_before']==native['frozen_after']==inputs
+    assert media['status']=='passed-public-CLI-floating-Gaussian-and-native-float-previews'
+    assert media['frozen_before']==media['frozen_after']==inputs and all(c['ok'] for c in media['checks'])
+    sys.path.insert(0,str(ROOT/'product/src'))
+    from ai_ad_editor.runtime import configure_local_runtime
+    configure_local_runtime()
+    from PIL import Image
+    with Image.open(ASSETS/'comparison.gif') as im:
+        clocks=[]
+        for i in range(im.n_frames):im.seek(i);clocks.append(im.info.get('duration'))
+        assert im.n_frames==14 and clocks==[100]*14
+    save(REL/'static-review-r1.json',{'status':'passed-static-contact-and-GIF-clock-review',
+        'at_utc':datetime.now(timezone.utc).isoformat(),'contact_sha256':sha(ASSETS/'contact.png'),
+        'GIF_sha256':sha(ASSETS/'comparison.gif'),'GIF_frames':14,'GIF_frame_duration_ms':clocks,
+        'viewed_panels':6,'viewed_author_frames':[3,10,16],
+        'view_tool':'functions.exec -> tools.view_image; exact contact viewed before this script',
+        'visible_observations':['All six panels retain the moving rectangle, checker grid and five-bit source frame markers.',
+            'Author frame3 linked blur visibly softens marker, rectangle and grid edges; frame10 vertical blur softens vertical detail.',
+            'Author frame16 premultiplied/exposure output is bright yellow-orange with blue, magenta and yellow grid cells; viewing copy uses explicit delivery clip.'],
+        'continuous_playback_review':False,'listening_review':False,'natural_quality_accepted':False,
+        'HDR_accepted':False,'full_capcut_parity':False})
+    first=read(REL/'native-r1/verification.json')
+    assert first['status']=='passed' and first['methods']==48 and first['failures']==first['errors']==first['skipped']==0
+    assert first['frozen_before']==first['frozen_after']==inputs
+    changes={
+        'product/tests/test_float_timeline.py':("('effects',[{'type':'blur'}])","('effects',[{'type':'avgblur'}])"),
+        'product/tests/test_float_preview.py':("[{'type': 'gblur', 'parameters': {'sigma': 1}}]","[{'type': 'avgblur', 'parameters': {'size_x': 1}}]"),
+        'product/tests/test_float_standard_render.py':("[{'type': 'blur', 'radius': 3}]","[{'type': 'avgblur', 'parameters': {'size_x': 3}}]")}
+    for name,(old,new) in changes.items():
+        parent=(PARENT/name).read_text('utf8');candidate=(ROOT/name).read_text('utf8')
+        assert parent.count(old)==1 and parent.replace(old,new)==candidate,name
+    foundation=read(REL/'foundation-r1.json')
+    changed=sorted(n for n,v in inputs.items() if foundation['parent_frozen_inputs'].get(n)!=v)
+    assert len(changed)==9 and set(changes)<=set(changed)
+    save(REL/'compatibility-sentinels-r1.json',{'status':'passed-exact-three-sentinel-replacements',
+        'changed_product_paths':changed,'source_delta':{n:{'parent':sha(PARENT/n),'candidate':sha(ROOT/n),
+        'old_sentinel':a,'new_sentinel':b} for n,(a,b) in changes.items()},
+        'reason':'Gaussian is now supported; avgblur remains unported in the Float32 host.',
+        'unsupported_rejection_codes_weakened':False,'legacy_fallback_guard_weakened':False,
+        'resource_cleanup_guard_weakened':False,'native_absolute_limit':8e-5,'media_linear_limit':2e-6,
+        'first_48_methods_passed':True,'failure_receipts_overwritten':False,'full_capcut_parity':False})
+    save(REL/'source-reference-r1.json',{'status':'official-reference-read-not-local-download-proof',
+        'primary_reference_urls':['https://raw.githubusercontent.com/FFmpeg/FFmpeg/n8.1/libavfilter/vf_gblur.c',
+            'https://raw.githubusercontent.com/FFmpeg/FFmpeg/n8.1/libavfilter/vf_gblur_init.h'],
+        'reference_reader':'web__run official n8.1 raw text read in this work session',
+        'local_upstream_RELEASE':'8.0.git','actual_native_binary_version':'8.1',
+        'claimed_n8_1_sources_downloaded':False,'runtime_network':False,
+        'notice':{'path':'product/src/ai_ad_editor/float_gaussian_NOTICE.txt','sha256':sha(ROOT/'product/src/ai_ad_editor/float_gaussian_NOTICE.txt')},
+        'reference_is_product_execution_proof':False})
+    bootstrap=('import sys,json,unittest;sys.path.insert(0,sys.argv[1]);'
+        'from ai_ad_editor.runtime import configure_local_runtime;configure_local_runtime();'
+        'loader=unittest.TestLoader();suite=loader.discover(sys.argv[2]);'
+        'print(json.dumps({"discovered_methods":suite.countTestCases(),"loader_errors":loader.errors,"methods_run":0}));'
+        'raise SystemExit(0 if not loader.errors else 1)')
+    command=[sys.executable,'-E','-B','-X','utf8','-c',bootstrap,str(ROOT/'product/src'),str(ROOT/'product/tests')]
+    p=subprocess.run(command,cwd=ROOT,capture_output=True,timeout=120,creationflags=subprocess.CREATE_NO_WINDOW)
+    (REL/'discovery-r1.stdout.log').write_bytes(p.stdout);(REL/'discovery-r1.stderr.log').write_bytes(p.stderr)
+    assert p.returncode==0,p.stderr[-1500:]
+    discovery=json.loads(p.stdout);assert discovery['discovered_methods']==2715 and discovery['methods_run']==0
+    save(REL/'discovery-r1.json',{'status':'passed-discovery-only-not-suite-execution',**discovery,
+        'command':command,'exit_code':p.returncode,'stdout_sha256':sha(REL/'discovery-r1.stdout.log'),
+        'stderr_sha256':sha(REL/'discovery-r1.stderr.log'),'complete_suite_passed':False})
+    scripts={p.relative_to(ROOT).as_posix():sha(p) for p in (ROOT/'scripts').glob('*.py')};assert len(scripts)==16
+    for name in scripts:ast.parse((ROOT/name).read_text('utf8'))
+    owners=('run_float_gaussian_complete','publish_float_gaussian','release_float_gaussian_after_complete','finish_float_gaussian_chain')
+    text={n:(ROOT/'scripts'/(n+'.py')).read_text('utf8') for n in owners}
+    assert 'published-V106-full2667-installed572' in text['run_float_gaussian_complete']
+    assert "'media-r1/verification.json'" in text['run_float_gaussian_complete']
+    assert 'published-V107-full2715-installed620' in text['finish_float_gaussian_chain']
+    assert 'passed-fresh-eight-wheel-193-resources-real-previews-and-620-methods' in text['publish_float_gaussian']
+    assert 'len(changed)==9' in text['publish_float_gaussian']
+    assert "'test_float_selective_hsl','test_float_tone','test_float_gaussian']" in (ROOT/'scripts/verify_float_gaussian_install.py').read_text('utf8')
+    save(REL/'release-driver-review-r1.json',{'status':'passed-AST-and-static-gate-review-not-execution',
+        'ROOT_scripts':scripts,'script_count':len(scripts),'required_actual_parent':'published V106/full2667/installed572',
+        'candidate_full_target':2715,'candidate_installed_target':620,'candidate_resource_target':193,
+        'source_media_binding':'media-r1/verification.json','full_suite_executed':False,
+        'force_push':False,'full_capcut_parity':False})
+    assert frozen()==inputs
+    (REL/'observations-r1.executed-script.py.txt').write_bytes(Path(__file__).read_bytes())
+    print(json.dumps({'status':'passed-actual-source-media-and-contact-observations','source_methods':420,
+        'media_checks':len(media['checks']),'GIF_frames':14,'viewed_panels':6,'discovered_methods':2715,'complete_methods_run':0}))
+
+
+if __name__=='__main__':main()

@@ -1,0 +1,52 @@
+"""Bind the packaging-only repair to fresh actual source/media/install resources."""
+from datetime import datetime,timezone
+import json
+from pathlib import Path
+import sys
+
+ROOT=Path(__file__).resolve().parents[3]
+REL=ROOT/'docs/validation/evidence/float-gaussian-20261022-lab'
+sys.path.insert(0,str(ROOT/'scripts'))
+from run_frozen_regression import frozen,sha
+
+
+def read(name):return json.loads((REL/name).read_bytes())
+
+
+def main():
+    before=frozen();assert len(before)==323
+    original=read('native-r2/verification.json');native=read('native-r3/verification.json')
+    assert original['status']==native['status']=='passed' and original['methods']==native['methods']==420
+    assert native['frozen_before']==native['frozen_after']==before and native['skipped']==0
+    changed=[n for n in before if before[n]!=original['frozen_after'][n]];assert changed==['product/pyproject.toml']
+    old=read('media-r1/verification.json');media=read('media-r2/verification.json')
+    assert media['status']==old['status']=='passed-public-CLI-floating-Gaussian-and-native-float-previews'
+    assert media['frozen_before']==media['frozen_after']==before
+    for name in media['decoded']:
+        for key in ('native_yuv10_sha256','PCM_sha256'):assert media['decoded'][name][key]==old['decoded'][name][key]
+    for key in ('Float32_sha256','PCM_sha256','PNG16_sha256'):assert media['preview_decoded'][key]==old['preview_decoded'][key]
+    installed=read('installed-r2/verification.json')
+    assert installed['status']=='running' or installed['status'].startswith('passed-')
+    resources=installed['resource_hashes'];assert len(resources)==193
+    assert all(sha(ROOT/'product/src/ai_ad_editor'/name)==value for name,value in resources.items())
+    notice=ROOT/'product/.runtime/float-gaussian-20261022/installed-r2/installed/site/ai_ad_editor/float_gaussian_NOTICE.txt'
+    assert sha(notice)==resources['float_gaussian_NOTICE.txt']
+    focused=read('packaging-recheck-r2.json');assert focused['resource_hashes']==resources
+    assert frozen()==before
+    result={'status':'passed-packaging-only-repair-with-fresh-source-media-and-193-installed-resources',
+        'at_utc':datetime.now(timezone.utc).isoformat(),'changed_product_since_first_source':changed,
+        'accepted_source_methods':420,'accepted_source_seconds':native['seconds'],'accepted_source_revision':'native-r3',
+        'source_media_calls':len(media['calls']),'source_media_checks':len(media['checks']),
+        'formal_encoded_yuv_PCM_equal_pre_fix':True,'preview_Float32_PCM_PNG16_equal_pre_fix':True,
+        'actual_source_wheel_site_resources':193,'installed_notice_sha256':sha(notice),
+        'resource_hashes':resources,'installed_status_at_capture':installed['status'],
+        'isolated620_counted_passed':installed.get('isolated_methods',{}).get('methods')==620,
+        'complete2715_counted_passed':False,'old_failure_receipts_preserved':True,
+        'main_mutated':False,'full_capcut_parity':False}
+    target=REL/'packaging-recovery-r2.json';assert not target.exists()
+    target.write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf8',newline='\n')
+    (REL/'packaging-recovery-r2.executed-script.py.txt').write_bytes(Path(__file__).read_bytes())
+    print(json.dumps({k:result[k] for k in ('status','accepted_source_methods','actual_source_wheel_site_resources','installed_status_at_capture','isolated620_counted_passed')}))
+
+
+if __name__=='__main__':main()

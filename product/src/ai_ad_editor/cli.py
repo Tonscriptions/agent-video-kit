@@ -4795,11 +4795,17 @@ def command_html_render(args: argparse.Namespace) -> dict[str, Any]:
         layout_path=root/'validation'/f'html-quality-{new_id("gate")}.json'
         layout_result=html_motion.inspect_layout(root,plan,layout_path,timeout=args.timeout_seconds,cancel_file=cancel)
     remaining=args.timeout_seconds-(monotonic()-started)
-    if remaining<=0:
-        raise AppError('HTML_TIMEOUT','HTML 布局预检与渲染共用的总期限已到',exit_code=6,path=str(layout_path) if layout_path else None)
-    snapshot = create_snapshot(root, project, label='before-html-render')
     operation_id = new_id('op')
     report_path = root / 'validation' / f'html-motion-{operation_id}.json'
+    cancelled=cancel is not None and cancel.exists()
+    if cancelled or remaining<=0:
+        error=AppError('CANCELLED' if cancelled else 'HTML_TIMEOUT',
+            'HTML 动效已取消' if cancelled else 'HTML 布局预检与渲染共用的总期限已到',
+            exit_code=8 if cancelled else 6)
+        html_motion.record_unstarted_render_failure(plan,report_path,error,
+            layout_report=layout_path,layout_result=layout_result)
+        raise error
+    snapshot = create_snapshot(root, project, label='before-html-render')
     created = False
     try:
         result = html_motion.render_frames(root, plan, output, report_path, timeout=remaining, cancel_file=cancel)

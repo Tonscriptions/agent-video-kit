@@ -1,0 +1,142 @@
+{
+  "status": "captured-native-planar-auto-cross-channel-observation",
+  "native_version": "ffmpeg version 8.1-full_build-www.gyan.dev Copyright (c) 2000-2026 the FFmpeg developers",
+  "cases": [
+    {
+      "green_range": [
+        0.1,
+        0.9
+      ],
+      "red_input_range": [
+        0.30000001192092896,
+        0.699999988079071
+      ],
+      "native_red_range": [
+        0.2500000596046448,
+        0.75
+      ],
+      "input_sha256": "4c2284afcd09d5a844ab8582a41b6524c13df7ad7fd1a5e638965090dadacb4d",
+      "output_sha256": "8824e7ad509f2d5e5131e4264f439d0142240358234c14e78a59ef9647c0693d",
+      "red_output_sha256": "72604ae76be9f3bbcce41c22e6c0315630f1956e34a487a1ff74cd645ce3c760",
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-nostdin",
+        "-v",
+        "error",
+        "-f",
+        "rawvideo",
+        "-pixel_format",
+        "gbrapf32le",
+        "-video_size",
+        "64x4",
+        "-i",
+        "pipe:0",
+        "-vf",
+        "colorlevels=rimin=-1:rimax=-1",
+        "-frames:v",
+        "1",
+        "-threads",
+        "1",
+        "-pix_fmt",
+        "gbrapf32le",
+        "-f",
+        "rawvideo",
+        "pipe:1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "green_range": [
+        0.2,
+        0.8
+      ],
+      "red_input_range": [
+        0.30000001192092896,
+        0.699999988079071
+      ],
+      "native_red_range": [
+        0.1666666716337204,
+        0.8333333134651184
+      ],
+      "input_sha256": "0fba17903b5d3612b41bc8385a1f905b63e43e82abcf1b828eb98a67a4955ac6",
+      "output_sha256": "7e990ee00907b72333e5f8c180d422910a678c741e2fcd898a9f490ddeea80f7",
+      "red_output_sha256": "c2612146375f11ed38827df04ebf803ea1611e6d854a7a2954f0c6a965d505b0",
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-nostdin",
+        "-v",
+        "error",
+        "-f",
+        "rawvideo",
+        "-pixel_format",
+        "gbrapf32le",
+        "-video_size",
+        "64x4",
+        "-i",
+        "pipe:0",
+        "-vf",
+        "colorlevels=rimin=-1:rimax=-1",
+        "-frames:v",
+        "1",
+        "-threads",
+        "1",
+        "-pix_fmt",
+        "gbrapf32le",
+        "-f",
+        "rawvideo",
+        "pipe:1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "green_range": [
+        0.1,
+        0.9
+      ],
+      "red_input_range": [
+        0.30000001192092896,
+        0.699999988079071
+      ],
+      "native_red_range": [
+        0.2500000596046448,
+        0.75
+      ],
+      "input_sha256": "4c2284afcd09d5a844ab8582a41b6524c13df7ad7fd1a5e638965090dadacb4d",
+      "output_sha256": "8824e7ad509f2d5e5131e4264f439d0142240358234c14e78a59ef9647c0693d",
+      "red_output_sha256": "72604ae76be9f3bbcce41c22e6c0315630f1956e34a487a1ff74cd645ce3c760",
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.EXE",
+        "-nostdin",
+        "-v",
+        "error",
+        "-f",
+        "rawvideo",
+        "-pixel_format",
+        "gbrapf32le",
+        "-video_size",
+        "64x4",
+        "-i",
+        "pipe:0",
+        "-vf",
+        "colorlevels=rimin=-1:rimax=-1",
+        "-frames:v",
+        "1",
+        "-threads",
+        "1",
+        "-pix_fmt",
+        "gbrapf32le",
+        "-f",
+        "rawvideo",
+        "pipe:1"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "original_red_input_unchanged": true,
+  "different_green_changes_native_red": true,
+  "repeat_red_output_equal": true,
+  "native_bug_is_not_product_semantics": true,
+  "product_modified": false,
+  "network": false,
+  "virtualization": false
+}

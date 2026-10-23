@@ -208,7 +208,7 @@ class FloatPreviewTests(unittest.TestCase):
         self.assertEqual(caught.exception.code, 'PREVIEW_ARGUMENT_INVALID'); self.assertEqual(tree(), before)
 
     def test_unported_operator_rejects_without_legacy_fallback_and_cleans_sources(self):
-        self.visual(); self.s['tracks'][0]['clips'][0]['effects'] = [{'type': 'gblur', 'parameters': {'sigma': 1}}]
+        self.visual(); self.s['tracks'][0]['clips'][0]['effects'] = [{'type': 'hqdn3d', 'parameters': {'amount': 1}}]
         with patch.object(preview, 'build_filter_graph', side_effect=AssertionError('legacy fallback')):
             with self.assertRaises(AppError) as caught: self.execute()
         self.assertEqual(caught.exception.code, 'FLOAT_TIMELINE_UNSUPPORTED')

@@ -1,0 +1,16 @@
+Filter chromakey
+  Turns a certain color into transparency. Operates on YUV colors.
+    slice threading supported
+    Inputs:
+       #0: default (video)
+    Outputs:
+       #0: default (video)
+chromakey AVOptions:
+   color             <color>      ..FV.....T. set the chromakey key color (default "black")
+   similarity        <float>      ..FV.....T. set the chromakey similarity value (from 1e-05 to 1) (default 0.01)
+   blend             <float>      ..FV.....T. set the chromakey key blend value (from 0 to 1) (default 0)
+   yuv               <boolean>    ..FV.....T. color parameter is in yuv instead of rgb (default false)
+
+This filter has support for timeline through the 'enable' option.
+
+Exiting with exit code 0

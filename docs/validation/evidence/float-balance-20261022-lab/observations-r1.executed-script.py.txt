@@ -1,0 +1,99 @@
+"""Record the viewed contact, unchanged runtime, actual failures and discovery."""
+import argparse
+import ast
+from datetime import datetime,timezone
+import json
+import os
+from pathlib import Path
+import subprocess
+import sys
+
+ROOT=Path(__file__).resolve().parents[3]
+REL=ROOT/'docs/validation/evidence/float-balance-20261022-lab'
+sys.path.insert(0,str(ROOT/'scripts'))
+from run_frozen_regression import frozen,sha
+from PIL import Image
+
+def read(path):return json.loads(path.read_bytes())
+
+def save(path,value):
+    assert not path.exists(),path
+    path.write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n',encoding='utf8')
+
+def main():
+    parser=argparse.ArgumentParser();parser.add_argument('--contact-viewed',action='store_true');args=parser.parse_args()
+    assert args.contact_viewed,'Use only after actually viewing this exact contact with the image tool'
+    source=frozen();assert len(source)==316
+    first=read(REL/'native-r1/verification.json');final=read(REL/'native-r2/verification.json')
+    media_first=read(REL/'media-r1/verification.json');media=read(REL/'media-r2/verification.json')
+    assert first['status']=='failed-preserved' and first['methods']==42 and first['failures']==1 and first['errors']==0
+    assert final['status']=='passed' and final['methods']==284 and final['skipped']==0
+    assert final['frozen_before']==final['frozen_after']==media['frozen_before']==media['frozen_after']==source
+    assert media_first['status']=='failed-preserved' and 'FLOAT_STREAM_RANGE' in media_first['error']
+    assert media_first['frozen_before']==media_first['frozen_after']==source
+    assert media['status']=='passed-public-CLI-floating-levels-and-native-float-previews'
+    assert len(media['calls'])==20 and len(media['checks'])==31
+    changed=[p for p,v in source.items() if first['frozen_before'].get(p)!=v]
+    assert changed==['product/tests/test_float_balance.py']
+    assets=ROOT/'docs/assets/float-balance-20261022-r2'
+    with Image.open(assets/'comparison.gif') as im:
+        frames=im.n_frames;durations=[]
+        for i in range(frames):im.seek(i);durations.append(im.info.get('duration'))
+    assert frames==14 and durations==[100]*14
+    with Image.open(assets/'contact.png') as im:assert im.size==(640,624)
+    save(REL/'static-review-r1.json',{'status':'passed-static-contact-and-GIF-clock-review',
+        'at_utc':datetime.now(timezone.utc).isoformat(),'contact_sha256':sha(assets/'contact.png'),
+        'GIF_sha256':sha(assets/'comparison.gif'),'GIF_frames':frames,'GIF_durations_ms':durations,
+        'viewed_author_frames':[3,10,16],'viewed_panels':6,
+        'observations':['Actually viewed exact local contact with image tool; original left, actual CLI preview right.',
+            'Moving rectangle, coloured grid and five source markers are present across all three selected rows.',
+            'Author10 midrange/exposure is visibly brighter with warm rectangle and brighter grid; author3 and16 retain darker graded pictures.',
+            'No blank output or missing rectangle observed in these six static panels.'],
+        'continuous_playback_review':False,'listening_review':False,'natural_quality_accepted':False,'HDR_accepted':False})
+    native_records=final['native_balance_records']
+    save(REL/'failure-analysis-r1.json',{'status':'preserved-first-test-and-media-failures-with-bounded-reference-corrections',
+        'first_methods':42,'first_seconds':first['seconds'],'failures':1,'errors':0,'skipped':0,
+        'first_receipt_sha256':sha(REL/'native-r1/verification.json'),'accepted_receipt_sha256':sha(REL/'native-r2/verification.json'),
+        'accepted_methods':284,'changed_product_paths_after_test_failure':changed,
+        'runtime_algorithm_changed_after_test_failure':False,'tolerances_widened_after_failure':False,
+        'test_correction':'Quadratic ease_in_out(.25)=.125; .15625 belongs to smoothstep/two-control Bezier.',
+        'first_media_calls':len(media_first['calls']),'first_media_checks':len(media_first['checks']),
+        'first_media_sha256':sha(REL/'media-r1/verification.json'),'accepted_media_sha256':sha(REL/'media-r2/verification.json'),
+        'media_correction':'Explicit existing range_policy=clip at final delivery; product protection and all 316 source hashes unchanged.',
+        'source_media_terminal_status_inherited_from_levels_harness':True,
+        'maximum_native_16bit_code_error':max(x.get('maximum_16bit_code_error',0) for x in native_records),
+        'native_black_white_diagnostic':[x for x in native_records if 'native_black_white_RGB' in x],
+        'native_float_equivalence_claimed':False})
+    bootstrap=('import sys,unittest;sys.path.insert(0,sys.argv[1]);'
+               'from ai_ad_editor.runtime import configure_local_runtime;configure_local_runtime();'
+               'print(unittest.defaultTestLoader.discover(sys.argv[2]).countTestCases())')
+    env=dict(os.environ,TEMP=str(ROOT/'product/.runtime/temp'),TMP=str(ROOT/'product/.runtime/temp'))
+    command=[sys.executable,'-E','-B','-X','utf8','-c',bootstrap,str(ROOT/'product/src'),str(ROOT/'product/tests')]
+    p=subprocess.run(command,cwd=ROOT,env=env,capture_output=True,check=True,creationflags=subprocess.CREATE_NO_WINDOW)
+    (REL/'discovery-r1.stdout.txt').write_bytes(p.stdout);(REL/'discovery-r1.stderr.txt').write_bytes(p.stderr)
+    assert int(p.stdout.strip())==2579
+    save(REL/'discovery-r1.json',{'status':'discovered-not-executed','discovered_methods':2579,'methods_run':0,
+        'complete_suite_passed':False,'command':command,'exit_code':p.returncode,
+        'stdout_sha256':sha(REL/'discovery-r1.stdout.txt'),'stderr_sha256':sha(REL/'discovery-r1.stderr.txt'),
+        'frozen_inputs_unchanged':frozen()==source})
+    drivers=['run_float_balance_complete.py','publish_float_balance.py','release_float_balance_after_complete.py','finish_float_balance_chain.py']
+    hashes={}
+    prepared=read(REL/'release-drivers-r1.json')
+    for name in drivers:
+        path=ROOT/'scripts'/name;text=path.read_text('utf8');ast.parse(text)
+        assert '2579' in text and '484' in text
+        assert "git('push','--force" not in text
+        assert prepared['scripts'][name]['candidate_sha256']==sha(path)
+        hashes[name]=sha(path)
+    scripts={p.relative_to(ROOT).as_posix():sha(p) for p in (ROOT/'scripts').glob('*.py')}
+    assert len(scripts)==16
+    for name in scripts:ast.parse((ROOT/name).read_bytes(),name)
+    save(REL/'release-driver-review-r1.json',{'status':'reviewed-AST-and-actual-parent-installed-full-source-gates-not-executed',
+        'drivers':hashes,'ROOT_scripts':scripts,'ROOT_scripts_count':16,
+        'required_parent':'actual published V103/full2537/installed442','candidate_inputs':316,'changed_product_paths':5,
+        'target_full_methods':2579,'target_installed_methods':484,'target_shipping_resources':189,
+        'force_push':False,'full_suite_claimed_passed':False,'full_capcut_parity':False})
+    (REL/'observations-r1.executed-script.py.txt').write_bytes(Path(__file__).read_bytes())
+    print(json.dumps({'source_methods':284,'full_discovered_not_run':2579,'GIF_frames':14,'viewed_panels':6,'ROOT_scripts':16}))
+
+if __name__=='__main__':main()

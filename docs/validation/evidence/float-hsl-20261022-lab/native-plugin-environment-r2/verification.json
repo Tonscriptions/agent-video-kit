@@ -1,0 +1,34 @@
+{
+  "status": "passed-corrected-native-test-environment",
+  "methods": 1,
+  "failures": 0,
+  "errors": 0,
+  "native_calls": [
+    {
+      "backend": "native",
+      "parameters": {
+        "red_hue": 31,
+        "orange_saturation": 0.3,
+        "yellow_lightness": -0.2,
+        "green_hue": -27,
+        "cyan_saturation": -0.4,
+        "blue_lightness": 0.25,
+        "purple_hue": 41,
+        "magenta_saturation": 0.2
+      },
+      "pixels": 731,
+      "exit_code": 0,
+      "input_sha256": "3bf69ae0012cf42ed5fe53d8d3375b537422123d36d8105e688c5fb3c5a248dd",
+      "output_sha256": "f281bd9805b94351ea641f94f754aa17a1509bbd33027a34f395cd647833ba3c",
+      "maximum_8bit_code_error": 1
+    }
+  ],
+  "diagnosis": "patch.dict previously restored FREI0R_PATH before child launch; child now receives captured verified native environment",
+  "unchanged_runtime": true,
+  "unchanged_dimensions": [
+    43,
+    17
+  ],
+  "unchanged_code_tolerance": 1,
+  "prior_mislabel_preserved": "native-plugin-odd-size-r1/verification.json"
+}

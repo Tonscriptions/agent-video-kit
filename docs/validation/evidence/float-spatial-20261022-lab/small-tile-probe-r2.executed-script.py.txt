@@ -1,0 +1,49 @@
+"""Check a lower-budget conversion tile without changing the parent kernel."""
+from datetime import datetime,timezone
+import hashlib
+import json
+from pathlib import Path
+import sys
+
+ROOT=Path(__file__).resolve().parents[3]
+PARENT=ROOT.parent/'float-gaussian-lab-20261022'
+REL=ROOT/'docs/validation/evidence/float-spatial-20261022-lab'
+sys.path[:0]=[str(PARENT/'product/src'),str(PARENT/'scripts')]
+from run_frozen_regression import frozen
+from ai_ad_editor.runtime import configure_local_runtime
+configure_local_runtime()
+import numpy as np
+from ai_ad_editor.errors import AppError
+from ai_ad_editor.float_color_signal import ColorSignal
+from ai_ad_editor.float_gaussian import compile_gaussian,apply_gaussian
+
+
+def main():
+    target=REL/'small-tile-probe-r2.json';assert not target.exists()
+    before=frozen();assert len(before)==323
+    signal={'primaries':'bt709','transfer':'linear'}
+    plan=compile_gaussian({'type':'blur','parameters':{'input_signal':signal,'output_signal':signal,
+        'radius_x':2,'radius_y':.7,'steps':3,'alpha_mode':'premultiplied'}})
+    a=np.random.default_rng(108).uniform(-.3,1.5,(65,71,4)).astype(np.float32)
+    a[...,3]=np.random.default_rng(109).uniform(.02,.98,(65,71)).astype(np.float32)
+    original=a.tobytes();working=ColorSignal(**signal);budget=2*1024*1024;code=None
+    full,full_meta=apply_gaussian(a,plan,0,working_signal=working)
+    try:apply_gaussian(a,plan,0,working_signal=working,max_working_bytes=budget)
+    except AppError as exc:code=exc.code
+    assert code=='FLOAT_GAUSSIAN_BUDGET'
+    small,meta=apply_gaussian(a,plan,0,working_signal=working,max_working_bytes=budget,tile_pixels=256)
+    assert full.tobytes()==small.tobytes() and a.tobytes()==original and meta['estimated_working_bytes']<=budget
+    assert frozen()==before
+    row={'status':'passed-actual-smaller-tile-pixel-identity-with-unchanged-parent',
+        'at_utc':datetime.now(timezone.utc).isoformat(),'frame':[71,65],'budget':budget,
+        'default_tile_error':code,'manual_tile':256,'manual_tile_estimate':meta['estimated_working_bytes'],
+        'actual_RGBA_components':int(a.size),'output_sha256':hashlib.sha256(small.tobytes()).hexdigest(),
+        'pixels_bit_equal_full_budget':True,'caller_unchanged':True,'parent_unchanged':True,
+        'adaptive_runtime_implemented':False,'actual_4K_smaller_tile_run':False,
+        'full_capcut_parity':False}
+    target.write_text(json.dumps(row,ensure_ascii=False,indent=2)+'\n',encoding='utf8',newline='\n')
+    (REL/'small-tile-probe-r2.executed-script.py.txt').write_bytes(Path(__file__).read_bytes())
+    print(json.dumps(row))
+
+
+if __name__=='__main__':main()

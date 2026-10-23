@@ -1,0 +1,44 @@
+{
+  "status": "passed-exact-three-sentinel-replacements",
+  "changed_product_paths": [
+    "product/pyproject.toml",
+    "product/src/ai_ad_editor/capabilities.py",
+    "product/src/ai_ad_editor/float_effect_chain.py",
+    "product/src/ai_ad_editor/float_gaussian.py",
+    "product/src/ai_ad_editor/float_gaussian_NOTICE.txt",
+    "product/src/ai_ad_editor/validator.py",
+    "product/tests/test_float_gaussian.py",
+    "product/tests/test_float_preview.py",
+    "product/tests/test_float_standard_render.py",
+    "product/tests/test_float_timeline.py"
+  ],
+  "source_delta": {
+    "product/tests/test_float_timeline.py": {
+      "parent": "sha256:8902685c682eaed1d4ac575807bd8156f8afd93eca366a673f6c4414e24c6810",
+      "candidate": "sha256:c16ef75e3842b48be2de6893b9b0c29f7c951d2cbdadb71231c2fff8e1c94e89",
+      "old_sentinel": "('effects',[{'type':'blur'}])",
+      "new_sentinel": "('effects',[{'type':'avgblur'}])"
+    },
+    "product/tests/test_float_preview.py": {
+      "parent": "sha256:e24181b7756825f8d55b3ef03c70def114a20ba88cc3e42d87eaa78bc17daa9b",
+      "candidate": "sha256:0e030fb4bdfa94c138edfef23a9f6e382f598d098af7a8f76806cc6ee4c1bc3b",
+      "old_sentinel": "[{'type': 'gblur', 'parameters': {'sigma': 1}}]",
+      "new_sentinel": "[{'type': 'avgblur', 'parameters': {'size_x': 1}}]"
+    },
+    "product/tests/test_float_standard_render.py": {
+      "parent": "sha256:e7c19d1a61031ac5375403aceea676423dd593cb6fdbeaa5e9246c9d97694ce9",
+      "candidate": "sha256:016b0dee6658a02e1b955ceb85eba32c21c6725ea38bf2d6ff84dcb4bd9c9d1c",
+      "old_sentinel": "[{'type': 'blur', 'radius': 3}]",
+      "new_sentinel": "[{'type': 'avgblur', 'parameters': {'size_x': 3}}]"
+    }
+  },
+  "reason": "Gaussian is now supported; avgblur remains unported in the Float32 host.",
+  "unsupported_rejection_codes_weakened": false,
+  "legacy_fallback_guard_weakened": false,
+  "resource_cleanup_guard_weakened": false,
+  "native_absolute_limit": 8e-05,
+  "media_linear_limit": 2e-06,
+  "first_48_methods_passed": true,
+  "failure_receipts_overwritten": false,
+  "full_capcut_parity": false
+}

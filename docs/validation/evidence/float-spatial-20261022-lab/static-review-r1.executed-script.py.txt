@@ -1,0 +1,27 @@
+from datetime import datetime,timezone
+import hashlib,json
+from pathlib import Path
+from PIL import Image
+ROOT=Path(__file__).resolve().parents[3]
+REL=ROOT/'docs/validation/evidence/float-spatial-20261022-lab'
+ASSETS=ROOT/'docs/assets/float-spatial-20261022-r1'
+FOURK=ROOT/'docs/assets/float-spatial-4k-20261022-r2'
+def sha(p):return 'sha256:'+hashlib.sha256(p.read_bytes()).hexdigest()
+for folder,expected in [(ASSETS,[100]*14),(FOURK,[800]*3)]:
+ with Image.open(folder/'comparison.gif') as im:
+  durations=[]
+  for i in range(im.n_frames):im.seek(i);durations.append(im.info.get('duration'))
+ assert durations==expected,(folder,durations)
+row={'status':'passed-static-contact-and-GIF-clock-review','at_utc':datetime.now(timezone.utc).isoformat(),
+ 'GIF_frames':14,'GIF_durations_ms':[100]*14,'viewed_panels':6,'viewed_author_frames':[3,10,16],
+ 'contact_sha256':sha(ASSETS/'contact.png'),'GIF_sha256':sha(ASSETS/'comparison.gif'),
+ 'contact_observations':['average softens grid and moving rectangle edges','horizontal-only pass softens horizontal detail','premultiplied headroom viewing copy is brighter and explicitly clips'],
+ 'actual4K_contact_sha256':sha(FOURK/'contact.png'),'actual4K_GIF_sha256':sha(FOURK/'comparison.gif'),
+ 'actual4K_static_panels_viewed':3,'actual4K_GIF_frames':3,'actual4K_GIF_durations_ms':[800]*3,
+ 'actual4K_observation':'three vertical-invariant stripe images, one per algorithm; this GIF switches still frames',
+ 'continuous_playback_review':False,'listening_review':False,'natural_quality_accepted':False,'HDR_accepted':False,
+ 'script_sha256':sha(Path(__file__))}
+target=REL/'static-review-r1.json';assert not target.exists()
+target.write_text(json.dumps(row,ensure_ascii=False,indent=2)+'\n',encoding='utf8',newline='\n')
+(REL/'static-review-r1.executed-script.py.txt').write_bytes(Path(__file__).read_bytes())
+print(json.dumps({'status':row['status'],'viewed_panels':row['viewed_panels'],'additional4K_panels':3}))

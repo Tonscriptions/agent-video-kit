@@ -1,0 +1,261 @@
+"""Numbered sharpen documents bind actual source, media, 4K and installation receipts."""
+import argparse
+import json
+from pathlib import Path
+import re
+from urllib.parse import unquote
+from run_frozen_regression import frozen, sha
+
+ROOT = Path(__file__).resolve().parents[1]
+MAIN = ROOT.parents[2]
+PARENT = ROOT.parent/'float-spatial-lab-20261022'
+REL = 'docs/validation/evidence/float-sharpen-20261022-lab'
+ASSETS = 'docs/assets/float-sharpen-20261022-r2'
+ASSETS_4K = 'docs/assets/float-sharpen-4k-20261022-r1'
+REPORT = 'docs/validation/连续浮点锐化与原生差异实测_2026-10-23.md'
+CONTRACT = 'docs/specs/连续浮点YCbCr锐化契约_v0.1_2026-10-23.md'
+MARKER = 'V109-CONTINUOUS-FLOAT-YCBCR-UNSHARP'
+LATEST_DOCS = ('README.md', 'docs/README.md', 'docs/产品需求与开发路线基线_2026-10-12.md',
+    'docs/构建进度总表_2026-10-16.md', 'docs/validation/能力覆盖与验收矩阵_v0.1_2026-10-13.md',
+    'docs/Concat与剪映功能差异矩阵_2026-10-12.md', 'docs/specs/AgentCLI契约_v0.1_2026-10-13.md')
+
+
+def read(path):
+    return json.loads(path.read_bytes())
+
+
+def write(path, text):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text.rstrip()+'\n', encoding='utf8', newline='\n')
+
+
+def bound_media(receipt, inputs, name):
+    """Accept original fixed inputs or an explicit test-only binding; never rewrite receipts."""
+    if receipt['frozen_before'] == receipt['frozen_after'] == inputs:
+        return True
+    b = read(ROOT/REL/'guard-only-input-binding-r1.json')
+    assert b['status'] == 'passed-only-unsupported-test-guard-changed-runtime-and-media-unchanged'
+    assert b['current_frozen_inputs'] == inputs
+    original = b['original_frozen_inputs']
+    assert receipt['frozen_before'] == receipt['frozen_after'] == original
+    assert [n for n in inputs if inputs[n] != original.get(n)] == ['product/tests/test_float_spatial.py']
+    assert set(inputs) == set(original)
+    assert b['original_receipts'][name] == sha(ROOT/REL/name)
+    for n, digest in b['media_scripts'].items():
+        assert sha(ROOT/n) == digest
+    return True
+
+
+def fourk(inputs):
+    d = read(ROOT/REL/'4k-r1/verification.json')
+    assert d['status'] == 'passed-actual-default-budget-4K-formal-preview-and-independent-pixels'
+    assert bound_media(d, inputs, '4k-r1/verification.json')
+    assert [r['name'] for r in d['cases']] == ['luma', 'chroma', 'coverage'] and d['public_CLI_processes'] == 8
+    assert all(row['ok'] for row in d['checks'])
+    assert d['script_sha256'] == sha(ROOT/'scripts/smoke_float_sharpen_4k.py')
+    for row in d['cases']:
+        assert row['actual_resolution'] == [3840, 2160] and row['compared_components'] == 33177600
+        assert row['maximum_absolute_error'] <= 2e-6 and row['default_workspace_bytes'] == 768*1024*1024
+    for name, row in d['assets'].items():
+        assert sha(ROOT/name) == row['sha256']
+    return d
+
+
+def current():
+    inputs = frozen(); assert len(inputs) == 328
+    native = read(ROOT/REL/'native-r4/verification.json'); media = read(ROOT/REL/'media-r2/verification.json')
+    assert native['status'] == 'passed' and native['methods'] == 121 and native['skipped'] == 0
+    assert native['frozen_before'] == native['frozen_after'] == inputs
+    assert native['generator_sha256'] == sha(ROOT/'scripts/verify_float_sharpen.py')
+    assert media['status'] == 'passed-public-CLI-floating-unsharp-and-native-float-previews'
+    assert bound_media(media, inputs, 'media-r2/verification.json')
+    assert media['actual_public_render_CLI_processes'] == 2 and media['actual_public_preview_CLI_processes'] == 3
+    assert all(row['ok'] for row in media['checks'])
+    assert media['script_sha256'] == sha(ROOT/'scripts/smoke_float_sharpen_media.py')
+    assert sha(ROOT/REL/'media-r2/executed-script.py.txt') == media['script_sha256']
+    oracle = media['sharpen_oracle']
+    assert oracle['scenarios'] == ['luma', 'chroma', 'horizontal', 'coverage', 'headroom']
+    assert oracle['RGB_values'] == 2419200 and oracle['maximum_linear_absolute_error'] <= 2e-6
+    assert oracle['oracle_sha256'] == sha(ROOT/'scripts/sharpen_media_oracle.py')
+    assert sha(ROOT/REL/'media-r2/executed-oracle.py.txt') == oracle['oracle_sha256']
+    for name, row in media['assets'].items():
+        assert sha(ROOT/name) == row['sha256']
+    fourk(inputs)
+    reference = read(ROOT/REL/'source-reference-r4/verification.json')
+    assert reference['status'] == 'passed-pinned-source-native-version-help-and-failures-recorded'
+    assert not reference['runtime_C_copied'] and not reference['findings']['native_alpha_nonzero_reference_accepted']
+    path = ROOT/REL/'installed-r2/verification.json'
+    installed = read(path) if path.exists() else {'status': 'not-executed'}
+    if installed['status'].startswith('passed-'):
+        assert installed['status'] == 'passed-fresh-eight-wheel-196-resources-real-previews-and-741-methods'
+        assert installed['isolated_methods']['methods'] == 741 and installed['isolated_methods']['skipped'] == 0
+        assert installed['frozen_before'] == installed['frozen_after'] == inputs
+        replay = read(ROOT/REL/'media-installed-r2/verification.json')
+        assert replay['status'] == media['status'] and replay['isolated']
+        for key in ('Float32_sha256', 'PCM_sha256', 'PNG16_sha256'):
+            assert replay['preview_decoded'][key] == media['preview_decoded'][key]
+    return inputs, native, media, installed
+
+
+def relink(text, name):
+    prefix = '../'*(len(Path(name).parts)-1)
+    return re.sub(r'(!?\[[^\]]*\]\()docs/', lambda m: m[1]+prefix+'docs/', text)
+
+
+def section(full=None, published=False):
+    inputs, native, media, installed = current(); o = media['sharpen_oracle']; k = fourk(inputs)
+    records = native['native_sharpen_records']
+    assert records and all(r['exit_code'] == 0 and r['maximum_fractional_code_error'] <= r['predeclared_code_limit'] for r in records)
+    maximum_native = max(r['maximum_fractional_code_error'] for r in records)
+    title = 'V109 连续浮点YCbCr锐化' if published else 'V109 候选：连续浮点YCbCr锐化（未发布）'
+    if installed['status'].startswith('passed-'):
+        itext = f"**741项 /{installed['isolated_methods']['suite_seconds']}秒 /0跳过**，196份source/wheel/site资源一致；8固定离线wheel、NumPy931文件与原许可一致；安装版真实音画、Float32及PNG16与源码版一致。"
+    else:
+        itext = f"**{installed['status']}，不计通过**；目标741项、196资源。"
+    if full:
+        assert full['status'] == 'passed' and full['terminal_ok'] and full['methods'] == 2836 and full['skipped'] == 0
+        assert full['frozen_before'] == full['frozen_after'] == inputs
+        ftext = f"**2836项 /{full['suite_seconds']}秒 /0跳过**；328产品输入、8外部夹具和9固定依赖保持一致。"
+    else:
+        ftext = '**尚未通过，不计通过**；目标2836项，等待V108实际2774项发布及其后的OpenFilm R17文档普通发布，再以R17提交和未变的V108产品326输入为基线执行。'
+    return f'''<!-- {MARKER} -->
+### {title}
+
+显式`float32-native-v1`正式render与preview共用新增`sharpen/unsharp`。在明确RGB信号和YCbCr矩阵／量程内锐化，保留浮点范围、分数半径、独立覆盖率及原作者关键帧。
+
+| 编号 | 功能性核验 | 实际内容与边界 | 证据 |
+|---|---|---|---|
+| US109-01 | 共用内核 | 空间滤镜父326→328输入，9路径改变、62新增方法；四个旧未支持样例改用hqdn3d，保留拒绝／清理／禁回退断言。旧默认引擎不自动迁移 | [契约]({CONTRACT}) |
+| US109-02 | 独立锐化数学 | 归一化Pascal二项核，复制端点；半径0..11、默认2，分数半径混合相邻整数核；Y、Cb/Cr、alpha三组独立XY与amount，默认只处理亮度 | [源码121项]({REL}/native-r4/verification.json) |
+| US109-03 | 明确参数与信号 | amount -2..10、intensity 0..1；4矩阵、full/limited、8/9/10/12/14/16码值轴；明确input/output RGB信号；原生尺寸别名只接受3..23奇数，拒绝重复别名及未知项 | [日志]({REL}/native-r4/unittest.log) |
+| US109-04 | 连续浮点与原生区别 | continuous为默认；native_coefficients只复制原生浮点参数转16.16系数及uint16路径额外8位移，非整数像素舍入或溢出。14位、半径0/分数、amount>5和较大组合核为明确扩展 | [固定源码与版本]({REL}/source-reference-r4/verification.json) |
+| US109-05 | 实际原生对照 | {len(records)}组FFmpeg YUVA444、8/9/10/12/16位、正负amount／各向异性／full-limited／默认CPU与纯C，alpha_amount=0。最大{maximum_native:.9g}码；每组执行前界限1.05+0.5×有效最大amount，未按结果放宽 | [原始I/O]({REL}/native-r4/verification.json) |
+| US109-06 | 原生alpha失败保留 | 本机8.1三次非零alpha调用返回3221225477访问异常；源码config_input只初始化luma/chroma工作区。未宣称原生alpha可用；产品alpha用自有数学，独立稠密矩阵及真实CLI另验 | [首次失败]({REL}/native-r1/verification.json) · [原始日志]({REL}/native-r1/unittest.log) |
+| US109-07 | 独立oracle／精度 | Bernoulli多项式乘法和显式端点索引矩阵，不调用产品核／卷积；覆盖各组方向、分数／最大核、单像素轴、DC、超过65536级Float32灰阶和所有矩阵量程 | [实跑断言]({REL}/native-r4/unittest.log) |
+| US109-08 | alpha／动态范围 | 默认保留alpha原位，含-0和1e-30；显式alpha锐化裁至0..1并计数，coverage独立混合。alpha-only同信号preserve绕过RGB转换保留隐藏RGB位；RGB负值／超白默认保留，最终交付另选clip | [契约]({CONTRACT}) |
+| US109-09 | 动画／编辑时钟 | 11可动画数值通道、6插值、Bezier时间根、大整数Fraction、原呈现窗口和嵌套倒放的独立作者时钟；静态尺寸别名不作为整数动画通道 | [日志]({REL}/native-r4/unittest.log) |
+| US109-10 | 安全与空间预算 | 6完整表面估算、768MiB上限、自适应转换tile，逐行核scratch单独预留。完整Float64 scratch作用域结束后才做输出信号转换；只读／晚块非法值／取消／溢出不改调用者；估算不等同峰值RSS | [4K实测]({REL}/4k-r1/verification.json) |
+| US109-11 | 五场景真实CLI | {len(media['calls'])}调用/{len(media['checks'])}检查，2正式render／3preview；320×180、10fps、2秒20帧，亮度、色度、水平、coverage、超白各4帧；实际工程及权利账公开 | [原片]({ASSETS}/original-range.mp4) · [输出]({ASSETS}/range.mp4) · [工程]({ASSETS}/author-project.json) |
+| US109-12 | 全选区／声音／PNG | 2,419,200线性RGB最大误差{o['maximum_linear_absolute_error']:.12g}，门槛2e-6；原片／成片96000与选区67200双声道PCM帧一致，PNG16≤1码；clip前峰值{o['unclipped_linear_max']:.9g}、越界{o['unclipped_outside_RGB_components']}分量 | [视频收据]({REL}/media-r2/verification.json) · [独立参考]({REL}/media-r2/executed-oracle.py.txt) |
+| US109-13 | 真正4K | 亮度、独立色度XY、alpha-only各1帧3840×2160，8次公开CLI；共99,532,800个RGBA分量与独立逐tap行公式比，最大{max(c['maximum_absolute_error'] for c in k['cases']):.12g}，门槛2e-6；正式16位输入／预览、静音／PNG16／缓存另验 | [4K记录]({REL}/4k-r1/verification.json) · [4K抽帧]({ASSETS_4K}/contact.png) |
+| US109-14 | 目检与GIF | 作者帧3/10/16共6幅静看；GIF14×100ms来自真实预览。4K GIF仅切换3张实际单帧；无连续播放、听感、自然素材或HDR验收 | [目检]({REL}/static-review-r1.json) · [视频GIF]({ASSETS}/comparison.gif) |
+| US109-15 | 离线安装 | {itext} | [安装收据]({REL}/installed-r2/verification.json) |
+| US109-16 | 完整回归／发布 | {ftext} 源码121、安装741、完整套件分别登记，不相加作为完成率；普通推送，保留OpenFilm研究文档 | [报告]({REPORT}) |
+| US109-17 | 失败／许可／剩余 | 首轮61项4失败2错误、第二轮62项1断言失败、第三轮541项1旧拒绝样例失败，均保留；当前源码复验为受影响121项，安装741与完整2836门槛保留。修正测试的交付策略、末键插值和错误码，原生非零alpha失败独立披露；未放宽数值门槛。FFmpeg GPL参考附原许可，自有Python数学未复制C；完整剪映功能、时间降噪、自然视频／长片／HDR继续开发 | [原失败1]({REL}/native-r1/unittest.log) · [原失败2]({REL}/native-r2/unittest.log) · [参考许可]({REL}/source-reference-r4/COPYING.GPLv2.txt) |
+
+![原创输入与真实CLI浮点锐化预览]({ASSETS}/comparison.gif)
+
+<!-- /{MARKER} -->
+'''
+
+
+def report(full=None, published=False):
+    _, native, _, _ = current()
+    return f'''# 连续浮点锐化与原生差异实测
+
+实际关联源码回归 **{native['methods']}项 /{native['seconds']:.6f}秒 /0跳过**，其中62项新增。真实媒体与4K原始收据不改写：唯一测试行更新后的328输入通过guard-only-input-binding-r1.json明确绑定到原收据；327路径（含全部产品运行资源、schema）、媒体脚本和oracle逐项未变，不把旧媒体伪装为重跑。源码、真实视频、4K、安装及完整回归分别登记；未执行或运行中不计通过，完整剪映目标仍在开发。
+
+本轮在共同Float32 render/preview效果链新增sharpen/unsharp。先按明确input_signal编码，再变换到明确矩阵／量程的YCbCr码值轴，以独立二项核求blur，按src+amount×(src-blur)处理亮度、色度或coverage。再明确解释output_signal、回到线性工作RGB，最后混合强度。默认只锐化亮度，alpha原位保留；默认continuous路径不建立整数图像，不经过8/16位栅格，也不隐式裁RGB。
+
+原生FFmpeg对照揭示两个不能忽略的区别：uint16实现的amount乘积右移24位，uint8右移16位；非零alpha_amount在本机8.1产生三次3221225477访问异常。固定n8.1源码config_input仅为luma/chroma分配工作区，未为alpha分配。产品不调用该原生alpha路径，也不复制崩溃行为；自己的coverage算法由独立稠密矩阵与实际CLI验证。native_coefficients是明确可选的标量兼容模式，绝不表示整数像素、uint32累加溢出、有符号32位乘积溢出或原生alpha兼容。默认continuous在高位深仍保持同等物理强度。
+
+原生8/9/10/12/16位比较使用码值40%..60%的受限对照，避免把原生整数溢出当作数学参考。执行前误差界限固定为1.05+0.5×有效最大amount，分别包含最终floor、blur半码量化及Float32颜色运输余量。14位不在该原生格式列表中，按自有连续参考轴测试，未伪装为真实原生14位通过。极大核／分数核及amount>5也明确列作扩展。RGB矩阵在完整4:4:4解释内处理；不宣称复现420色度采样的逐位结果。
+
+五场景媒体从原创16位图形和合成双声道声音生成，原片和成片均走公开CLI与正式编码器。Float32选区由独立Bernoulli多项式／端点索引稠密矩阵、显式YCbCr公式及独立关键帧方程验证；不调用产品卷积、颜色或采样器。4K图案竖直恒定，以独立逐tap行公式检查每个实际RGBA分量，三种场景各一帧，静音、正式交付输入、PNG16和独立进程缓存另验。这不是长片性能、整个进程峰值RSS、连续播放、听感或自然素材画质验收。
+
+首次61项有4失败2错误：三次原生alpha崩溃、末尾关键帧缺插值字段、两项真实预览未显式选择交付clip。第二轮62项仅新增拒绝测试的错误码断言不符，输出实际上已被拒绝。第三轮541项仅一项失败：空间滤镜旧测试仍把unsharp当作未支持类型。等原回归与等待流程终结后，仅将这一行的拒绝样例改为hqdn3d，原拒绝码断言不变，再执行第四轮受影响121项（锐化62、空间滤镜59）；安装741项和完整2836项继续覆盖全套相关模块。前三轮源文件、命令与日志保留。未改变数学门槛；原生alpha不再冒充有效参考，已有独立alpha正确性断言保留，原生对照明确限制alpha_amount=0。
+
+第一次安装在build前，因重复检查仍比较包含旧测试行的全部4K输入表而拒绝；仅将它改为已存在的显式bound_media校验，产品328输入、121项源码与原媒体不变。保留installed-r1和失败编排记录，以installed-r2重新执行完整离线构建及741项；未跳过实际4K或产品资源核验。媒体首跑数值检查已通过，但描述中沿用旧方案的RGB-only半径文字。仅删除该无关描述后，以media-r2重新执行20调用／31检查；实际编码像素、PCM、Float32、PNG16、GIF与抽帧逐项相同，原成功记录也保留。该修正不涉及效果参数、oracle或数值门槛，单独记录于media-description-replay-r1.json。
+
+固定参考为官方[FFmpeg n8.1 vf_unsharp.c](https://github.com/FFmpeg/FFmpeg/blob/n8.1/libavfilter/vf_unsharp.c)，SHA256见source-reference-r4。n8.1 C文件首次已成功读取；其后的404来自不存在的unsharp.h，不是n8.1标签不存在。n8.0 C文件也成功且哈希相同；后来许可请求DNS失败，最终从本地已有原GPLv2文本补齐许可，未再引入运行库。GPL C只用于行为研究并附许可，Python核数学独立实现，未复制C实现。产品运行、测试和媒体生成没有网络请求，无Docker／WSL／虚拟环境；文本参考读取未打开浏览器tab。
+
+发布顺序固定为V108实际完整2774项及安装679项通过并普通发布，然后OpenFilm R17研究文档普通发布，最后才以R17提交和V108未变的326产品输入启动本轮完整2836项。避免研究提交和产品候选争用同一个main基线，自动发布始终使用普通推送。完整目标未被缩减为当前浮点滤镜子集。
+
+'''+relink(section(full, published), REPORT)
+
+
+def contract():
+    return '''# 连续浮点YCbCr锐化契约 v0.1
+
+## 入口与参数
+
+显式settings.pixel_pipeline.engine=float32-native-v1启用，正式render与preview range/frame使用同一EffectCompiler。type为sharpen或unsharp；顶层只接受id/type/enabled/parameters/keyframes。parameters必须提供input_signal、output_signal={primaries,transfer}以及matrix和range；工作信号须linear。矩阵为bt709/smpte170m/bt470bg/bt2020nc，range为full或limited；reference_bits为8/9/10/12/14/16，默认8。
+
+luma_amount/chroma_amount/alpha_amount各为有限数-2..10，默认1/0/0。amount和la别名对应luma_amount，ca/aa对应chroma/alpha。radius默认2，范围0..11；luma/chroma/alpha各自radius_x、radius_y范围相同。radius_x/y只别名至亮度XY。静态或动态明确声明的轴覆盖master radius，其余轴在每个作者tick跟随radius；不是编译时复制master值。
+
+luma/chroma/alpha_msize_x/y及lx/ly/cx/cy/ax/ay为静态原生尺寸别名，仅允许3..23的奇数整数，映射radius=(size-1)/2；不接受bool、浮点整数或动画尺寸。相同静态通道重复别名、同轨重复通道和未知项拒绝。intensity有限0..1默认1。arithmetic为continuous默认或native_coefficients；code_gamut和output_gamut各为preserve默认或clip。信号／矩阵／量程／参考轴／算术模式／裁切策略不动画。
+
+```json
+{"type":"sharpen","parameters":{"input_signal":{"primaries":"bt709","transfer":"bt709-oetf"},"output_signal":{"primaries":"bt709","transfer":"bt709-oetf"},"matrix":"bt709","range":"full","reference_bits":16,"luma_amount":1.2,"chroma_amount":0,"alpha_amount":0,"radius":2.375,"intensity":0.8}}
+```
+
+## 独立数学与原生差异
+
+整数r=n的归一化核为C(2n,k)/2^(2n)，n=0是identity。r=n+f时把相邻整数核对齐中心，按(1-f)K_n+fK_(n+1)混合；分别做水平和垂直复制端点卷积。先blur再src+amount×(src-blur)。Y、Cb/Cr和alpha三组各用自己的amount及XY；Cb和Cr同组参数独立平面。
+
+full轴Y=[0,2^bits-1]，色度中心128×2^(bits-8)、跨度2^bits-1。limited轴Y偏移16×scale、跨度219×scale，色度中心128×scale、跨度224×scale。矩阵系数Kr/Kb明确，Kg=1-Kr-Kb。码值轴为Float64数学单位，未生成整数图像或LUT。code_gamut=clip仅裁处理过的YCbCr平面至0..maximum；output_gamut=clip在按output_signal恢复线性工作RGB之前裁算子RGB至0..1，两者均不同于最终交付range_policy。
+
+continuous直接使用amount。native_coefficients把原参数先按Float32存储，再trunc(value×65536)，8位除65536，高于8位除16777216，对应本机原生uint16实现额外8位移。它不复现blur逐像素舍入、最终整数floor／存储裁切、uint32递推累加溢出或signed32乘法溢出，native_bit_equivalence始终false。原生alpha非零路径已有实际崩溃证据，不作为有效参考。alpha映射是产品独立覆盖率数学，非原生逐位alpha兼容。
+
+14位并非该原生unsharp支持的像素格式；半径0/分数、amount>5、双轴较大组合也是自有扩展。metadata分别报告原生选项形状资格、在最大参考码下的累加位数界、格式支持情况，均不等同原生执行成功或安全保证。native_fixedpoint_overflow_reproduced=false。
+
+## 信号、alpha与作者时钟
+
+线性工作RGB→input_signal→YCbCr→卷积／amount→RGB→按output_signal返回线性工作RGB，intensity在工作RGB和独立coverage上线性混合。持久RGBA为Float32，卷积scratch为Float64。未请求alpha时保留输入alpha位模式，包括-0和正1e-30。显式alpha算子裁coverage至0..1并报告裁切数；不是RGB预乘模糊。alpha-only、输入输出信号相同且preserve时绕过RGB转换，保留隐藏RGB位。intensity0在整图／计划验证后逐位恒等。RGB负值和超白默认保留；交付超范围而未明确clip须拒绝。
+
+11个数值通道可动画：3amount、master radius、6独立XY、intensity。支持linear/hold/ease_in/ease_out/ease_in_out/bezier，四控制值Bezier先解时间根；严格递增非负整数键tick，支持Fraction和超过double整数精度的作者采样。规范轨道JSON及既有自动化预算适用，末键也须按工程schema声明interpolation。超原作者时长拒绝；呈现窗口与嵌套倒放保留各层作者时钟，不把裁后首帧当作新原点。
+
+## 空间预算、生命周期与失败
+
+输入为连续H×W×4 Float32，有限RGB、alpha0..1；边长1..16384、像素数≤16777216。fixed估算=6×完整表面字节+保留表字节+4×轨道JSON字节+max(1MiB,(max(H,W)+23)×8×6)。转换tile请求1..262144，按既有准入先限至16384和像素数，再按剩余预算每像素2048字节缩小；不提高默认768MiB上限。估算不表示进程峰值RSS、并发总内存或自然长片性能。
+
+全尺寸Float64四平面和单通道blur只在内部作用域存活，不返回保留它们的view；输出信号转换在该作用域结束后开始。每个水平／垂直处理行复制一个输入行，支持垂直原位写回；不建立核数量倍数的整图数组。预算／整图合法性验证先于结果，对转换、核tap及行写入检查取消。取消True报RENDER_CANCELLED，回调异常原样传播；非有限、Float32溢出、晚块非法值或错误参数明确拒绝，调用者不变，允许只读输入。
+
+## 验收、许可与发布
+
+62新增／121关联源码、原生对照、五场景20帧真实CLI、实际三场景4K、196资源741项离线安装与2836项完整套件分开登记。目标数字不是通过数。GIF为真实输出派生；4K GIF仅三张单帧切换。未完成自然素材、长片RSS、连续播放、听感、HDR、默认全量浮点迁移、时间降噪及完整剪映功能验收。
+
+FFmpeg原生C文件仅用于固定行为参考并附GPLv2文本，自有Python二项核与卷积未复制该C实现；FFmpeg程序、原高斯NOTICE、NumPy等依赖归属保留。研究读取网络与产品运行网络分开，产品运行及验证全本地，无Docker／WSL或虚拟环境。完整回归必须等待V108实际发布及OpenFilm R17文档发布，绑定R17 main提交和V108产品326输入；普通提交／推送，不执行新force push。
+'''
+
+
+def documents(target, full=None, published=False):
+    names = [*LATEST_DOCS, REPORT, CONTRACT]; block = section(full, published)
+    for name in LATEST_DOCS:
+        text = (MAIN/name).read_text('utf8')
+        text = re.sub(r'\n?<!-- '+MARKER+r' -->.*?<!-- /'+MARKER+r' -->\n?', '\n', text, flags=re.S)
+        position = text.find('\n')+1
+        write(target/name, text[:position]+'\n'+relink(block, name)+'\n'+text[position:])
+    write(target/REPORT, report(full, published)); write(target/CONTRACT, contract())
+    return names
+
+
+def links(target, names):
+    found = []
+    for name in names:
+        for value in re.findall(r'!?\[[^\]]*\]\(([^\s)]+)(?:\s+[^)]*)?\)', (target/name).read_text('utf8')):
+            path = unquote(value.strip('<>').split('#')[0])
+            if not path or re.match(r'^[a-zA-Z][a-zA-Z0-9+.-]*:', path):
+                continue
+            assert any((base/name).parent.joinpath(path).resolve().exists() for base in (target, ROOT, MAIN, PARENT)), (name, path)
+            found.append([name, path])
+    return found
+
+
+def main():
+    parser = argparse.ArgumentParser(); parser.add_argument('--revision', required=True); args = parser.parse_args()
+    assert re.fullmatch(r'r\d+', args.revision)
+    target = ROOT/'product/.runtime/float-sharpen-20261022'/('readme-preview-'+args.revision)
+    assert not target.exists(); target.mkdir(parents=True)
+    names = documents(target); checked = links(target, names)
+    write(ROOT/REPORT, report()); write(ROOT/CONTRACT, contract())
+    inputs, _, _, installed = current()
+    receipt = ROOT/REL/('readme-preview-'+args.revision+'.json'); assert not receipt.exists()
+    write(receipt, json.dumps({'status': 'passed-local-document-links', 'documents': {name: sha(target/name) for name in names},
+        'document_count': len(names), 'links': len(checked), 'installed_status': installed['status'], 'frozen_input_count': len(inputs),
+        'main_mutated': False, 'full_suite_claimed_passed': False, 'preview_root': str(target), 'generator_sha256': sha(Path(__file__))}, ensure_ascii=False, indent=2))
+    print(json.dumps({'documents': len(names), 'links': len(checked), 'installed_status': installed['status'], 'full_suite_claimed_passed': False}))
+
+
+if __name__ == '__main__':
+    main()

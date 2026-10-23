@@ -81,16 +81,16 @@ class MattingFrameTests(unittest.TestCase):
 MOCK_WORKER = r'''
 import json, sys, time
 from pathlib import Path
+mode=sys.argv[2]
+if mode in {'wait','cancel'}:
+    if mode=='cancel': Path(sys.argv[3]).write_text('cancel',encoding='utf-8')
+    time.sleep(20)
 sys.path.insert(0, PRODUCT_SOURCE)
 sys.path.insert(0, NUMPY_SOURCE)
 import numpy as np
 from ai_ad_editor.matting_frames import process_frames
 from ai_ad_editor.utils import atomic_write_json
 request=json.loads(Path(sys.argv[1]).read_text(encoding='utf-8'))
-mode=sys.argv[2]
-if mode in {'wait','cancel'}:
-    if mode=='cancel': Path(sys.argv[3]).write_text('cancel',encoding='utf-8')
-    time.sleep(20)
 if mode=='fail': raise RuntimeError('controlled worker failure')
 info=request['video']
 def infer(rgb,states):

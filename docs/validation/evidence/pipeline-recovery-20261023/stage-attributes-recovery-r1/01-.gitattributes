@@ -1,0 +1,1304 @@
+# Published evidence uses byte hashes; preserve its bytes on Windows checkout.
+# R13 preserves original source, HTTP responses, tests, and legal notices verbatim.
+docs/validation/evidence/openfilm-024-20261021-r13/** -text -whitespace
+scripts/capture_openfilm_r13.py text eol=lf
+scripts/review_openfilm_r13.py text eol=lf
+scripts/sync_openfilm_r13_documents.py text eol=lf
+scripts/audit_openfilm_r13.py text eol=lf
+docs/OpenFilm_0.2.4复用复核与成本更新_2026-10-21.md text eol=lf
+# V63 rejection and V64 source-context receipts include native raw log bytes.
+docs/validation/evidence/vace-delivery-20261019-v63-r1/** -text -whitespace
+docs/validation/evidence/audio-source-context-20261019-v64/** -text -whitespace
+docs/validation/evidence/audio-context-install-20261019-v64-r1/** -text -whitespace
+docs/validation/evidence/audio-context-media-20261019-v64-r1/** -text -whitespace
+docs/assets/audio-source-context-*/** -text -whitespace
+docs/assets/audio-context-offline-*/** -text -whitespace
+docs/specs/离线音频真实源上下文与精确选区契约_v0.1_2026-10-19.md text eol=lf
+docs/validation/离线音频真实源上下文与短窗音高实测_2026-10-19.md text eol=lf
+docs/validation/VACE共享显存真实重试与准入拒绝_2026-10-19.md text eol=lf
+scripts/probe_audio_source_context.py -text
+scripts/smoke_audio_source_context.py -text
+scripts/verify_audio_source_context_install.py -text
+scripts/audit_audio_source_context_media.py -text
+scripts/build_audio_context_preview.py -text
+scripts/collect_audio_context_development.py -text
+scripts/collect_vace_retry_rejection.py -text
+scripts/sync_audio_source_context_documents.py -text
+scripts/audit_audio_source_context_release.py -text
+.gitattributes text eol=lf
+.gitignore text eol=lf
+docs/validation/evidence/openfilm-batch-reuse-20261020-v70/** -text -whitespace
+docs/assets/openfilm-batch-reuse-20261020-v70*/** -text -whitespace
+scripts/*queue_reuse*.py -text whitespace=cr-at-eol
+docs/specs/同批次相同渲染结果复用契约_v0.1_2026-10-20.md text eol=lf
+docs/validation/OpenFilm同批次结果复用实测_2026-10-20.md text eol=lf
+docs/validation/evidence/local-face-beauty-20261020-v69/** -text -whitespace
+product/src/ai_ad_editor/OPENSEEFACE_LICENSE.txt -text whitespace=cr-at-eol
+product/src/ai_ad_editor/OPENSEEFACE_NOTICE.txt -text whitespace=cr-at-eol
+scripts/probe_openseeface_native.py -text whitespace=cr-at-eol
+scripts/smoke_local_face.py -text whitespace=cr-at-eol
+docs/assets/local-face-beauty-20261020-v69*/** whitespace=cr-at-eol
+scripts/verify_local_face_install.py -text
+scripts/verify_local_face_worker_cancel.py -text
+scripts/probe_local_face_controls.py -text
+scripts/sync_local_face_documents.py -text
+scripts/audit_local_face_release.py -text
+scripts/audit_local_face_media.py -text
+scripts/finalize_local_face.py -text
+docs/specs/离线人脸锚点与局部修饰契约_v0.1_2026-10-20.md text eol=lf
+docs/validation/离线人脸锚点与局部修饰实测_2026-10-20.md text eol=lf
+docs/third-party/OpenSeeFace模型与原生SDK取舍_2026-10-20.md text eol=lf
+product/**/*.py text eol=lf
+docs/specs/agent-project.schema.json text eol=lf
+docs/assets/** -text
+scripts/build_readme_gallery.py -text
+docs/validation/evidence/readme-gallery-20261016.json -text
+scripts/smoke_mask_review.py -text
+docs/validation/evidence/mask-review-20261016.json -text
+docs/validation/evidence/mask-review-*-20261016.log -text whitespace=cr-at-eol
+scripts/smoke_mask_tracking.py -text
+docs/validation/evidence/mask-tracking-20261016.json -text
+docs/validation/evidence/mask-tracking-*-20261016.log -text whitespace=cr-at-eol
+# Preserve the interrupted raw progress line, including its final space.
+docs/validation/evidence/mask-tracking-interrupted-full-20261016.log -whitespace
+scripts/smoke_alpha_resampling.py -text
+docs/validation/evidence/alpha-resampling-20261016.json -text
+docs/validation/evidence/alpha-resampling-*-20261016.log -text whitespace=cr-at-eol
+scripts/smoke_alpha_geometry.py -text
+docs/validation/evidence/alpha-geometry-20261016.json -text
+docs/validation/evidence/alpha-geometry-*-20261016.log -text whitespace=cr-at-eol
+# Keep the bundled third-party font license verbatim, including trailing spaces.
+docs/assets/alpha-geometry-20261016/font-license.txt -whitespace
+scripts/smoke_nested_time_mapping.py -text
+docs/validation/evidence/nested-time-20261016.json -text
+docs/validation/evidence/nested-time-quality-20261016.json -text
+docs/validation/evidence/nested-time-*-20261016.log -text whitespace=cr-at-eol
+docs/validation/evidence/nested-time-full-interrupted-fixture-20261016.log -whitespace
+docs/assets/nested-time-20261016/font-license.txt -whitespace
+scripts/smoke_speed_easing.py -text
+docs/validation/evidence/speed-easing-20261016.json -text
+docs/validation/evidence/speed-easing-quality-20261016.json -text
+docs/validation/evidence/speed-easing-stability-20261016.json -text
+docs/validation/evidence/speed-easing-*-20261016.log -text whitespace=cr-at-eol
+# Preserve the captured unittest subTest progress lines, including final spaces.
+docs/validation/evidence/speed-easing-before-20261016.log -whitespace
+docs/assets/speed-easing-20261016/font-license.txt -whitespace
+
+# Keep captured caption verification bytes, including raw progress spaces.
+scripts/smoke_subtitle_clock.py -text
+docs/validation/evidence/subtitle-clock*.json -text
+docs/validation/evidence/subtitle-clock*.log -text -whitespace
+docs/assets/subtitle-clock-20261016/font-license.txt -whitespace
+
+# Native word-layout proofs preserve raw logs and third-party license bytes.
+scripts/smoke_word_layout.py -text
+docs/validation/evidence/*word-layout*.json -text
+docs/validation/evidence/word-layout*.log -text -whitespace
+docs/validation/evidence/glyph-dev*.log -text -whitespace
+docs/validation/evidence/word-policy*.log -text -whitespace
+docs/assets/word-layout*/*.txt -whitespace
+
+# Keep captured color/opacity proofs, raw failure logs and font license bytes.
+scripts/smoke_text_paint.py -text
+docs/validation/evidence/*text-paint*.json -text
+docs/validation/evidence/text-paint*.log -text -whitespace
+docs/assets/text-paint-20261016/font-license.txt -whitespace
+
+# V24 native text animation proofs preserve raw log and font license bytes.
+scripts/smoke_text_animation.py -text
+docs/validation/evidence/*text-animation*.json -text
+docs/validation/evidence/text-animation*.log -text -whitespace
+docs/assets/text-animation-20261017/font-license.txt -whitespace
+
+# V25 keeps native frame, EOF and short-audio failure evidence byte-exact.
+scripts/smoke_nested_frame_coverage.py -text
+docs/validation/evidence/*nested*coverage*.json -text
+docs/validation/evidence/nested-coverage*.log -text -whitespace
+docs/assets/nested-frame-coverage-20261017/font-license.txt -whitespace
+
+# V26 keeps actual offline audio proofs and upstream license bytes unchanged.
+scripts/smoke_offline_audio_stretch.py -text
+docs/validation/evidence/*audio-stretch*.json -text
+docs/validation/evidence/audio-stretch*.log -text -whitespace
+docs/assets/offline-audio-stretch-20261017/*.txt -whitespace
+
+# V27 preserves actual channel-mode media, PCM and native phase evidence.
+scripts/smoke_audio_channel_modes.py -text
+docs/validation/evidence/*audio-channels*.json -text
+docs/validation/evidence/audio-channels*.log -text -whitespace
+docs/assets/audio-channel-modes-20261017/*.txt -whitespace
+
+# V28 preserves sequence canvas pixels, independent references and raw failures.
+scripts/smoke_sequence_compositing.py -text
+docs/validation/evidence/*sequence-groups*.json -text
+docs/validation/evidence/sequence-groups*.log -text -whitespace
+docs/assets/sequence-compositing-20261017/*.txt -whitespace
+
+# V29 preserves float PCM, actual bus evidence and native failure logs.
+scripts/smoke_audio_buses.py -text
+docs/validation/evidence/*audio-buses*.json -text
+docs/validation/evidence/audio-buses*.log -text -whitespace
+docs/assets/audio-buses-20261017/*.txt -whitespace
+
+# V30 retains actual tempo PCM, terminal failures and immutable native logs.
+scripts/smoke_audio_tempo_context.py -text
+docs/validation/evidence/*tempo-context*.json -text
+docs/validation/evidence/tempo-context*.log -text -whitespace
+docs/assets/audio-tempo-context-20261017/*.txt -whitespace
+
+# OpenFilm research preserves pinned archive, original failures and exact patches.
+scripts/audit_openfilm_reuse.py -text
+sources/upstream/openfilm/** -text
+docs/validation/evidence/openfilm-reuse-20261017.json -text
+docs/validation/evidence/openfilm-reuse-20261017/** -text -whitespace
+
+# Preserve independent-canvas demonstrations, raw failures and source hashes.
+scripts/smoke_sequence_canvas.py -text
+docs/validation/evidence/sequence-canvas*.json -text
+docs/validation/evidence/sequence-canvas*.log -text -whitespace
+docs/validation/evidence/sequence-canvas-dev-v3-generator.py -text
+docs/assets/sequence-canvas-20261017/font-license.txt -whitespace
+
+# V37 retains fragment resource proofs, frozen source records and raw failures.
+scripts/*fragment*.py -text
+scripts/run_frozen_regression.py -text
+docs/validation/evidence/fragments*.json -text
+docs/validation/evidence/fragments*.log -text -whitespace
+docs/validation/evidence/fragments-*/** -text -whitespace
+
+# V38 native output cuts: preserve raw CLI/failure logs and source freezes.
+scripts/*clip_window*.py -text
+docs/validation/evidence/windows*.json -text
+docs/validation/evidence/windows*.log -text -whitespace
+docs/validation/evidence/windows-*/** -text -whitespace
+docs/validation/evidence/openfilm-window-followup-*/** -text -whitespace
+docs/assets/clip-windows-*/cli-*.log -text -whitespace
+
+# V39 range edits retain native command logs, frozen sources and failures.
+scripts/*range_edit*.py -text
+docs/validation/evidence/range*.json -text
+docs/validation/evidence/range*.log -text -whitespace
+docs/validation/evidence/range-*/** -text -whitespace
+docs/validation/evidence/openfilm-range-followup-*/** -text -whitespace
+docs/assets/range-edits-*/cli-*.log -text -whitespace
+
+# V40 finite source edits preserve raw CLI, regression and failure evidence.
+scripts/*source_edit*.py -text
+docs/validation/evidence/source-*-20261018.json -text
+docs/validation/evidence/source-*-20261018.log -text -whitespace
+docs/validation/evidence/source-*-20261018/** -text -whitespace
+docs/assets/source-edits-*/cli-*.log -text -whitespace
+
+# V41 native HTML motion preserves exact workers, source snapshots and raw logs.
+product/**/*.mjs -text
+product/pyproject.toml text eol=lf
+product/src/ai_ad_editor/OPENFILM_LICENSE.txt -text
+skills/**/SKILL.md text eol=lf
+scripts/*html_motion*.py -text
+scripts/audit_openfilm_html_adoption.py -text
+docs/validation/evidence/html-motion*.json -text whitespace=cr-at-eol
+docs/validation/evidence/html-motion*.log -text -whitespace
+docs/validation/evidence/html-motion*.py -text
+docs/validation/evidence/html-motion-*/** -text -whitespace
+docs/validation/evidence/openfilm-html-adoption-*/** -text -whitespace
+docs/assets/html-motion-*/** -text -whitespace
+
+# V42 research retains unsuccessful candidates and reproducible NPZ/frame evidence.
+research/temporal-background/*.py text eol=lf
+scripts/*coherent_reference*.py -text
+scripts/create_repair_reference_holdouts.py -text
+docs/validation/evidence/coherent-reference*.json -text whitespace=cr-at-eol
+docs/validation/evidence/coherent-reference-*/** -text -whitespace
+docs/validation/evidence/docs-audit-coherent-reference*.json -text
+
+# V43 encoded mask editing preserves exact native runs, media and failure records.
+scripts/*mask_edit*.py -text
+docs/validation/evidence/mask-edit*/** -text -whitespace
+docs/validation/evidence/mask-edit*.json -text
+docs/validation/evidence/docs-audit-mask-edit*.json -text
+README.md text eol=lf
+docs/README.md text eol=lf
+docs/构建进度总表_2026-10-16.md text eol=lf
+docs/产品需求与开发路线基线_2026-10-12.md text eol=lf
+docs/产品实现入口与P0使用说明_v0.1_2026-10-13.md text eol=lf
+docs/validation/README功能核验与实测演示_2026-10-16.md text eol=lf
+docs/validation/能力覆盖与验收矩阵_v0.1_2026-10-13.md text eol=lf
+docs/validation/本地蒙版笔刷与关键帧修正实测_2026-10-18.md text eol=lf
+docs/specs/本地蒙版笔刷与关键帧修正契约_v0.1_2026-10-18.md text eol=lf
+docs/specs/AgentCLI契约_v0.1_2026-10-13.md text eol=lf
+video-cut-install-manifest.json text eol=lf
+
+# V44 neural temporal research preserves actual source, acquisition and worker bytes.
+research/temporal-neural/*.py -text
+scripts/*fgt*.py -text
+docs/validation/evidence/fgt-temporal-*/** -text -whitespace
+docs/validation/evidence/fgt-temporal*.json -text
+docs/validation/evidence/docs-audit-fgt*.json -text
+docs/OpenFilm_v0.2增量复用与接入建议_2026-10-18.md text eol=lf
+docs/specs/开源时序修复候选核验契约_v0.1_2026-10-18.md text eol=lf
+docs/validation/开源FGT时序修复候选实测_2026-10-18.md text eol=lf
+docs/third-party/时序修复候选源码与许可说明_2026-10-18.md text eol=lf
+skills/video-cut-local-models/SKILL.md text eol=lf
+skills/video-cut-quality/SKILL.md text eol=lf
+
+# V45 MIT template sources and real verification evidence retain exact bytes.
+product/src/ai_ad_editor/openfilm_overrides.mjs -text -whitespace
+product/src/ai_ad_editor/openfilm_template_fields.mjs -text -whitespace
+product/src/ai_ad_editor/html_template_dom.mjs -text
+scripts/*html_template*.py -text
+scripts/adopt_openfilm_template_controls.py -text
+docs/validation/evidence/html-template*/** -text -whitespace
+docs/validation/evidence/html-template*.json -text
+docs/validation/evidence/openfilm-template*/** -text -whitespace
+docs/validation/evidence/docs-audit-html-template*.json -text
+docs/assets/html-template-20261018/template/** whitespace=cr-at-eol
+docs/specs/离线HTML模板控件与覆盖恢复契约_v0.1_2026-10-18.md text eol=lf
+docs/validation/离线HTML模板控件与覆盖恢复实测_2026-10-18.md text eol=lf
+docs/third-party/OpenFilm复用声明_2026-10-17.md text eol=lf
+skills/video-cut-agent-editor/SKILL.md text eol=lf
+
+# V58 preserve native commands, originals, failed captures and byte-bound receipts.
+scripts/*color_automation*.py -text
+docs/validation/evidence/effect-automation-*/** -text -whitespace
+docs/validation/evidence/color-native-*/** -text -whitespace
+docs/assets/color-automation-*/** -text -whitespace
+docs/assets/color-group-*/** -text -whitespace
+docs/validation/evidence/color-group-*/** -text -whitespace
+docs/specs/逐帧调色参数自动化契约_v0.1_2026-10-19.md text eol=lf
+docs/validation/逐帧调色参数自动化实测_2026-10-19.md text eol=lf
+docs/specs/本地效果目录与参数契约_v0.1_2026-10-14.md text eol=lf
+
+# R05 preserve fixed public research receipts, patches and executed scripts.
+scripts/audit_openfilm_r05.py -text
+scripts/sync_openfilm_r05_documents.py -text
+docs/validation/evidence/openfilm-*-20261019-r05/** -text -whitespace
+docs/OpenFilm复用复核与开发成本更新_2026-10-19.md text eol=lf
+
+# V57: preserve hashed raw CLI captures, native CRLF receipts and original font notices.
+scripts/*complete_output_retime*.py -text
+docs/validation/evidence/retime-*/** -text -whitespace
+docs/assets/retime-*/** -text -whitespace
+docs/specs/完整作者输出变速与磁吸联动契约_v0.1_2026-10-18.md text eol=lf
+docs/validation/完整作者输出变速与磁吸联动实测_2026-10-19.md text eol=lf
+
+# V56 preserve actual magnetic editing captures, interrupted runs and media.
+scripts/*magnetic_mode*.py -text
+docs/validation/evidence/magnetic-mode-*/** -text -whitespace
+docs/assets/magnetic-mode-*/** -text -whitespace
+docs/specs/主轨磁吸模式与跨剪口同步拆分契约_v0.1_2026-10-18.md text eol=lf
+docs/validation/主轨磁吸模式与跨剪口同步拆分实测_2026-10-18.md text eol=lf
+
+# V55 original PCM/media, failed runs, native logs and exact evidence bytes.
+scripts/*audio_routing*.py -text
+docs/validation/evidence/audio-routing-*/** -text -whitespace
+docs/assets/audio-routing-*/** -text -whitespace
+docs/specs/命名音频总线发送返回与侧链契约_v0.1_2026-10-18.md text eol=lf
+docs/validation/命名音频总线发送返回与侧链实测_2026-10-18.md text eol=lf
+
+# R04/V54 preserve fixed upstream bytes, watchdog evidence and failed fixtures.
+scripts/audit_openfilm_recheck*.py -text
+docs/validation/evidence/openfilm-recheck-*/** -text -whitespace
+docs/validation/evidence/openfilm-recheck-*.json -text -whitespace
+sources/upstream/openfilm-recheck-*/** -text -whitespace
+docs/OpenFilm最新源码复核与降本清单_2026-10-18.md text eol=lf
+
+# V53 keep executed generators, partial failures and exact media byte evidence.
+scripts/*magnetic_reorder*.py -text
+docs/validation/evidence/magnetic-reorder-*/** -text -whitespace
+docs/validation/evidence/magnetic-reorder-*.json -text -whitespace
+docs/assets/magnetic-reorder-*/** -text -whitespace
+docs/specs/主轨磁吸重排与关联附着契约_v0.1_2026-10-18.md text eol=lf
+docs/validation/主轨磁吸重排与关联附着实测_2026-10-18.md text eol=lf
+skills/video-cut-template-library/SKILL.md text eol=lf
+
+# V46 diagnostic sources, failure records and rendered media retain exact bytes.
+product/src/ai_ad_editor/openfilm_text_bounds.mjs -text -whitespace
+product/src/ai_ad_editor/html_quality_dom.mjs -text
+scripts/*html_quality*.py -text
+docs/validation/evidence/html-quality*/** -text -whitespace
+docs/validation/evidence/html-quality*.json -text
+docs/validation/evidence/openfilm-layout*/** -text -whitespace
+docs/validation/evidence/docs-audit-html-quality*.json -text
+docs/assets/html-quality-20261018/** whitespace=cr-at-eol
+docs/specs/HTML文字布局与字体覆盖核验契约_v0.1_2026-10-18.md text eol=lf
+docs/validation/HTML文字布局与字体覆盖实测_2026-10-18.md text eol=lf
+
+# V47 preserves the exact contract, dependency wheels and raw execution records.
+product/src/ai_ad_editor/agent-project.schema.json -text
+product/src/ai_ad_editor/RFC3339_VALIDATOR_LICENSE.txt -text -whitespace
+sources/python-runtime/** -text -whitespace
+product/offline/*.py text eol=lf
+scripts/*offline_release*.py -text
+scripts/acquire_python_runtime_wheels.py -text
+scripts/verify_schema_baseline.py -text
+scripts/review_openfilm_release_reuse.py -text
+scripts/run_frozen_regression.py -text
+scripts/smoke_fragments.py -text
+docs/validation/evidence/offline-*/** -text -whitespace
+docs/validation/evidence/offline-*.json -text
+docs/assets/offline-release*/install-receipt.json whitespace=cr-at-eol
+docs/validation/evidence/schema-release-*.json -text
+docs/validation/evidence/openfilm-release-review-*/** -text -whitespace
+docs/validation/evidence/docs-audit-offline-*.json -text
+docs/specs/离线发行与随包Schema契约_v0.1_2026-10-18.md text eol=lf
+docs/validation/离线发行与随包Schema实测_2026-10-18.md text eol=lf
+docs/third-party/离线Python依赖与日期检查器许可说明_2026-10-18.md text eol=lf
+docs/OpenFilm当前复用决策_2026-10-18.md text eol=lf
+skills/video-cut-project-ops/SKILL.md text eol=lf
+scripts/map_openfilm_skills.py -text
+scripts/verify_offline_native_entries.py -text
+scripts/verify_staged_release.py -text
+docs/validation/evidence/openfilm-skill-local-mapping-20261018.json -text
+docs/OpenFilm官方Skill本地能力映射_2026-10-18.md text eol=lf
+scripts/review_openfilm_examples.py -text
+scripts/review_openfilm_example_engine.py -text
+docs/validation/evidence/openfilm-examples-review-*/** -text -whitespace
+docs/OpenFilm示例与动效内核复用评估_2026-10-18.md text eol=lf
+
+# V48 original MIT notices and machine evidence are byte-pinned.
+product/src/ai_ad_editor/openfilm_stroke.mjs -text
+product/src/ai_ad_editor/OPENFILM_EXAMPLES_LICENSE.txt -text -whitespace
+product/src/ai_ad_editor/PDOOM_VIDEO_LICENSE.txt -text -whitespace
+docs/validation/evidence/stroke-*/** -text -whitespace
+docs/validation/evidence/stroke-*.json -text
+docs/validation/evidence/ctc-model-*/** -text -whitespace
+docs/validation/evidence/openfilm-stroke-adoption-*/** -text
+docs/assets/stroke-motion-*/install-receipt.json whitespace=cr-at-eol
+scripts/*stroke*.py -text
+scripts/inspect_ctc_model_sources.py -text
+docs/specs/离线逐笔描线动效契约_v0.1_2026-10-18.md text eol=lf
+docs/validation/离线逐笔描线动效实测_2026-10-18.md text eol=lf
+docs/third-party/OpenFilm示例描线函数复用声明_2026-10-18.md text eol=lf
+docs/CTC对齐模型来源预研_2026-10-18.md text eol=lf
+
+# V49 preserve captured CTC clocks, raw CLI logs and third-party notices.
+scripts/*ctc*.py -text
+scripts/acquire_pillow_release_wheel.py -text
+docs/validation/evidence/ctc-*/** -text -whitespace
+docs/validation/evidence/ctc-*.json -text whitespace=cr-at-eol
+docs/validation/evidence/pillow-release-wheel-*/** -text -whitespace
+docs/third-party/flite-source-*/** -text -whitespace
+docs/assets/ctc-alignment-*/** -text whitespace=cr-at-eol
+scripts/*boundary*.py -text
+docs/validation/evidence/boundary-*/** -text -whitespace
+docs/validation/evidence/boundary-*.json -text whitespace=cr-at-eol
+docs/assets/boundary-*/** -text whitespace=cr-at-eol
+docs/third-party/boundary-*/** -text -whitespace
+docs/assets/boundary-readable-font-*/LICENSE_DEJAVU -whitespace
+docs/specs/离线CTC字词强制对齐契约_v0.1_2026-10-18.md text eol=lf
+docs/validation/离线CTC字词强制对齐实测_2026-10-18.md text eol=lf
+docs/third-party/CTC模型与英文演示语音来源_2026-10-18.md text eol=lf
+
+# V51 preserve raw frame/sample evidence, failed runs and original font notices.
+scripts/*nested_freeze*.py -text
+docs/validation/evidence/nested-freeze-*/** -text -whitespace
+docs/validation/evidence/nested-freeze-*.json -text -whitespace
+docs/assets/nested-freeze-*/** -text -whitespace
+docs/specs/复合片段定格与完整音画时钟契约_v0.1_2026-10-18.md text eol=lf
+docs/specs/嵌套转场合成与作者时钟契约_v0.1_2026-10-18.md text eol=lf
+docs/validation/复合片段定格与完整音画时钟实测_2026-10-18.md text eol=lf
+
+# V52 preserve captured alpha planes, encoded media and actual CLI receipts.
+scripts/*delivery_precision*.py -text
+docs/validation/evidence/delivery-precision-*/** -text -whitespace
+docs/validation/evidence/delivery-precision-*.json -text -whitespace
+docs/assets/delivery-precision-*/** -text -whitespace
+docs/specs/透明视频交付与音画端点契约_v0.1_2026-10-18.md text eol=lf
+docs/validation/透明视频交付与音画端点实测_2026-10-18.md text eol=lf
+skills/video-cut-agent-editor/SKILL.md text eol=lf
+
+# V59 preserve original source matching, frozen research receipts and media bytes.
+scripts/*rose*.py -text
+scripts/prepare_rose_research.py -whitespace
+docs/validation/evidence/rose-*/** -text -whitespace
+docs/assets/rose-*/** -text -whitespace
+docs/specs/ROSE离线对象移除与副作用核验契约_v0.1_2026-10-19.md text eol=lf
+docs/third-party/ROSE原生研究依赖与来源说明_2026-10-19.md text eol=lf
+docs/validation/ROSE*.md text eol=lf
+
+# V60 CUDA admission evidence and executed recipes retain exact bytes.
+product/src/ai_ad_editor/cuda_admission.py -text
+product/tests/test_cuda_admission.py text eol=lf
+scripts/*cuda_admission*.py -text
+docs/validation/evidence/cuda-admission-*/** -text -whitespace
+docs/assets/cuda-admission-*/** -text -whitespace
+docs/specs/VACE物理显卡准入与分阶段资源检查契约_v0.1_2026-10-19.md text eol=lf
+docs/validation/VACE物理显卡准入与真实交付实测_2026-10-19.md text eol=lf
+scripts/audit_openfilm_workflow_routes.py -text
+docs/validation/evidence/openfilm-workflow-map-*/** -text -whitespace
+docs/OpenFilm创作流程本地适配设计_2026-10-19.md text eol=lf
+
+# V61 workflow media and executed recipes retain original bytes.
+scripts/*openfilm_workflow*.py -text
+scripts/capture_openfilm_workflow_demo.mjs -text
+docs/assets/openfilm-workflow-*/** -text -whitespace
+docs/validation/evidence/openfilm-workflows-*/** -text -whitespace
+docs/specs/OpenFilm三套本地创作Skill适配与实片核验契约_v0.1_2026-10-19.md text eol=lf
+docs/validation/OpenFilm三套本地创作Skill与实片核验_2026-10-19.md text eol=lf
+skills/video-cut-reference-remake/SKILL.md text eol=lf
+skills/video-cut-long-to-short/SKILL.md text eol=lf
+skills/video-cut-screen-demo/SKILL.md text eol=lf
+
+# V62 OCR observations, actual native encodes and executed evidence are byte-bound.
+scripts/*ocr*.py -text
+scripts/run_frozen_regression.py -text
+product/src/ai_ad_editor/local_ocr.py -text
+product/src/ai_ad_editor/ocr_cli.py -text
+product/src/ai_ad_editor/ocr_worker.py -text
+product/src/ai_ad_editor/ocr_geometry.py -text
+product/src/ai_ad_editor/PADDLE_OCR_LICENSE.txt -text -whitespace
+product/src/ai_ad_editor/PADDLE_OCR_NOTICE.txt -text
+docs/assets/ocr-*/** -text -whitespace
+docs/validation/evidence/ocr-*/** -text -whitespace
+docs/specs/离线OCR与文字运镜锚点契约_v0.1_2026-10-19.md text eol=lf
+docs/validation/离线OCR与文字锚点真实成片实测_2026-10-19.md text eol=lf
+docs/third-party/PP-OCRv4离线模型与许可来源_2026-10-19.md text eol=lf
+
+# R06 fixed OpenFilm source research, separate from V62 product evidence.
+scripts/audit_openfilm_r06.py -text
+scripts/sync_openfilm_r06_documents.py -text
+sources/upstream/openfilm-refresh-20261019-r06/** -text -whitespace
+docs/validation/evidence/openfilm-head-20261019-r06/** -text -whitespace
+docs/validation/evidence/openfilm-refresh-20261019-r06/** -text -whitespace
+docs/validation/evidence/openfilm-reuse-20261019-r06/** -text -whitespace
+docs/OpenFilm导出修复与纯轨道模块复用复核_2026-10-19.md text eol=lf
+
+# R07 fixed OpenFilm 0.2.1 acquisition and native source-only observations.
+scripts/audit_openfilm_r07.py -text
+scripts/audit_openfilm_r07_delivery.py -text
+scripts/sync_openfilm_r07_documents.py -text
+sources/upstream/openfilm-refresh-20261019-r07/** -text -whitespace
+docs/validation/evidence/openfilm-refresh-20261019-r07/** -text -whitespace
+docs/validation/evidence/openfilm-reuse-20261019-r07*/** -text -whitespace
+docs/OpenFilm_0.2.1复用清单与成本复核_2026-10-19.md text eol=lf
+
+# V65 native hardware execution logs, media and release receipts are byte-bound.
+docs/validation/evidence/hardware-acceleration-20261019-v65/** -text -whitespace
+docs/assets/hardware-acceleration-20261019-v65-*/** -text -whitespace
+scripts/smoke_hardware_acceleration.py -text
+scripts/verify_hardware_acceleration_install.py -text
+scripts/audit_hardware_acceleration_media.py -text
+scripts/sync_hardware_acceleration_documents.py -text
+scripts/audit_hardware_acceleration_release.py -text
+
+docs/specs/硬件编解码探测与显式回退契约_v0.1_2026-10-19.md text eol=lf
+
+docs/validation/硬件编解码与显式回退实测_2026-10-19.md text eol=lf
+
+# V66 real local outpainting, archived VACE retry and executed evidence.
+docs/validation/evidence/video-outpainting-20261019-v66/** -text -whitespace
+docs/validation/evidence/outpaint-geometry-20261019-v66-r1/** -text -whitespace
+docs/validation/evidence/vace-delivery-20261019-v66-r1/** -text -whitespace
+docs/assets/video-outpainting-20261019-v66-*/** -text -whitespace
+docs/assets/vace-delivery-20261019-v66-r1/** -text -whitespace
+
+# V67 diagnostics and R08 research retain exact native evidence bytes.
+sources/upstream/openfilm-refresh-20261020-r08/** -text -whitespace
+docs/validation/evidence/openfilm-refresh-20261020-r08/** -text -whitespace
+docs/validation/evidence/openfilm-reuse-20261020-r08*/** -text -whitespace
+docs/validation/evidence/pipeline-diagnostics-20261020-v67/** -text -whitespace
+docs/assets/pipeline-diagnostics-20261020-v67*/** -text -whitespace
+scripts/*pipeline_diagnostics*.py -text
+scripts/review_openfilm_r08.py -text
+scripts/review_openfilm_r09.py -text
+scripts/audit_openfilm_r09_delivery.py -text
+docs/validation/evidence/openfilm-recheck-20261020-r09/** -text -whitespace
+
+# V68 generated-context conditions and actual native evidence retain exact bytes.
+docs/validation/evidence/vace-temporal-context-20261020-v68/** -text -whitespace
+docs/assets/vace-temporal-context-20261020-v68*/** -text -whitespace
+scripts/*vace_temporal_context*.py -text
+docs/specs/VACE前窗生成上下文与连续输出契约_v0.1_2026-10-20.md text eol=lf
+docs/validation/VACE前窗生成上下文实测_2026-10-20.md text eol=lf
+docs/OpenFilm最新复用评估与成本取舍_2026-10-20.md text eol=lf
+docs/specs/本地模型管道诊断与有界留证契约_v0.1_2026-10-20.md text eol=lf
+docs/validation/本地模型管道诊断与回收前留证实测_2026-10-20.md text eol=lf
+scripts/*video_outpainting*.py -text
+scripts/audit_vace_retry_delivery.py -text
+scripts/probe_safetensors_window_read.py -text
+scripts/integrate_vace_pread.py -text
+docs/specs/本地视频扩图与原画面保护契约_v0.1_2026-10-19.md text eol=lf
+docs/specs/VACE本地权重读取与原生访问冲突约束_v0.1_2026-10-20.md text eol=lf
+docs/validation/本地视频扩图与原画面保护实测_2026-10-19.md text eol=lf
+docs/OpenFilm诊断模块复用与原生模型故障后续项_2026-10-20.md text eol=lf
+docs/specs/本地模型管道诊断与有界留证契约_v0.1_2026-10-20.md text eol=lf
+
+# Preserve the byte-frozen V70 executed test module; allow its terminal blank line.
+product/tests/test_queue_reuse.py whitespace=-blank-at-eof,blank-at-eol,space-before-tab,cr-at-eol
+
+# V71 native contact sheets: preserve original native receipts and media bytes.
+docs/assets/contact-sheet-20261020-v71-native-r1/** -text -whitespace
+docs/assets/contact-sheet-20261020-v71-installed-r1/** -text -whitespace
+docs/assets/contact-sheet-20261020-v71-native-r2/** -text -whitespace
+docs/assets/contact-sheet-20261020-v71-installed-r2/** -text -whitespace
+docs/validation/evidence/contact-sheet-20261020-v71/** -text -whitespace
+docs/validation/透明视频多帧联系表与Alpha核验实测_2026-10-20.md text eol=lf
+docs/specs/透明视频多帧联系表与实际时间锚点契约_v0.1_2026-10-20.md text eol=lf
+
+# V72 HTML subframe shutter: preserve raw native evidence and media.
+docs/assets/html-shutter-20261020-v72-native-r2/** -text -whitespace
+docs/assets/html-shutter-20261020-v72-installed-r1/** -text -whitespace
+docs/assets/html-shutter-20261020-v72-native-r1/** -text -whitespace
+docs/assets/html-shutter-20261020-v72-native-r3/** -text -whitespace
+docs/assets/html-shutter-20261020-v72-installed-r2/** -text -whitespace
+docs/validation/evidence/html-shutter-20261020-v72/** -text -whitespace
+docs/validation/evidence/openfilm-shutter-20261020-r10/** -text -whitespace
+docs/validation/HTML子帧快门与透明混合实测_2026-10-20.md text eol=lf
+docs/specs/HTML子帧快门采样与预乘透明合成契约_v0.1_2026-10-20.md text eol=lf
+docs/specs/HTML子帧快门采样增量设计_v0.1_2026-10-20.md text eol=lf
+
+# R11 OpenFilm 0.2.2 source research: preserve original bytes and failed observations.
+docs/validation/evidence/openfilm-022-20261020-r11/** -text -whitespace
+sources/upstream/openfilm-022-20261020-r11/** -text -whitespace
+
+# D01 native wait diagnostic evidence: preserve sampled bytes.
+docs/validation/evidence/native-wait-20261020-d01/** -text -whitespace
+
+# V73 retains native CRLF, progress/help spaces and original LUT/media bytes.
+docs/validation/evidence/lut-intensity-20261020-v73/** -text -whitespace
+docs/assets/lut-intensity-20261020-v73-*/** -text -whitespace
+docs/assets/lut-intensity-20261020-v73-LICENSE.txt -text -whitespace
+scripts/*lut*.py -text
+docs/validation/LUT强度关键帧与中性调色修复实测_2026-10-20.md text eol=lf
+docs/specs/LUT强度关键帧契约_v0.1_2026-10-20.md text eol=lf
+
+# V74 preserves native logs, stopped runs and original RGBA/PCM evidence.
+docs/validation/evidence/retime-blend-20261020-v74/** -text -whitespace
+docs/assets/retime-blend-20261020-v74-*/** -text -whitespace
+docs/assets/retime-blend-20261020-v74-LICENSE.txt -text -whitespace
+scripts/*blend_retime*.py -text
+scripts/probe_silent_retime_baseline.py -text
+docs/specs/外部混合动画与完整输出变速契约_v0.1_2026-10-20.md text eol=lf
+docs/specs/完整作者输出变速与磁吸联动契约_v0.1_2026-10-18.md text eol=lf
+docs/validation/外部混合动画变速与静音修复实测_2026-10-20.md text eol=lf
+
+# V75 preserves native receipts, original media and failed numeric validation.
+docs/validation/evidence/spatial-automation-20261020-v75/** -text -whitespace
+docs/assets/spatial-automation-20261020-v75-*/** -text -whitespace
+scripts/*spatial_automation*.py -text
+docs/specs/空间滤镜与抠像参数关键帧契约_v0.1_2026-10-20.md text eol=lf
+docs/validation/空间滤镜与抠像关键帧实测_2026-10-20.md text eol=lf
+
+# V76 retains original HSL media, failed validation, pixel and CPU cost evidence.
+docs/validation/evidence/selective-hsl-20261020-v76/** -text -whitespace
+docs/assets/selective-hsl-20261020-v76-*/** -text -whitespace
+scripts/*selective_hsl*.py -text
+docs/specs/八色分区HSL与关键帧契约_v0.1_2026-10-20.md text eol=lf
+docs/validation/八色分区HSL与离线发行实测_2026-10-20.md text eol=lf
+
+# V77 preserves native DLL/C source, executed build snapshots, failures and media.
+docs/validation/evidence/native-hsl-20261020-v77/** -text -whitespace
+docs/assets/native-hsl-20261020-v77-*/** -text -whitespace
+product/src/ai_ad_editor/native_hsl.c -text
+product/src/ai_ad_editor/avk_hsl_*.dll -text
+product/src/ai_ad_editor/native_hsl_manifest.json -text
+product/src/ai_ad_editor/NATIVE_HSL_LICENSE.txt -text
+product/setup.py -text
+scripts/*native_hsl*.py -text
+docs/specs/八色HSL原生像素内核与表达式DAG契约_v0.1_2026-10-20.md text eol=lf
+docs/validation/八色HSL原生提速与离线发行实测_2026-10-20.md text eol=lf
+
+# R12 keeps original upstream source/diff/log bytes and execution hashes intact.
+docs/validation/evidence/openfilm-023-20261020-r12/** -text -whitespace
+sources/upstream/openfilm-023-20261020-r12/** -text -whitespace
+scripts/*openfilm_r12*.py -text
+docs/OpenFilm_0.2.3增量复用与开发成本评估_2026-10-20.md text eol=lf
+docs/OpenFilm_0.2.2差异复核与复用取舍_2026-10-20.md text eol=lf
+docs/specs/OpenFilm组件参数与预览缓存接入边界_v0.1_2026-10-20.md text eol=lf
+
+# V78 keeps preview receipts, executed generators, failures and public media byte-exact.
+docs/validation/evidence/timeline-preview-20261020-v78/** -text -whitespace
+docs/assets/timeline-preview-20261020-v78-*/** -text -whitespace
+scripts/*timeline_preview*.py -text
+docs/specs/时间线帧区间预览与内容缓存契约_v0.1_2026-10-20.md text eol=lf
+docs/validation/时间线帧区间预览与离线发行实测_2026-10-20.md text eol=lf
+
+# V79 keeps component receipts, failure logs and public original media byte-exact.
+docs/validation/evidence/html-components-20261021-v79/** -text -whitespace
+docs/assets/html-components-20261021-v79-*/** -text -whitespace
+scripts/*html_components*.py -text
+docs/specs/HTML组件字段与逐片段取值契约_v0.1_2026-10-21.md text eol=lf
+docs/validation/HTML组件字段与逐片段参数离线实测_2026-10-21.md text eol=lf
+
+# R14 preserves raw upstream responses and native execution evidence.
+docs/validation/evidence/openfilm-reuse-20261021-r14/** -text -whitespace
+scripts/*openfilm_r14*.py -text
+
+# V80 candidate history and V81 keep execution, failures and media byte-exact.
+docs/validation/evidence/curve-points-20261021-v80/** -text -whitespace
+docs/validation/evidence/cfr-boundaries-20261021-*/** -text -whitespace
+docs/assets/curve-points-20261021-v80-*/** -text -whitespace
+docs/assets/cfr-boundaries-20261021-*/** -text -whitespace
+scripts/*curve_automation*.py -text
+scripts/*cfr_boundaries*.py -text
+scripts/*curve_clock*.py -text
+
+# V82 reverse evidence preserves exact native bytes.
+docs/validation/evidence/vfr-reverse-20261021-lab/** -text -whitespace
+docs/validation/evidence/vfr-reverse-chunks-20261021-v82/** -text -whitespace
+scripts/seed_reverse_chunks.py -text whitespace=cr-at-eol
+scripts/probe_reverse_chunks.py -text whitespace=cr-at-eol
+scripts/probe_reverse_orientation.py -text whitespace=cr-at-eol
+scripts/smoke_reverse_chunks.py -text whitespace=cr-at-eol
+scripts/smoke_reverse_video_clock.py -text whitespace=cr-at-eol
+scripts/verify_reverse_video_clock_install.py -text whitespace=cr-at-eol
+scripts/record_reverse_prototype.py -text whitespace=cr-at-eol
+scripts/prepare_reverse_release.py -text whitespace=cr-at-eol
+scripts/verify_reverse_chunks_install.py -text whitespace=cr-at-eol
+scripts/finalize_reverse_chunks.py -text whitespace=cr-at-eol
+
+# V82 reverse evidence preserves exact native bytes.
+docs/validation/evidence/vfr-reverse-test-oracle-20261021-r1/** -text -whitespace
+scripts/record_reverse_test_bridge.py -text whitespace=cr-at-eol
+
+# V82 retained historical CRLF license bytes.
+docs/assets/vfr-reverse-20261021-lab/installed-r1/LICENSE.txt whitespace=cr-at-eol
+docs/assets/vfr-reverse-20261021-lab/native-r1/LICENSE.txt whitespace=cr-at-eol
+docs/assets/vfr-reverse-20261021-lab/native-r2/LICENSE.txt whitespace=cr-at-eol
+docs/assets/vfr-reverse-20261021-lab/native-r3/LICENSE.txt whitespace=cr-at-eol
+docs/validation/evidence/vfr-reverse-chunks-release-20261021-r1/** -text -whitespace
+scripts/recover_reverse_chunks_release.py -text whitespace=cr-at-eol
+
+# V83 exact tested index bytes and evidence.
+docs/validation/evidence/native-frame-index-20261021-lab/** -text -whitespace
+docs/assets/native-frame-index-20261021-lab/** -text -whitespace
+product/src/ai_ad_editor/capabilities.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/cli.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/preview.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/render.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/reverse_cache.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/reverse_video_clock.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/native_video_index.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/derived_cache.py -text whitespace=cr-at-eol
+product/tests/test_native_video_index.py -text whitespace=cr-at-eol
+product/tests/test_native_video_index_ops.py -text whitespace=cr-at-eol
+product/tests/test_native_video_index_render.py -text whitespace=cr-at-eol
+scripts/smoke_native_frame_index.py -text whitespace=cr-at-eol
+scripts/verify_native_frame_index_install.py -text whitespace=cr-at-eol
+scripts/finalize_native_index_lab.py -text whitespace=cr-at-eol
+scripts/run_native_index_after_v82.py -text whitespace=cr-at-eol
+scripts/native_index_release_tools.py -text whitespace=cr-at-eol
+scripts/publish_native_frame_index.py -text whitespace=cr-at-eol
+
+# V84 exact tested native nested-clock bytes.
+docs/validation/evidence/nested-native-clock-20261021-lab/** -text -whitespace
+docs/assets/nested-native-clock-20261021-lab/** -text -whitespace
+product/src/ai_ad_editor/render.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/reverse_video_clock.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/capabilities.py -text whitespace=cr-at-eol
+product/tests/test_nested_native_clock.py -text whitespace=cr-at-eol
+product/tests/test_cli.py -text whitespace=cr-at-eol
+scripts/run_nested_native_after_index.py -text whitespace=cr-at-eol
+scripts/run_with_regression_fixtures.py -text whitespace=cr-at-eol
+scripts/run_frozen_regression.py -text whitespace=cr-at-eol
+scripts/materialize_regression_fixtures.py -text whitespace=cr-at-eol
+scripts/run_nested_native_regressions.py -text whitespace=cr-at-eol
+scripts/smoke_nested_native_clock.py -text whitespace=cr-at-eol
+scripts/verify_nested_native_clock_install.py -text whitespace=cr-at-eol
+scripts/finalize_nested_native_clock_lab.py -text whitespace=cr-at-eol
+scripts/prepare_nested_native_skills.py -text whitespace=cr-at-eol
+scripts/native_index_release_tools.py -text whitespace=cr-at-eol
+scripts/publish_nested_native_clock.py -text whitespace=cr-at-eol
+scripts/run_nested_native_after_index_r2.py -text whitespace=cr-at-eol
+scripts/run_nested_native_regressions_r2.py -text whitespace=cr-at-eol
+scripts/run_nested_contract_controls.py -text whitespace=cr-at-eol
+scripts/prepare_nested_contract_refresh.py -text whitespace=cr-at-eol
+scripts/prepare_nested_verification_r2.py -text whitespace=cr-at-eol
+scripts/audit_nested_contract_refresh.py -text whitespace=cr-at-eol
+scripts/prepare_nested_publication_r2.py -text whitespace=cr-at-eol
+scripts/publish_nested_native_clock_r2.py -text whitespace=cr-at-eol
+
+# V85 exact tested empty-window bytes.
+docs/validation/evidence/native-empty-window-20261021-lab/** -text -whitespace
+docs/assets/native-empty-window-20261021-lab/** -text -whitespace
+product/src/ai_ad_editor/reverse_video_clock.py -text whitespace=cr-at-eol
+product/tests/test_native_empty_window.py -text whitespace=cr-at-eol
+scripts/run_empty_native_after_nested.py -text whitespace=cr-at-eol
+scripts/run_frozen_regression.py -text whitespace=cr-at-eol
+scripts/run_with_regression_fixtures.py -text whitespace=cr-at-eol
+scripts/materialize_regression_fixtures.py -text whitespace=cr-at-eol
+scripts/run_empty_native_regressions.py -text whitespace=cr-at-eol
+scripts/smoke_native_empty_window.py -text whitespace=cr-at-eol
+scripts/verify_native_empty_install.py -text whitespace=cr-at-eol
+scripts/finalize_native_empty_lab.py -text whitespace=cr-at-eol
+scripts/native_index_release_tools.py -text whitespace=cr-at-eol
+scripts/publish_native_empty_window.py -text whitespace=cr-at-eol
+scripts/run_empty_native_after_nested_r2.py -text whitespace=cr-at-eol
+scripts/refresh_empty_parent_contract.py -text whitespace=cr-at-eol
+scripts/run_empty_parent_contract_controls.py -text whitespace=cr-at-eol
+scripts/audit_empty_parent_contract_refresh.py -text whitespace=cr-at-eol
+scripts/prepare_empty_verification_r2.py -text whitespace=cr-at-eol
+scripts/publish_native_empty_window_r2.py -text whitespace=cr-at-eol
+
+# V86 exact tested multicamera source-coverage bytes.
+docs/validation/evidence/multicam-source-range-20261021-lab/** -text -whitespace
+docs/assets/multicam-source-range-20261021-lab/** -text -whitespace
+product/src/ai_ad_editor/multicam.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/cli.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/capabilities.py -text whitespace=cr-at-eol
+product/tests/test_multicam_source_range.py -text whitespace=cr-at-eol
+scripts/run_multicam_after_empty.py -text whitespace=cr-at-eol
+scripts/run_frozen_regression.py -text whitespace=cr-at-eol
+scripts/run_with_regression_fixtures.py -text whitespace=cr-at-eol
+scripts/materialize_regression_fixtures.py -text whitespace=cr-at-eol
+scripts/run_multicam_related_regressions.py -text whitespace=cr-at-eol
+scripts/smoke_multicam_source_range.py -text whitespace=cr-at-eol
+scripts/verify_multicam_source_range_install.py -text whitespace=cr-at-eol
+scripts/audit_multicam_related_lab.py -text whitespace=cr-at-eol
+scripts/refresh_multicam_parent_contract.py -text whitespace=cr-at-eol
+scripts/prepare_multicam_full_gate.py -text whitespace=cr-at-eol
+scripts/finalize_multicam_source_range_lab.py -text whitespace=cr-at-eol
+scripts/prepare_multicam_isolated_verifier.py -text whitespace=cr-at-eol
+scripts/prepare_multicam_skills.py -text whitespace=cr-at-eol
+scripts/run_multicam_compatibility.py -text whitespace=cr-at-eol
+scripts/native_index_release_tools.py -text whitespace=cr-at-eol
+scripts/prepare_multicam_publication.py -text whitespace=cr-at-eol
+scripts/publish_multicam_source_range.py -text whitespace=cr-at-eol
+
+# V87 exact tested native-stream coverage bytes.
+docs/validation/evidence/multicam-stream-coverage-20261021-lab/** -text -whitespace
+docs/assets/multicam-stream-coverage-20261021-lab/** -text -whitespace
+product/src/ai_ad_editor/multicam.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/cli.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/capabilities.py -text whitespace=cr-at-eol
+product/tests/test_multicam_stream_coverage.py -text whitespace=cr-at-eol
+scripts/run_multicam_stream_after_parent.py -text whitespace=cr-at-eol
+scripts/run_frozen_regression.py -text whitespace=cr-at-eol
+scripts/run_with_regression_fixtures.py -text whitespace=cr-at-eol
+scripts/materialize_regression_fixtures.py -text whitespace=cr-at-eol
+scripts/run_stream_related_regressions_r2.py -text whitespace=cr-at-eol
+scripts/run_stream_related_regressions.py -text whitespace=cr-at-eol
+scripts/run_stream_audio_controls.py -text whitespace=cr-at-eol
+scripts/prepare_stream_audio_related.py -text whitespace=cr-at-eol
+scripts/prepare_stream_related.py -text whitespace=cr-at-eol
+scripts/prepare_stream_coverage_lab.py -text whitespace=cr-at-eol
+scripts/audit_stream_development.py -text whitespace=cr-at-eol
+scripts/smoke_multicam_stream_coverage.py -text whitespace=cr-at-eol
+scripts/verify_multicam_stream_coverage_install.py -text whitespace=cr-at-eol
+scripts/finalize_multicam_stream_lab.py -text whitespace=cr-at-eol
+scripts/prepare_stream_skills.py -text whitespace=cr-at-eol
+scripts/prepare_stream_full_gate.py -text whitespace=cr-at-eol
+scripts/prepare_stream_smoke.py -text whitespace=cr-at-eol
+scripts/prepare_stream_install_verifier.py -text whitespace=cr-at-eol
+scripts/native_index_release_tools.py -text whitespace=cr-at-eol
+scripts/prepare_stream_publication.py -text whitespace=cr-at-eol
+scripts/publish_multicam_stream_coverage.py -text whitespace=cr-at-eol
+
+# V88 exact tested native PCM source-clock bytes.
+docs/validation/evidence/audio-source-origin-20261021-lab/** -text -whitespace
+docs/assets/audio-source-origin-20261021-lab/** -text -whitespace
+product/src/ai_ad_editor/multicam.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/render.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/audio_stretch.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/capabilities.py -text whitespace=cr-at-eol
+product/tests/test_audio_source_origin.py -text whitespace=cr-at-eol
+scripts/run_audio_origin_after_parent.py -text whitespace=cr-at-eol
+scripts/run_frozen_regression.py -text whitespace=cr-at-eol
+scripts/run_with_regression_fixtures.py -text whitespace=cr-at-eol
+scripts/materialize_regression_fixtures.py -text whitespace=cr-at-eol
+scripts/run_audio_origin_related.py -text whitespace=cr-at-eol
+scripts/run_audio_origin_regressions.py -text whitespace=cr-at-eol
+scripts/probe_audio_source_origin.py -text whitespace=cr-at-eol
+scripts/smoke_audio_source_origin.py -text whitespace=cr-at-eol
+scripts/verify_audio_source_origin_install.py -text whitespace=cr-at-eol
+scripts/prepare_audio_origin_lab.py -text whitespace=cr-at-eol
+scripts/prepare_audio_origin_skills.py -text whitespace=cr-at-eol
+scripts/prepare_audio_origin_smoke.py -text whitespace=cr-at-eol
+scripts/prepare_audio_origin_install.py -text whitespace=cr-at-eol
+scripts/finalize_audio_origin_media.py -text whitespace=cr-at-eol
+scripts/finalize_audio_origin_lab.py -text whitespace=cr-at-eol
+scripts/audit_audio_origin_related.py -text whitespace=cr-at-eol
+scripts/document_audio_origin_development.py -text whitespace=cr-at-eol
+scripts/prepare_audio_origin_full_gate.py -text whitespace=cr-at-eol
+scripts/native_index_release_tools.py -text whitespace=cr-at-eol
+scripts/prepare_audio_origin_publication.py -text whitespace=cr-at-eol
+scripts/publish_audio_source_origin.py -text whitespace=cr-at-eol
+
+# V89 exact tested offline media runtime and distributable wheels.
+docs/validation/evidence/offline-media-profile-20261021-lab/** -text -whitespace
+docs/assets/offline-media-profile-20261021-lab/** -text -whitespace
+sources/python-runtime/cp313-win_amd64-media/** -text -whitespace
+product/offline/build.py -text whitespace=cr-at-eol
+product/offline/install.py -text whitespace=cr-at-eol
+product/pyproject.toml -text whitespace=cr-at-eol
+product/tests/test_offline_media_profile.py -text whitespace=cr-at-eol
+scripts/run_offline_media_after_parent.py -text whitespace=cr-at-eol
+scripts/run_frozen_regression.py -text whitespace=cr-at-eol
+scripts/run_with_regression_fixtures.py -text whitespace=cr-at-eol
+scripts/materialize_regression_fixtures.py -text whitespace=cr-at-eol
+scripts/prepare_offline_media_lab.py -text whitespace=cr-at-eol
+scripts/prepare_media_wheelhouse.py -text whitespace=cr-at-eol
+scripts/audit_media_profile_development.py -text whitespace=cr-at-eol
+scripts/prepare_media_install_verifier.py -text whitespace=cr-at-eol
+scripts/smoke_audio_source_origin.py -text whitespace=cr-at-eol
+scripts/verify_media_profile_install.py -text whitespace=cr-at-eol
+scripts/finalize_media_profile_lab.py -text whitespace=cr-at-eol
+scripts/run_media_profile_related.py -text whitespace=cr-at-eol
+scripts/prepare_media_profile_skills.py -text whitespace=cr-at-eol
+scripts/finalize_media_profile_audit.py -text whitespace=cr-at-eol
+scripts/prepare_media_full_gate.py -text whitespace=cr-at-eol
+scripts/native_index_release_tools.py -text whitespace=cr-at-eol
+scripts/prepare_media_publication.py -text whitespace=cr-at-eol
+scripts/publish_offline_media_profile.py -text whitespace=cr-at-eol
+scripts/smoke_default_media_profile.py -text whitespace=cr-at-eol
+
+# V90 immutable affine-clock media and execution receipts.
+docs/validation/evidence/multicam-affine-clock-20261021-lab/** -text -whitespace
+docs/assets/multicam-affine-clock-20261021-lab/** -text -whitespace
+
+# V91 immutable native source-audio media and execution evidence.
+docs/validation/evidence/audio-discontinuity-20261021-lab/** -text -whitespace
+docs/assets/audio-discontinuity-20261021-lab/** -text -whitespace
+
+# V92 immutable original/failed/native Float32 media and receipts.
+docs/validation/evidence/color-precision-20261021-lab/** -text -whitespace
+docs/assets/color-precision-20261021-lab/** -text -whitespace
+
+# V93 immutable host native/failed/media evidence.
+docs/validation/evidence/float-timeline-20261022-lab/** -text -whitespace
+docs/assets/float-timeline-20261022-lab/** -text -whitespace
+
+# V93 publication recovery preserves the reviewed CRLF manifest.
+video-cut-install-manifest.json -text whitespace=cr-at-eol
+scripts/recover_float_timeline_publication.py -text
+
+# R16 immutable upstream source research.
+docs/validation/evidence/openfilm-reuse-20261022-r16/** -text -whitespace
+sources/upstream/openfilm-025-20261022-r16/** -text -whitespace
+scripts/*openfilm_r16* -text whitespace=cr-at-eol
+docs/OpenFilm_0.2.5可拆模块与复用成本评估_2026-10-22.md text eol=lf
+
+# V97 cumulative Float32 delivery.
+docs/validation/evidence/float-stream-20261022-lab/** -text -whitespace
+docs/assets/float-stream-20261022-*/** -text -whitespace
+docs/validation/evidence/float-render-20261022-lab/** -text -whitespace
+docs/assets/float-render-20261022-*/** -text -whitespace
+docs/validation/evidence/float-standard-20261022-lab/** -text -whitespace
+docs/assets/float-standard-20261022-*/** -text -whitespace
+docs/validation/evidence/float-preview-20261022-lab/** -text -whitespace
+docs/assets/float-preview-20261022-*/** -text -whitespace
+docs/validation/evidence/float-delivery-20261022/** -text -whitespace
+docs/specs/agent-project.schema.json -text whitespace=cr-at-eol
+product/offline/build.py -text whitespace=cr-at-eol
+product/offline/install.py -text whitespace=cr-at-eol
+product/pyproject.toml -text whitespace=cr-at-eol
+product/setup.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/NATIVE_HSL_LICENSE.txt -text whitespace=cr-at-eol
+product/src/ai_ad_editor/OPENFILM_EXAMPLES_LICENSE.txt -text whitespace=cr-at-eol
+product/src/ai_ad_editor/OPENFILM_LICENSE.txt -text whitespace=cr-at-eol
+product/src/ai_ad_editor/OPENSEEFACE_LICENSE.txt -text whitespace=cr-at-eol
+product/src/ai_ad_editor/OPENSEEFACE_NOTICE.txt -text whitespace=cr-at-eol
+product/src/ai_ad_editor/PADDLE_OCR_LICENSE.txt -text whitespace=cr-at-eol
+product/src/ai_ad_editor/PADDLE_OCR_NOTICE.txt -text whitespace=cr-at-eol
+product/src/ai_ad_editor/PDOOM_VIDEO_LICENSE.txt -text whitespace=cr-at-eol
+product/src/ai_ad_editor/RFC3339_VALIDATOR_LICENSE.txt -text whitespace=cr-at-eol
+product/src/ai_ad_editor/__init__.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/__main__.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/ad_plan.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/agent-project.schema.json -text whitespace=cr-at-eol
+product/src/ai_ad_editor/animation.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/artifact_locks.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/asr_quality.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/audio_routing.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/audio_separation.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/audio_stretch.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/audio_tempo.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/audio_tools.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/avk_hsl_4ba3c00f517b589b.dll -text whitespace=cr-at-eol
+product/src/ai_ad_editor/batch.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/beat_edit.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/bindings.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/blend_automation.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/browser_process.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/capabilities.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/captions.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/cli.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/clip_windows.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/contact_sheet.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/convert.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/ctc_alignment.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/ctc_cli.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/ctc_worker.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/cuda_admission.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/curve_automation.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/demucs_worker.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/derived_cache.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/draft_adapter.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/edit_planner.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/effect_automation.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/effects.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/errors.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/face_cli.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/face_geometry.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/face_landmarks.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/face_worker.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/float_audio_graph.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/float_bundle.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/float_bundle_source.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/float_color_signal.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/float_composite.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/float_geometry.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/float_native_pipe.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/float_native_source.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/float_pixels.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/float_preview.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/float_raster.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/float_standard_render.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/float_stream.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/float_timeline.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/float_video_source.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/float_yuv.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/float_yuv_source.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/font_coverage.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/fragments.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/hardware_acceleration.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/hsl_native.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/hsl_program.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/html_components.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/html_motion.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/html_motion_worker.mjs -text whitespace=cr-at-eol
+product/src/ai_ad_editor/html_quality.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/html_quality_dom.mjs -text whitespace=cr-at-eol
+product/src/ai_ad_editor/html_shutter.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/html_template.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/html_template_dom.mjs -text whitespace=cr-at-eol
+product/src/ai_ad_editor/inline_sequences.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/inpainting_frames.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/lama_worker.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/library.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/local_asr.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/local_ctc.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/local_face.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/local_inpainting.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/local_matting.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/local_ocr.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/local_outpainting.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/local_segmentation.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/local_separation.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/local_tts.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/local_vace.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/local_vision.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/lut_library.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/magnetic_mode.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/magnetic_reorder.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/magnetic_sync.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/mask_edit.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/mask_edit_geometry.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/mask_review.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/mask_tracking.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/matting_frames.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/media.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/migration.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/model_registry.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/motion_presets.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/multicam.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/multicam_clock.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/native_audio_clock.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/native_hsl.c -text whitespace=cr-at-eol
+product/src/ai_ad_editor/native_hsl_manifest.json -text whitespace=cr-at-eol
+product/src/ai_ad_editor/native_video_index.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/nested_freeze.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/ocr_cli.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/ocr_geometry.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/ocr_worker.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/openfilm_frame_clock.mjs -text whitespace=cr-at-eol
+product/src/ai_ad_editor/openfilm_overrides.mjs -text whitespace=cr-at-eol
+product/src/ai_ad_editor/openfilm_stroke.mjs -text whitespace=cr-at-eol
+product/src/ai_ad_editor/openfilm_subtitle_segments.mjs -text whitespace=cr-at-eol
+product/src/ai_ad_editor/openfilm_template_fields.mjs -text whitespace=cr-at-eol
+product/src/ai_ad_editor/openfilm_text_bounds.mjs -text whitespace=cr-at-eol
+product/src/ai_ad_editor/pipeline_diagnostics.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/policy.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/preview.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/project.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/quality.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/queue_reuse.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/range_edits.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/recommend.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/render.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/render_queue.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/repair_blend.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/retime_edits.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/retime_transform.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/reverse_cache.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/reverse_video_clock.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/rfc3339_dates.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/rights.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/runtime.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/rvm_worker.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/sam2_worker.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/schema_contract.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/scopes.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/segmentation_frames.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/selective_hsl.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/separation_dsp.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/sequence_canvas.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/sequence_sampling.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/smart_cut.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/soulx_worker.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/source_edits.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/source_transitions.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/speech.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/speed_curves.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/stroke_motion.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/subtitle_clock.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/subtitle_segment_worker.mjs -text whitespace=cr-at-eol
+product/src/ai_ad_editor/subtitle_segments.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/template.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/text_highlight.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/text_layout.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/text_paint.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/text_typing.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/time_mapping.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/tracking.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/transcribe.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/understand.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/utils.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/vace_context.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/vace_frames.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/vace_model.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/vace_worker.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/validator.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/video_clock.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/vision_tracker.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/whisper_worker.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/yolo_worker.py -text whitespace=cr-at-eol
+product/tests/test_alpha_resampling.py -text whitespace=cr-at-eol
+product/tests/test_artifact_locks.py -text whitespace=cr-at-eol
+product/tests/test_atomic_io.py -text whitespace=cr-at-eol
+product/tests/test_audio_buses.py -text whitespace=cr-at-eol
+product/tests/test_audio_channel_modes.py -text whitespace=cr-at-eol
+product/tests/test_audio_discontinuity.py -text whitespace=cr-at-eol
+product/tests/test_audio_discontinuity_paths.py -text whitespace=cr-at-eol
+product/tests/test_audio_resample_precision.py -text whitespace=cr-at-eol
+product/tests/test_audio_routing.py -text whitespace=cr-at-eol
+product/tests/test_audio_source_context.py -text whitespace=cr-at-eol
+product/tests/test_audio_source_origin.py -text whitespace=cr-at-eol
+product/tests/test_audio_stretch.py -text whitespace=cr-at-eol
+product/tests/test_audio_tempo_context.py -text whitespace=cr-at-eol
+product/tests/test_audio_unity.py -text whitespace=cr-at-eol
+product/tests/test_blend_retime.py -text whitespace=cr-at-eol
+product/tests/test_bounded_hash.py -text whitespace=cr-at-eol
+product/tests/test_cfr_boundaries.py -text whitespace=cr-at-eol
+product/tests/test_cli.py -text whitespace=cr-at-eol
+product/tests/test_clip_windows.py -text whitespace=cr-at-eol
+product/tests/test_contact_sheet.py -text whitespace=cr-at-eol
+product/tests/test_ctc_alignment.py -text whitespace=cr-at-eol
+product/tests/test_cuda_admission.py -text whitespace=cr-at-eol
+product/tests/test_curve_automation.py -text whitespace=cr-at-eol
+product/tests/test_delivery_precision.py -text whitespace=cr-at-eol
+product/tests/test_draft_adapter.py -text whitespace=cr-at-eol
+product/tests/test_effect_automation.py -text whitespace=cr-at-eol
+product/tests/test_float_audio_graph.py -text whitespace=cr-at-eol
+product/tests/test_float_bundle.py -text whitespace=cr-at-eol
+product/tests/test_float_bundle_source.py -text whitespace=cr-at-eol
+product/tests/test_float_color_signal.py -text whitespace=cr-at-eol
+product/tests/test_float_composite.py -text whitespace=cr-at-eol
+product/tests/test_float_geometry.py -text whitespace=cr-at-eol
+product/tests/test_float_native_pipe.py -text whitespace=cr-at-eol
+product/tests/test_float_native_source.py -text whitespace=cr-at-eol
+product/tests/test_float_pixels.py -text whitespace=cr-at-eol
+product/tests/test_float_preview.py -text whitespace=cr-at-eol
+product/tests/test_float_raster.py -text whitespace=cr-at-eol
+product/tests/test_float_standard_render.py -text whitespace=cr-at-eol
+product/tests/test_float_stream.py -text whitespace=cr-at-eol
+product/tests/test_float_timeline.py -text whitespace=cr-at-eol
+product/tests/test_float_video_source.py -text whitespace=cr-at-eol
+product/tests/test_float_yuv.py -text whitespace=cr-at-eol
+product/tests/test_font_coverage.py -text whitespace=cr-at-eol
+product/tests/test_fragments.py -text whitespace=cr-at-eol
+product/tests/test_hardware_acceleration.py -text whitespace=cr-at-eol
+product/tests/test_hsl_native.py -text whitespace=cr-at-eol
+product/tests/test_html_components.py -text whitespace=cr-at-eol
+product/tests/test_html_motion.py -text whitespace=cr-at-eol
+product/tests/test_html_quality.py -text whitespace=cr-at-eol
+product/tests/test_html_shutter.py -text whitespace=cr-at-eol
+product/tests/test_html_template.py -text whitespace=cr-at-eol
+product/tests/test_html_url_parser.py -text whitespace=cr-at-eol
+product/tests/test_linked_edit.py -text whitespace=cr-at-eol
+product/tests/test_local_asr.py -text whitespace=cr-at-eol
+product/tests/test_local_face.py -text whitespace=cr-at-eol
+product/tests/test_local_inpainting.py -text whitespace=cr-at-eol
+product/tests/test_local_matting.py -text whitespace=cr-at-eol
+product/tests/test_local_ocr.py -text whitespace=cr-at-eol
+product/tests/test_local_segmentation.py -text whitespace=cr-at-eol
+product/tests/test_local_separation.py -text whitespace=cr-at-eol
+product/tests/test_local_tts.py -text whitespace=cr-at-eol
+product/tests/test_local_vace.py -text whitespace=cr-at-eol
+product/tests/test_local_vision.py -text whitespace=cr-at-eol
+product/tests/test_lut_automation.py -text whitespace=cr-at-eol
+product/tests/test_magnetic_mode.py -text whitespace=cr-at-eol
+product/tests/test_magnetic_reorder.py -text whitespace=cr-at-eol
+product/tests/test_mask_edit.py -text whitespace=cr-at-eol
+product/tests/test_mask_edit_geometry.py -text whitespace=cr-at-eol
+product/tests/test_mask_review.py -text whitespace=cr-at-eol
+product/tests/test_mask_tracking.py -text whitespace=cr-at-eol
+product/tests/test_multicam_affine_clock.py -text whitespace=cr-at-eol
+product/tests/test_multicam_source_range.py -text whitespace=cr-at-eol
+product/tests/test_multicam_stream_coverage.py -text whitespace=cr-at-eol
+product/tests/test_native_audio_clock.py -text whitespace=cr-at-eol
+product/tests/test_native_empty_window.py -text whitespace=cr-at-eol
+product/tests/test_native_job_start.py -text whitespace=cr-at-eol
+product/tests/test_native_video_index.py -text whitespace=cr-at-eol
+product/tests/test_native_video_index_ops.py -text whitespace=cr-at-eol
+product/tests/test_native_video_index_render.py -text whitespace=cr-at-eol
+product/tests/test_nested_frame_coverage.py -text whitespace=cr-at-eol
+product/tests/test_nested_freeze.py -text whitespace=cr-at-eol
+product/tests/test_nested_native_clock.py -text whitespace=cr-at-eol
+product/tests/test_nested_time_mapping.py -text whitespace=cr-at-eol
+product/tests/test_nested_transitions.py -text whitespace=cr-at-eol
+product/tests/test_offline_install.py -text whitespace=cr-at-eol
+product/tests/test_offline_media_profile.py -text whitespace=cr-at-eol
+product/tests/test_outpainting.py -text whitespace=cr-at-eol
+product/tests/test_pipeline_diagnostics.py -text whitespace=cr-at-eol
+product/tests/test_queue_reuse.py -text whitespace=cr-at-eol
+product/tests/test_range_edits.py -text whitespace=cr-at-eol
+product/tests/test_repair_blend.py -text whitespace=cr-at-eol
+product/tests/test_retime_edits.py -text whitespace=cr-at-eol
+product/tests/test_reverse_cache.py -text whitespace=cr-at-eol
+product/tests/test_reverse_cache_ops.py -text whitespace=cr-at-eol
+product/tests/test_reverse_cache_render.py -text whitespace=cr-at-eol
+product/tests/test_reverse_video_budget.py -text whitespace=cr-at-eol
+product/tests/test_reverse_video_clock.py -text whitespace=cr-at-eol
+product/tests/test_schema_contract.py -text whitespace=cr-at-eol
+product/tests/test_selective_hsl.py -text whitespace=cr-at-eol
+product/tests/test_sequence_canvas.py -text whitespace=cr-at-eol
+product/tests/test_sequence_compositing.py -text whitespace=cr-at-eol
+product/tests/test_sequence_sampling.py -text whitespace=cr-at-eol
+product/tests/test_source_edits.py -text whitespace=cr-at-eol
+product/tests/test_source_transitions.py -text whitespace=cr-at-eol
+product/tests/test_spatial_automation.py -text whitespace=cr-at-eol
+product/tests/test_speed_easing.py -text whitespace=cr-at-eol
+product/tests/test_stroke_motion.py -text whitespace=cr-at-eol
+product/tests/test_subtitle_clock.py -text whitespace=cr-at-eol
+product/tests/test_subtitle_segments.py -text whitespace=cr-at-eol
+product/tests/test_text_animation_composition.py -text whitespace=cr-at-eol
+product/tests/test_text_paint.py -text whitespace=cr-at-eol
+product/tests/test_timeline_preview.py -text whitespace=cr-at-eol
+product/tests/test_tracking_geometry.py -text whitespace=cr-at-eol
+product/tests/test_vace_context.py -text whitespace=cr-at-eol
+product/tests/test_word_highlight.py -text whitespace=cr-at-eol
+scripts/define_float_pipeline_schema.py -text whitespace=cr-at-eol
+scripts/derive_float_native_install.py -text whitespace=cr-at-eol
+scripts/derive_float_native_media.py -text whitespace=cr-at-eol
+scripts/derive_float_native_publication.py -text whitespace=cr-at-eol
+scripts/float_delivery_bundle.py -text whitespace=cr-at-eol
+scripts/float_delivery_docs.py -text whitespace=cr-at-eol
+scripts/float_native_release_docs.py -text whitespace=cr-at-eol
+scripts/float_preview_release_docs.py -text whitespace=cr-at-eol
+scripts/float_standard_release_docs.py -text whitespace=cr-at-eol
+scripts/float_stream_release_docs.py -text whitespace=cr-at-eol
+scripts/materialize_regression_fixtures.py -text whitespace=cr-at-eol
+scripts/prepare_float_preview_install_driver.py -text whitespace=cr-at-eol
+scripts/prepare_float_preview_lab.py -text whitespace=cr-at-eol
+scripts/prepare_float_preview_media_driver.py -text whitespace=cr-at-eol
+scripts/prepare_float_preview_publisher.py -text whitespace=cr-at-eol
+scripts/prepare_float_render_lab.py -text whitespace=cr-at-eol
+scripts/prepare_float_standard_lab.py -text whitespace=cr-at-eol
+scripts/prepare_float_stream_lab.py -text whitespace=cr-at-eol
+scripts/prepare_float_stream_recovery_owner.py -text whitespace=cr-at-eol
+scripts/probe_float_delivery_alpha.py -text whitespace=cr-at-eol
+scripts/probe_float_delivery_color.py -text whitespace=cr-at-eol
+scripts/probe_float_preview_black.py -text whitespace=cr-at-eol
+scripts/probe_float_preview_formats.py -text whitespace=cr-at-eol
+scripts/publish_float_delivery.py -text whitespace=cr-at-eol
+scripts/publish_float_native.py -text whitespace=cr-at-eol
+scripts/publish_float_preview.py -text whitespace=cr-at-eol
+scripts/publish_float_standard.py -text whitespace=cr-at-eol
+scripts/publish_float_stream.py -text whitespace=cr-at-eol
+scripts/record_float_native_discovery.py -text whitespace=cr-at-eol
+scripts/record_float_native_review.py -text whitespace=cr-at-eol
+scripts/record_float_preview_review.py -text whitespace=cr-at-eol
+scripts/record_float_standard_review.py -text whitespace=cr-at-eol
+scripts/release_float_delivery_after_complete.py -text whitespace=cr-at-eol
+scripts/release_float_native_after_complete.py -text whitespace=cr-at-eol
+scripts/release_float_preview_after_complete.py -text whitespace=cr-at-eol
+scripts/release_float_standard_after_complete.py -text whitespace=cr-at-eol
+scripts/release_float_stream_after_complete.py -text whitespace=cr-at-eol
+scripts/run_float_audio_tests.py -text whitespace=cr-at-eol
+scripts/run_float_delivery_complete.py -text whitespace=cr-at-eol
+scripts/run_float_native_complete.py -text whitespace=cr-at-eol
+scripts/run_float_native_tests.py -text whitespace=cr-at-eol
+scripts/run_float_preview_complete.py -text whitespace=cr-at-eol
+scripts/run_float_standard_complete.py -text whitespace=cr-at-eol
+scripts/run_float_stream_complete.py -text whitespace=cr-at-eol
+scripts/run_float_stream_complete_r2.py -text whitespace=cr-at-eol
+scripts/run_float_stream_tests.py -text whitespace=cr-at-eol
+scripts/run_frozen_regression.py -text whitespace=cr-at-eol
+scripts/run_with_regression_fixtures.py -text whitespace=cr-at-eol
+scripts/smoke_float_native_media.py -text whitespace=cr-at-eol
+scripts/smoke_float_preview_media.py -text whitespace=cr-at-eol
+scripts/smoke_float_standard_media.py -text whitespace=cr-at-eol
+scripts/smoke_float_stream_media.py -text whitespace=cr-at-eol
+scripts/update_float_native_progress.py -text whitespace=cr-at-eol
+scripts/update_float_preview_progress.py -text whitespace=cr-at-eol
+scripts/update_float_standard_progress.py -text whitespace=cr-at-eol
+scripts/update_float_stream_progress.py -text whitespace=cr-at-eol
+scripts/verify_float_native_install.py -text whitespace=cr-at-eol
+scripts/verify_float_preview.py -text whitespace=cr-at-eol
+scripts/verify_float_preview_install.py -text whitespace=cr-at-eol
+scripts/verify_float_standard.py -text whitespace=cr-at-eol
+scripts/verify_float_standard_install.py -text whitespace=cr-at-eol
+scripts/verify_float_stream_install.py -text whitespace=cr-at-eol
+
+# V98 immutable original/failed/native media and source evidence.
+docs/validation/evidence/float-exposure-20261022-lab/** -text -whitespace
+docs/assets/float-exposure-20261022-*/** -text -whitespace
+product/src/ai_ad_editor/capabilities.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/float_exposure.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/float_timeline.py -text whitespace=cr-at-eol
+product/tests/test_float_exposure.py -text whitespace=cr-at-eol
+product/tests/test_float_preview.py -text whitespace=cr-at-eol
+
+# V99 immutable original/failed/native media and source evidence.
+docs/validation/evidence/float-mask-20261022-lab/** -text -whitespace
+docs/assets/float-mask-20261022-*/** -text -whitespace
+product/src/ai_ad_editor/capabilities.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/float_mask.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/float_timeline.py -text whitespace=cr-at-eol
+product/tests/test_float_mask.py -text whitespace=cr-at-eol
+product/tests/test_float_timeline.py -text whitespace=cr-at-eol
+
+# V100 immutable original/failed/native media and source evidence.
+docs/validation/evidence/float-crop-20261022-lab/** -text -whitespace
+docs/assets/float-crop-20261022-*/** -text -whitespace
+product/src/ai_ad_editor/capabilities.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/float_crop.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/float_timeline.py -text whitespace=cr-at-eol
+product/tests/test_float_crop.py -text whitespace=cr-at-eol
+product/tests/test_float_timeline.py -text whitespace=cr-at-eol
+
+# V101 immutable original/failed/native media and source evidence.
+docs/validation/evidence/float-lut-20261022-lab/** -text -whitespace
+docs/assets/float-lut-20261022-*/** -text -whitespace
+product/src/ai_ad_editor/capabilities.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/float_effect_chain.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/float_lut.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/float_standard_render.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/float_timeline.py -text whitespace=cr-at-eol
+product/tests/test_float_lut.py -text whitespace=cr-at-eol
+
+# V102 immutable original/failed/native media and source evidence.
+docs/validation/evidence/float-curves-20261022-lab/** -text -whitespace
+docs/assets/float-curves-20261022-*/** -text -whitespace
+product/src/ai_ad_editor/capabilities.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/float_curves.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/float_effect_chain.py -text whitespace=cr-at-eol
+product/src/ai_ad_editor/validator.py -text whitespace=cr-at-eol
+product/tests/test_float_curves.py -text whitespace=cr-at-eol
+
+# R17 immutable upstream research, raw failures and source archive.
+docs/validation/evidence/openfilm-reuse-20261022-r17/** -text -whitespace
+sources/upstream/openfilm-025-20261022-r17/** -text -whitespace
+scripts/*openfilm_r17* -text whitespace=cr-at-eol
+docs/OpenFilm当前复用建议与导出恢复增量_2026-10-22.md text eol=lf
+
+scripts/publish_research_recovery_20261023.py -text whitespace=cr-at-eol
+
+# R111 final snapshot: preserve source, native failures, raw media and drivers.
+product/** -text whitespace=cr-at-eol
+docs/specs/agent-project.schema.json -text whitespace=cr-at-eol
+scripts/* -text whitespace=cr-at-eol
+docs/validation/evidence/float-*/** -text -whitespace
+docs/validation/evidence/pipeline-recovery-20261023/** -text -whitespace
+docs/assets/float-*/** -text -whitespace

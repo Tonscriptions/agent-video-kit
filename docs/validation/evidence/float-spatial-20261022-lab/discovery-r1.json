@@ -1,0 +1,23 @@
+{
+  "status": "passed-actual-discovery-not-suite-execution",
+  "at_utc": "2026-10-22T15:13:50.932787+00:00",
+  "command": [
+    "C:\\Python313\\python.exe",
+    "-E",
+    "-B",
+    "-X",
+    "utf8",
+    "-c",
+    "import sys,unittest,json;sys.path[:0]=[sys.argv[1],sys.argv[2]];from ai_ad_editor.runtime import configure_local_runtime;configure_local_runtime();print(json.dumps({\"full_discovered\":unittest.defaultTestLoader.discover(sys.argv[2]).countTestCases(),\"installed_discovered\":unittest.defaultTestLoader.loadTestsFromNames(json.loads(sys.argv[3])).countTestCases(),\"methods_run\":0}))",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\float-spatial-lab-20261022\\product\\src",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\float-spatial-lab-20261022\\product\\tests",
+    "[\"test_float_raster\", \"test_float_geometry\", \"test_float_pixels\", \"test_float_video_source\", \"test_float_yuv\", \"test_float_color_signal\", \"test_float_bundle\", \"test_queue_reuse\", \"test_float_composite\", \"test_float_timeline\", \"test_float_bundle_source\", \"test_float_audio_graph\", \"test_float_stream\", \"test_float_native_pipe\", \"test_float_native_source\", \"test_float_standard_render\", \"test_timeline_preview\", \"test_float_preview\", \"test_float_exposure\", \"test_float_mask\", \"test_float_crop\", \"test_float_lut\", \"test_float_curves\", \"test_float_levels\", \"test_float_balance\", \"test_float_selective_hsl\", \"test_float_tone\", \"test_float_gaussian\", \"test_float_spatial\"]"
+  ],
+  "stdout": "{\"full_discovered\": 2774, \"installed_discovered\": 679, \"methods_run\": 0}\r\n",
+  "stderr": "",
+  "full_discovered": 2774,
+  "installed_discovered": 679,
+  "methods_run": 0,
+  "frozen_input_count": 326,
+  "frozen_equal": true
+}

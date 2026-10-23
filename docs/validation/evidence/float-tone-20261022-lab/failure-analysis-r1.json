@@ -1,0 +1,20 @@
+{
+  "status": "passed-preserved-failure-and-scoped-correction-review",
+  "first_source_sha256": "sha256:4707142b76517243b4d54c14ed486a1964159a071661b3ed736f95fb998e6e78",
+  "accepted_source_sha256": "sha256:4371736b238394d630a2db00f454be6dd359fe95797fa226f08f2f3a6b934da6",
+  "first_source_methods": 44,
+  "first_source_seconds": 81.67062059999444,
+  "first_source_failures": 0,
+  "first_source_errors": 1,
+  "first_source_skips": 0,
+  "source_changes_since_first_run": [
+    "product/tests/test_float_tone.py"
+  ],
+  "runtime_or_tolerance_changed": false,
+  "test_cause": "The test omitted the required two/four Bezier control values; the product correctly rejected it.",
+  "test_fix": "Only provide direct linear Bezier controls 1/3 and 2/3 in the six-easing fixture.",
+  "native_fractional_code_limit": 1.01,
+  "media_linear_tolerance": 2e-06,
+  "failure_receipts_overwritten": false,
+  "full_capcut_parity": false
+}

@@ -1,0 +1,93 @@
+{
+  "status": "passed-official-n8.1-source-and-actual-local-binary-reference",
+  "at_utc": "2026-10-22T17:46:24.375520+00:00",
+  "purpose": "development-only official source and native option reference",
+  "sources": [
+    {
+      "url": "https://api.github.com/repos/FFmpeg/FFmpeg/contents/libavfilter/vf_colorkey.c?ref=n8.1",
+      "http_status": 200,
+      "file": "vf_colorkey.c.txt",
+      "bytes": 11320,
+      "sha256": "sha256:30e76c5de42a44c36fc424d4e4e48af1d008e6f5cd34f3e7d59a03fd44817283",
+      "git_blob_sha1": "4781e53bb2eed2e905d45c7c76d644788d3ad10b"
+    },
+    {
+      "url": "https://api.github.com/repos/FFmpeg/FFmpeg/contents/libavfilter/vf_chromakey.c?ref=n8.1",
+      "http_status": 200,
+      "file": "vf_chromakey.c.txt",
+      "bytes": 14413,
+      "sha256": "sha256:81fabff8f710e75fae2a2cf55fff036c7308c96776346b0fbd01e76f59b96509",
+      "git_blob_sha1": "e5a7ac15b5e6c86e7141c9755c4f8abfec47bc27"
+    }
+  ],
+  "calls": [
+    {
+      "name": "version",
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.exe",
+        "-version"
+      ],
+      "exit_code": 0,
+      "stdout": {
+        "file": "version.stdout.log",
+        "sha256": "sha256:40cbd764aa9f5e9ae10b41da9e53fc901c606832f05af38f67ec763a580020c5"
+      },
+      "stderr": {
+        "file": "version.stderr.log",
+        "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "colorkey",
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.exe",
+        "-hide_banner",
+        "-h",
+        "filter=colorkey"
+      ],
+      "exit_code": 0,
+      "stdout": {
+        "file": "colorkey.stdout.log",
+        "sha256": "sha256:613ac1f14191310a4310936a1bbb440180a0582d3aa84a87ca1666ccbfa515a3"
+      },
+      "stderr": {
+        "file": "colorkey.stderr.log",
+        "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "chromakey",
+      "command": [
+        "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.exe",
+        "-hide_banner",
+        "-h",
+        "filter=chromakey"
+      ],
+      "exit_code": 0,
+      "stdout": {
+        "file": "chromakey.stdout.log",
+        "sha256": "sha256:a1593fd72e7f06bedb8db98f72d7a4823a96b6d6bd7328f368d3ec7bef06e8d0"
+      },
+      "stderr": {
+        "file": "chromakey.stderr.log",
+        "sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "runtime_network_added": false,
+  "copied_C_into_runtime": false,
+  "native_windows": true,
+  "virtualization": false,
+  "transport": "api",
+  "reference_license": {
+    "license": "LGPL-2.1-or-later",
+    "original_source": "E:\\dev\\sandbox\\AI广告剪辑\\sources\\upstream\\ffmpeg\\COPYING.LGPLv2.1",
+    "file": "COPYING.LGPLv2.1.txt",
+    "sha256": "sha256:37828f96b745455c387a19946bc005b5e0b7c4cef782bbd67e9de5130d7d0bdc"
+  },
+  "local_binary": {
+    "path": "C:\\Users\\carzy\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-8.1-full_build\\bin\\ffmpeg.exe",
+    "sha256": "sha256:d1e2a156261ecc675081943197a85f08f2868784a0af499171ede89353edad31"
+  },
+  "finished_at_utc": "2026-10-22T17:46:28.320444+00:00"
+}

@@ -1,0 +1,122 @@
+"""Own source proof -> real install -> existing full/publication finisher.
+
+This immediate task process is native Windows and does not schedule jobs.
+It freezes the candidate without changing any earlier release owner.
+"""
+from datetime import datetime,timezone
+import ctypes
+from ctypes import wintypes
+import json
+import os
+from pathlib import Path
+import subprocess
+import sys
+import time
+
+ROOT=Path(__file__).resolve().parents[3]
+WORK=ROOT/'product/.runtime/float-gaussian-20261022'
+REL=ROOT/'docs/validation/evidence/float-gaussian-20261022-lab'
+sys.path.insert(0,str(ROOT/'scripts'))
+from run_frozen_regression import frozen,sha
+
+def read(path):
+    for i in range(12):
+        try:return json.loads(path.read_bytes())
+        except (OSError,ValueError):
+            if i==11:raise
+            time.sleep(.025)
+
+def save(path,value):
+    temporary=path.with_name(path.name+'.tmp')
+    temporary.write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n',encoding='utf8')
+    temporary.replace(path)
+
+def live(pid):
+    kernel=ctypes.WinDLL('kernel32',use_last_error=True)
+    kernel.OpenProcess.argtypes=[wintypes.DWORD,wintypes.BOOL,wintypes.DWORD];kernel.OpenProcess.restype=wintypes.HANDLE
+    kernel.GetExitCodeProcess.argtypes=[wintypes.HANDLE,ctypes.POINTER(wintypes.DWORD)]
+    kernel.CloseHandle.argtypes=[wintypes.HANDLE]
+    handle=kernel.OpenProcess(0x1000,False,pid)
+    if not handle:return False
+    try:
+        code=wintypes.DWORD()
+        return bool(kernel.GetExitCodeProcess(handle,ctypes.byref(code))) and code.value==259
+    finally:kernel.CloseHandle(handle)
+
+def main():
+    work=WORK/'continuation-r1';work.mkdir(exist_ok=False)
+    source=frozen();assert len(source)==323
+    scripts={p.relative_to(ROOT).as_posix():sha(p) for p in (ROOT/'scripts').glob('*.py')};assert len(scripts)==16
+    contact=ROOT/'docs/assets/float-gaussian-20261022-r1/contact.png'
+    state={'status':'waiting-for-actual-source420','pid':os.getpid(),
+           'started_at_utc':datetime.now(timezone.utc).isoformat(),'frozen_inputs':source,'ROOT_scripts':scripts,
+           'actual_contact_viewed_before_start':True,'viewed_contact_sha256':sha(contact),
+           'native_windows':True,'virtualization':False,'main_mutated':False,'force_push':False,'full_capcut_parity':False}
+    children=[]
+    def checkpoint():
+        state['updated_at_utc']=datetime.now(timezone.utc).isoformat();save(work/'run.json',state)
+    def verify():
+        assert frozen()==source
+        assert all(sha(ROOT/n)==v for n,v in scripts.items())
+        assert sha(contact)==state['viewed_contact_sha256']
+    def run(name,command):
+        with (work/(name+'.log')).open('xb') as stream:
+            process=subprocess.run(command,cwd=ROOT,stdout=stream,stderr=subprocess.STDOUT,creationflags=subprocess.CREATE_NO_WINDOW)
+        assert process.returncode==0,(name,process.returncode)
+    def spawn(name,script):
+        stream=(work/(name+'.log')).open('xb')
+        command=[sys.executable,'-E','-B','-X','utf8',str(script)]
+        process=subprocess.Popen(command,cwd=ROOT,stdout=stream,stderr=subprocess.STDOUT,creationflags=subprocess.CREATE_NO_WINDOW)
+        children.append((process,stream))
+        state.setdefault('children',{})[name]={'pid':process.pid,'command':command};checkpoint()
+        return process
+    checkpoint()
+    try:
+        while True:
+            native=read(REL/'native-r2/verification.json')
+            assert not native['status'].startswith('failed'),native.get('error',native['status'])
+            if native['status']=='passed':break
+            assert native['status']=='running' and live(native['pid']),'Original source owner is not live; preserve state for recovery'
+            time.sleep(5)
+        assert native['methods']==420 and native['skipped']==0
+        assert native['frozen_before']==native['frozen_after']==source
+        media=read(REL/'media-r1/verification.json')
+        assert media['status']=='passed-public-CLI-floating-Gaussian-and-native-float-previews'
+        assert media['frozen_before']==media['frozen_after']==source
+        verify()
+        state['status']='recording-actual-source-media-and-reviewed-contact';checkpoint()
+        run('record-reviewed-source-media',[sys.executable,'-E','-B','-X','utf8',str(WORK/'record_gaussian_observations.py'),'--contact-viewed'])
+        observation=read(REL/'static-review-r1.json')
+        assert observation['status']=='passed-static-contact-and-GIF-clock-review'
+        assert observation['contact_sha256']==sha(contact) and observation['viewed_panels']==6
+        assert read(REL/'release-driver-review-r1.json')['ROOT_scripts']==scripts
+        assert read(REL/'discovery-r1.json')['discovered_methods']==2715
+        state['observations_executed_after_source_proof']=True
+        verify()
+        install=spawn('verify_float_gaussian_install',ROOT/'scripts/verify_float_gaussian_install.py')
+        installed_path=REL/'installed-r1/verification.json'
+        while not installed_path.exists():
+            assert install.poll() is None,'Install owner ended before recording its actual state'
+            time.sleep(.2)
+        run('readme-preview-r1',[sys.executable,'-E','-B','-X','utf8',str(ROOT/'scripts/float_gaussian_release_docs.py'),'--revision','r1'])
+        verify()
+        finisher=spawn('finish_float_gaussian_chain',ROOT/'scripts/finish_float_gaussian_chain.py')
+        state['status']='running-installed620-and-automatic-finisher';checkpoint()
+        while finisher.poll() is None:
+            if install.poll() is not None:assert install.returncode==0,('installed620',install.returncode)
+            time.sleep(5)
+        assert finisher.returncode==0,('automatic-finisher',finisher.returncode)
+        terminal=read(WORK/'finish-chain-r1/run.json')
+        assert terminal['status']=='published-V107-full2715-installed620'
+        assert terminal['commit']==terminal['remote_main']
+        state.update(status=terminal['status'],main_mutated=True,commit=terminal['commit'],remote_main=terminal['remote_main'])
+    except BaseException as exc:
+        state.update(status='failed-preserved',error=repr(exc));raise
+    finally:
+        state['child_exit_codes']={str(p.pid):p.poll() for p,s in children}
+        for process,stream in children:stream.close()
+        checkpoint()
+        (REL/'continuation-r1.executed-owner.py.txt').write_bytes(Path(__file__).read_bytes())
+        print(json.dumps({k:state.get(k) for k in ['status','pid','commit','error']}),flush=True)
+
+if __name__=='__main__':main()

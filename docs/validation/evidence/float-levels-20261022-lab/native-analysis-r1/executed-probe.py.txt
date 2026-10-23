@@ -1,0 +1,40 @@
+"""Read-only native planar auto-endpoint diagnosis, raw inputs retained."""
+import hashlib
+import json
+import os
+from pathlib import Path
+import subprocess
+import sys
+
+import numpy as np
+
+ROOT = Path(__file__).resolve().parents[4]
+sys.path[:0] = [str(ROOT/'product/src')]
+from ai_ad_editor.runtime import configure_local_runtime
+from ai_ad_editor.media import ffmpeg_path,ffmpeg_version
+configure_local_runtime()
+OUT = Path(__file__).resolve().parent
+rows = []
+for n,(low,high) in enumerate(((.1,.9),(.2,.8),(.1,.9))):
+    a = np.ones((4,64,4),np.float32)
+    a[...,0] = np.linspace(.3,.7,64,dtype=np.float32)
+    a[...,1] = np.linspace(low,high,64,dtype=np.float32)
+    a[...,2] = .5
+    payload = np.moveaxis(a[...,[1,2,0,3]],2,0).astype('<f4').tobytes()
+    command = [ffmpeg_path(),'-nostdin','-v','error','-f','rawvideo','-pixel_format','gbrapf32le',
+        '-video_size','64x4','-i','pipe:0','-vf','colorlevels=rimin=-1:rimax=-1',
+        '-frames:v','1','-threads','1','-pix_fmt','gbrapf32le','-f','rawvideo','pipe:1']
+    p = subprocess.run(command,input=payload,capture_output=True,check=True,creationflags=subprocess.CREATE_NO_WINDOW)
+    (OUT/f'case-{n}.input.gbrapf32').write_bytes(payload);(OUT/f'case-{n}.output.gbrapf32').write_bytes(p.stdout)
+    (OUT/f'case-{n}.stderr.txt').write_bytes(p.stderr)
+    out = np.frombuffer(p.stdout,'<f4').reshape(4,4,64)[2]
+    rows.append({'green_range':[low,high],'red_input_range':[float(a[...,0].min()),float(a[...,0].max())],
+        'native_red_range':[float(out.min()),float(out.max())],
+        'input_sha256':hashlib.sha256(payload).hexdigest(),'output_sha256':hashlib.sha256(p.stdout).hexdigest(),
+        'red_output_sha256':hashlib.sha256(out.tobytes()).hexdigest(),'command':command,'exit_code':p.returncode})
+record = {'status':'captured-native-planar-auto-cross-channel-observation','native_version':ffmpeg_version(),
+    'cases':rows,'original_red_input_unchanged':True,'different_green_changes_native_red':rows[0]['red_output_sha256']!=rows[1]['red_output_sha256'],
+    'repeat_red_output_equal':rows[0]['red_output_sha256']==rows[2]['red_output_sha256'],
+    'native_bug_is_not_product_semantics':True,'product_modified':False,'network':False,'virtualization':False}
+(OUT/'verification.json').write_text(json.dumps(record,ensure_ascii=False,indent=2)+'\n',encoding='utf8')
+print(json.dumps(record,ensure_ascii=False))

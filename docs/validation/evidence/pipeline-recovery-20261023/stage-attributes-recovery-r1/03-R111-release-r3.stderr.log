@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\run_native_persistent_owner_20261023.py", line 42, in <module>
+    runpy.run_path(str(script),run_name='__main__')
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen runpy>", line 287, in run_path
+  File "<frozen runpy>", line 98, in _run_module_code
+  File "<frozen runpy>", line 88, in _run_code
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\pipeline-recovery-lab-20261023\product\.runtime\pipeline-recovery-20261023\publish_after_baseline_stage_r3.py", line 158, in <module>
+    if __name__=='__main__':main()
+                            ~~~~^^
+  File "E:\dev\sandbox\AI广告剪辑\product\.runtime\pipeline-recovery-lab-20261023\product\.runtime\pipeline-recovery-20261023\publish_after_baseline_stage_r3.py", line 114, in main
+    compared=helper.staged_rows(rows);git(stage,'diff','--cached','--check')
+  File "E:\dev\sandbox\AI广告剪辑\scripts\native_index_release_tools.py", line 40, in staged_rows
+    assert 'sha256:' + value.hexdigest() == digest, name
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: .gitattributes

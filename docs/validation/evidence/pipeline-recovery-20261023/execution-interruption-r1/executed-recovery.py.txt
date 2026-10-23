@@ -1,0 +1,139 @@
+"""Retain interrupted evidence and prepare fresh owners without changing product bytes."""
+from datetime import datetime,timezone
+import ctypes
+from ctypes import wintypes
+import hashlib
+import importlib.util
+import json
+import os
+from pathlib import Path
+import shutil
+
+MAIN=Path(__file__).resolve().parents[2]
+R111=MAIN/'product/.runtime/pipeline-recovery-lab-20261023'
+R112=MAIN/'product/.runtime/float-shaper-lab-20261023'
+SKILLS=MAIN/'product/.runtime/float-skill-sync-20261023-r2'
+A=R111/'product/.runtime/pipeline-recovery-20261023'
+B=R112/'product/.runtime/float-shaper-20261023'
+AR=R111/'docs/validation/evidence/pipeline-recovery-20261023'
+BR=R112/'docs/validation/evidence/float-shaper-20261023-lab'
+SR=SKILLS/'docs/validation/evidence/float-skill-sync-20261023'
+
+
+def read(p):return json.loads(p.read_bytes())
+def sha(p):return 'sha256:'+hashlib.sha256(p.read_bytes()).hexdigest()
+def save(p,d):
+    p.parent.mkdir(parents=True,exist_ok=True)
+    temporary=p.with_name(p.name+'.'+str(os.getpid())+'.tmp')
+    temporary.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n',encoding='utf8',newline='\n')
+    os.replace(temporary,p)
+def frozen(root,name):
+    spec=importlib.util.spec_from_file_location(name,root/'scripts/run_frozen_regression.py')
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);return module.frozen()
+def write(p,t):
+    assert not p.exists(),p
+    p.write_text(t,encoding='utf8',newline='\n')
+
+
+def main():
+    missing=[]
+    kernel=ctypes.WinDLL('kernel32',use_last_error=True)
+    kernel.OpenProcess.argtypes=[wintypes.DWORD,wintypes.BOOL,wintypes.DWORD]
+    kernel.OpenProcess.restype=wintypes.HANDLE
+    kernel.CloseHandle.argtypes=[wintypes.HANDLE]
+    for pid in [15148,39288,43988,41892,40056,10792,32336,15724]:
+        handle=kernel.OpenProcess(0x1000,False,pid)
+        if handle:kernel.CloseHandle(handle);raise AssertionError(('prior PID is live; do not restart',pid))
+        assert ctypes.get_last_error()==87,(pid,ctypes.get_last_error())
+        missing.append(pid)
+    probe=MAIN/'product/.runtime/native-wmi-probe-20261023'
+    assert read(probe/'entered.json')['in_job'] is False
+    assert read(probe/'completed.json')['status']=='completed-after-launcher-exit'
+    parent=read(A/'complete-r1/run.json');child=read(B/'complete-r2/run.json')
+    assert frozen(R111,'recovery_parent_frozen')==parent['frozen_inputs']
+    assert frozen(R112,'recovery_shaper_frozen')==child['frozen_inputs']
+    for root,state in [(R111,parent),(R112,child)]:
+        assert {p.relative_to(root).as_posix():sha(p) for p in sorted((root/'scripts').iterdir()) if p.is_file()}==state['verification_scripts']
+    assert parent['suite_launched'] and not child['suite_launched']
+    receipt=dict(status='verified-native-owners-missing-before-recovery',at_utc=datetime.now(timezone.utc).isoformat(),
+        missing_pids=missing,probe_entered=read(probe/'entered.json'),probe_completed=read(probe/'completed.json'),
+        session_job_observed_limit_flags=10240,session_job_kill_on_close=True,session_job_breakaway_allowed=True,
+        remaining_outer_job_flags_after_breakaway=8192,breakaway_alone_does_not_remove_outer_job=True,
+        independent_native_provider_probe_completed=True,
+        cause_of_interruption='not independently established; session job lifetime is an observed recovery risk',
+        parent_suite_started=True,parent_terminal_result=False,parent_completed_methods_unknown=True,
+        shaper_suite_started=False,shaper_completed_methods=0,main_mutated=False,
+        source330_and331_unchanged=True,source_and_installed_success_receipts_reused_without_rerun=True)
+    destinations=[AR/'execution-interruption-r1',BR/'execution-interruption-r1',SR/'execution-interruption-r1']
+    for destination in destinations:
+        destination.mkdir(parents=True,exist_ok=False)
+        save(destination/'verification.json',receipt)
+        shutil.copyfile(Path(__file__),destination/'executed-recovery.py.txt')
+        shutil.copyfile(MAIN/'product/.runtime/run_native_persistent_owner_20261023.py',destination/'native-owner-bootstrap.py.txt')
+    owners=[(A/'complete-r1/run.json',destinations[0]),(A/'release-r1/run.json',destinations[0]),
+        (B/'complete-r2/run.json',destinations[1]),(B/'release-r2/run.json',destinations[1]),
+        (SKILLS/'product/.runtime/release-r1/run.json',destinations[2])]
+    for p,destination in owners:
+        before=read(p);shutil.copyfile(p,destination/(p.parent.name+'-owner-before.json'))
+        assert not before.get('main_mutated',False)
+        before.update(status='failed-preserved-owner-process-missing',terminal_result=False,
+            process_disappearance_verified_at_utc=receipt['at_utc'],interruption_evidence=str(destination/'verification.json'),
+            error='Authoritative native PID missing; no final suite/publication result. Prior bytes retained.')
+        save(p,before)
+    for name in ['full-r1.json','full-r1.source.json','full-r1.source.log']:
+        p=AR/name
+        if p.exists():shutil.copyfile(p,destinations[0]/name)
+    for root,names,destination in [(R111,['pipeline_recovery_release_docs.py','run_pipeline_complete.py','publish_pipeline_after_complete.py'],destinations[0]),
+        (R112,['float_shaper_release_docs.py','run_float_shaper_complete_r2.py','publish_float_shaper_after_complete_r2.py'],destinations[1])]:
+        for name in names:shutil.copyfile(root/'scripts'/name,destination/(name+'.before.txt'))
+    t=(R111/'scripts/run_pipeline_complete.py').read_text(encoding='utf8')
+    assert t.count('/complete-r1')==1
+    t=t.replace('/complete-r1','/complete-r2').replace("'full-r1.json'","'full-r2.json'").replace("'external-fixtures-r1.json'","'external-fixtures-r2.json'")
+    write(R111/'scripts/run_pipeline_complete_r2.py',t)
+    t=(R111/'scripts/publish_pipeline_after_complete.py').read_text(encoding='utf8')
+    t=t.replace('/release-r1','/release-r2').replace('/complete-r1','/complete-r2')
+    write(R111/'scripts/publish_pipeline_after_complete_r2.py',t)
+    p=R111/'scripts/pipeline_recovery_release_docs.py';t=p.read_text(encoding='utf8')
+    assert t.count('full-r1.json')==2
+    t=t.replace('full-r1.json','full-r2.json')
+    needle='未启动的旧 V104–R109 完整回归继续登记为未执行。'
+    assert t.count(needle)==1
+    t=t.replace(needle,needle+' 本轮第一次完整回归的原生进程中途消失，没有终结结果；原状态和部分日志保存在[中断记录](evidence/pipeline-recovery-20261023/execution-interruption-r1/verification.json)。其通过数未知，不登记为成功；使用同一产品输入另开完整回归，不重跑已有安装成功证明。')
+    p.write_text(t,encoding='utf8',newline='\n')
+    t=(R112/'scripts/run_float_shaper_complete_r2.py').read_text(encoding='utf8')
+    t=t.replace('/float-shaper-20261023/complete-r2','/float-shaper-20261023/complete-r3')
+    t=t.replace('/pipeline-recovery-20261023/complete-r1','/pipeline-recovery-20261023/complete-r2')
+    t=t.replace('/pipeline-recovery-20261023/release-r1','/pipeline-recovery-20261023/release-r2')
+    write(R112/'scripts/run_float_shaper_complete_r3.py',t)
+    t=(R112/'scripts/publish_float_shaper_after_complete_r2.py').read_text(encoding='utf8')
+    t=t.replace('/float-shaper-20261023/release-r2','/float-shaper-20261023/release-r3')
+    t=t.replace('/float-shaper-20261023/complete-r2','/float-shaper-20261023/complete-r3')
+    t=t.replace('/pipeline-recovery-20261023/release-r1','/pipeline-recovery-20261023/release-r2')
+    write(R112/'scripts/publish_float_shaper_after_complete_r3.py',t)
+    p=R112/'scripts/float_shaper_release_docs.py';t=p.read_text(encoding='utf8')
+    needle="    report+=link(REPORT,CONTRACT,'完整契约与一手格式来源')"
+    assert t.count(needle)==1
+    addition="    report+='\\n本轮旧 R2 完整回归与发布 owner 在套件启动前消失，尚未执行完整方法；保留'+link(REPORT,REL+'/execution-interruption-r1/verification.json','原状态与中断记录')+'。源码 118 和安装 118 的成功证据不变；新 owner 仍等待实际父版本发布后才执行完整回归。\\n'\n"
+    t=t.replace(needle,addition+needle);p.write_text(t,encoding='utf8',newline='\n')
+    old=SKILLS/'product/.runtime/publish_after_shaper.py'
+    shutil.copyfile(old,destinations[2]/'publisher-r1-before.py.txt')
+    t=old.read_text(encoding='utf8').replace('/float-shaper-20261023/release-r2','/float-shaper-20261023/release-r3')
+    t=t.replace('/float-shaper-20261023/complete-r2','/float-shaper-20261023/complete-r3')
+    assert "WORK = ROOT / 'product/.runtime/release-r1'" in t
+    t=t.replace("WORK = ROOT / 'product/.runtime/release-r1'","WORK = ROOT / 'product/.runtime/release-r2'")
+    write(SKILLS/'product/.runtime/publish_after_shaper_r2.py',t)
+    shutil.copyfile(SKILLS/'product/.runtime/publish_after_shaper_r2.py',SR/'publisher-r2.py.txt')
+    assert frozen(R111,'recovery_parent_final')==parent['frozen_inputs']
+    assert frozen(R112,'recovery_shaper_final')==child['frozen_inputs']
+    for root in (R111,R112):
+        for p in (root/'scripts').glob('*r[23].py'):
+            compile(p.read_bytes(),str(p),'exec')
+    compile((SKILLS/'product/.runtime/publish_after_shaper_r2.py').read_bytes(),'skill-publisher-r2','exec')
+    save(MAIN/'product/.runtime/native-release-owner-recovery-20261023.json',dict(status='prepared-new-native-owner-drivers',
+        at_utc=receipt['at_utc'],product_unchanged=True,parent_product_inputs=330,shaper_product_inputs=331,
+        parent_scripts=len(list((R111/'scripts').glob('*.py'))),shaper_scripts=len(list((R112/'scripts').glob('*.py'))),
+        actual_new_tests_executed=0,prior_interruption_preserved=True))
+    print(json.dumps({'status':'prepared-new-native-owner-drivers','product_unchanged':True,'prior_interruption_preserved':True}))
+
+
+if __name__=='__main__':main()

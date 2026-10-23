@@ -229,7 +229,7 @@ class FloatStandardRenderTests(unittest.TestCase):
         self.assert_clean()
 
     def test_declared_unsupported_operator_never_falls_back_to_legacy(self):
-        self.visual(); self.s['tracks'][0]['clips'][0]['effects'] = [{'type': 'blur', 'radius': 3}]
+        self.visual(); self.s['tracks'][0]['clips'][0]['effects'] = [{'type': 'hqdn3d', 'parameters': {'amount': 3}}]
         with patch('ai_ad_editor.render.build_filter_graph', side_effect=AssertionError('legacy fallback')):
             with self.assertRaises(AppError) as caught:
                 self.execute()

@@ -1,0 +1,138 @@
+"""Preserve failed install and roll terminal Gaussian owners to fresh evidence."""
+import ast
+from datetime import datetime,timezone
+import hashlib
+import json
+from pathlib import Path
+import sys
+import tomllib
+import zipfile
+
+ROOT=Path(__file__).resolve().parents[3]
+WORK=ROOT/'product/.runtime/float-gaussian-20261022'
+REL=ROOT/'docs/validation/evidence/float-gaussian-20261022-lab'
+sys.path[:0]=[str(ROOT/'scripts'),str(WORK)]
+from run_frozen_regression import frozen,sha
+from continue_verified_gaussian import live,read
+
+
+def save(path,value):
+    assert not path.exists(),path;path.parent.mkdir(parents=True,exist_ok=True)
+    path.write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n',encoding='utf8',newline='\n')
+
+
+def common(source):
+    for old,new in [('native-r2','native-r3'),('media-installed-r1','media-installed-r2'),
+        ('installed-r1','installed-r2'),('media-r1','media-r2'),('static-review-r1','static-review-r2')]:
+        source=source.replace(old,new)
+    return source
+
+
+def write_code(path,source):
+    ast.parse(source);path.write_text(source,encoding='utf8',newline='\n')
+
+
+def main():
+    native=read(REL/'native-r2/verification.json');installed=read(REL/'installed-r1/verification.json')
+    continuation=read(WORK/'continuation-r1/run.json');finish=read(WORK/'finish-chain-r1/run.json')
+    assert native['status']=='passed' and native['methods']==420 and native['skipped']==0
+    assert installed['status']==continuation['status']==finish['status']=='failed-preserved'
+    assert installed['error']=="AssertionError('193 source wheel site resources exact')"
+    for data in (native,installed,continuation,finish):assert not live(data['pid']),data['pid']
+    assert not (WORK/'complete-r1').exists() and not (WORK/'release-chain-r1').exists()
+    before=frozen();assert len(before)==323 and before==native['frozen_after']==installed['frozen_after']
+    scripts=read(REL/'release-driver-review-r1.json')['ROOT_scripts'];assert len(scripts)==16
+    assert all(sha(ROOT/name)==digest for name,digest in scripts.items())
+    backup=REL/'packaging-failure-r1';assert not backup.exists();backup.mkdir()
+    for name in scripts:
+        path=backup/'executed-root'/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes((ROOT/name).read_bytes())
+    (backup/'pyproject.toml.txt').write_bytes((ROOT/'product/pyproject.toml').read_bytes())
+    build=WORK/'installed-r1/bundle';site=WORK/'installed-r1/installed/site/ai_ad_editor'
+    manifest=read(build/'manifest.json');wheel=next(build/r['path'] for r in manifest['wheels'] if r['name']=='ai-ad-editor')
+    ext={'.py','.mjs','.json','.txt','.c','.dll'}
+    source={p.name:p.read_bytes() for p in (ROOT/'product/src/ai_ad_editor').iterdir() if p.is_file() and p.suffix in ext}
+    installed_files={p.name:p.read_bytes() for p in site.iterdir() if p.is_file() and p.suffix in ext}
+    shipped={}
+    with zipfile.ZipFile(wheel) as archive:
+        for name in archive.namelist():
+            for prefix in ('ai_ad_editor/','ai_ad_editor-0.1.0.data/purelib/ai_ad_editor/'):
+                if name.startswith(prefix) and not name.endswith('/'):shipped[name[len(prefix):]]=archive.read(name)
+    assert len(source)==193 and len(shipped)==len(installed_files)==192
+    assert source.keys()-shipped.keys()==source.keys()-installed_files.keys()=={'float_gaussian_NOTICE.txt'}
+    assert shipped==installed_files=={n:v for n,v in source.items() if n!='float_gaussian_NOTICE.txt'}
+    save(backup/'diagnostic.json',{'status':'confirmed-single-NOTICE-packaging-omission','source_resources':193,
+        'wheel_resources':192,'installed_resources':192,'missing':['float_gaussian_NOTICE.txt'],
+        'other_resource_bytes_equal':True,'wheel_sha256':sha(wheel),'manifest_sha256':sha(build/'manifest.json'),
+        'failed_install_receipt_sha256':sha(REL/'installed-r1/verification.json'),
+        'source420_receipt_sha256':sha(REL/'native-r2/verification.json'),'frozen_inputs':before,
+        'ROOT_scripts':scripts,'all_previous_Gaussian_owners_terminal':True,'full_owner_started':False})
+    path=ROOT/'product/pyproject.toml';old=path.read_text('utf8')
+    assert old.count('"html_quality_dom.mjs"]')==1
+    new=old.replace('"html_quality_dom.mjs"]','"html_quality_dom.mjs", "float_gaussian_NOTICE.txt"]')
+    assert 'float_gaussian_NOTICE.txt' in tomllib.loads(new)['tool']['setuptools']['package-data']['ai_ad_editor']
+    path.write_text(new,encoding='utf8',newline='\n')
+    after=frozen();assert len(after)==323
+    assert [n for n in before if before[n]!=after[n]]==['product/pyproject.toml']
+    altered={}
+    for stem in ('verify_float_gaussian_install','run_float_gaussian_complete','publish_float_gaussian',
+                 'release_float_gaussian_after_complete','finish_float_gaussian_chain','float_gaussian_release_docs'):
+        path=ROOT/'scripts'/(stem+'.py');text=common(path.read_text('utf8'))
+        if stem=='publish_float_gaussian':text=text.replace('len(changed)==9','len(changed)==10')
+        if stem=='finish_float_gaussian_chain':
+            text=text.replace('finish-chain-r1','finish-chain-r2').replace('actual-readme-preview-r2','actual-readme-preview-r3')
+            text=text.replace("'--revision','r2'","'--revision','r3'")
+        if stem=='float_gaussian_release_docs':
+            text=text.replace('float-gaussian-20261022-r1','float-gaussian-20261022-r2').replace('9路径改变','10路径改变')
+            row='| FG107-17 | 打包故障与修复 | 首次source193／wheel192／site192，唯一缺失NOTICE；显式补入package-data，保留首次420项和安装失败，随后以新source／media／install证据重跑；数值算法与门槛未改变 | [诊断与修复]({REL}/failure-analysis-r1.json) |\n'
+            marker='\n![原片与真实CLI高斯预览]'
+            assert text.count(marker)==1;text=text.replace(marker,'\n'+row+marker)
+            marker='本轮为显式float32-native-v1接入'
+            paragraph='首次相关源码420项通过，但离线安装资源一致性检查拒绝：source193、wheel192、site192，唯一缺少float_gaussian_NOTICE.txt。package-data采用显式清单，本轮遗漏新增NOTICE。修复仅将该文件加入product/pyproject.toml；数值代码、关键帧、预算和误差门槛不变。原source-r2、media-r1、安装／finisher／continuation-r1与旧ROOT脚本完整保留；新source-r3、media-r2和installed-r2重新绑定最终323输入，不能用旧源码通过结果替代新输入验收。\n\n'
+            assert text.count(marker)==1;text=text.replace(marker,paragraph+marker)
+        write_code(path,text);altered[path.relative_to(ROOT).as_posix()]=sha(path)
+    # Keep the historical preparation procedure reproducible, followed by this
+    # recorded roll-forward; do not rewrite prepared-r1 evidence as executed-r2.
+    observation=(WORK/'record_gaussian_observations.py').read_text('utf8')
+    observation=common(observation).replace('float-gaussian-20261022-r1','float-gaussian-20261022-r2')
+    for old_name,new_name in [('compatibility-sentinels-r1','compatibility-sentinels-r2'),('source-reference-r1','source-reference-r2'),
+        ('discovery-r1','discovery-r2'),('release-driver-review-r1','release-driver-review-r2'),('observations-r1','observations-r2')]:
+        observation=observation.replace(old_name,new_name)
+    observation=observation.replace("assert first['frozen_before']==first['frozen_after']==inputs",
+        "assert first['frozen_before']==first['frozen_after']\n    assert {n for n in inputs if first['frozen_after'][n]!=inputs[n]}=={'product/pyproject.toml'}")
+    observation=observation.replace('len(changed)==9','len(changed)==10')
+    write_code(WORK/'record_gaussian_observations_r2.py',observation)
+    follow=common((WORK/'continue_verified_gaussian.py').read_text('utf8'))
+    follow=follow.replace('continuation-r1','continuation-r2').replace('finish-chain-r1','finish-chain-r2')
+    follow=follow.replace('float-gaussian-20261022-r1','float-gaussian-20261022-r2')
+    follow=follow.replace('record_gaussian_observations.py','record_gaussian_observations_r2.py')
+    follow=follow.replace('release-driver-review-r1','release-driver-review-r2').replace('discovery-r1','discovery-r2')
+    follow=follow.replace('readme-preview-r1','readme-preview-r2').replace("'--revision','r1'","'--revision','r2'")
+    write_code(WORK/'continue_verified_gaussian_r2.py',follow)
+    checkpoint=common((WORK/'checkpoint_gaussian.py').read_text('utf8'))
+    checkpoint=checkpoint.replace('from continue_verified_gaussian import','from continue_verified_gaussian_r2 import')
+    checkpoint=checkpoint.replace("WORK/'continuation-r1/run.json'","WORK/'continuation-r2/run.json'")
+    checkpoint=checkpoint.replace('discovery-r1','discovery-r2').replace("'changed_paths':9","'changed_paths':10")
+    checkpoint=checkpoint.replace('owners[name]={kind:owner(base/path)',
+        "owners[name]={kind:owner(base/(path.replace('continuation-r1','continuation-r2').replace('finish-chain-r1','finish-chain-r2') if name=='gaussian' else path))")
+    write_code(WORK/'checkpoint_gaussian_r2.py',checkpoint)
+    save(REL/'release-drivers-r2.json',{'status':'prepared-not-executed-after-packaging-fix','altered_ROOT_scripts':altered,
+        'native_proof':'native-r3/verification.json','source_media':'media-r2/verification.json',
+        'installed_proof':'installed-r2/verification.json','installed_media':'media-installed-r2/verification.json',
+        'source_target':420,'installed_target':620,'complete_target':2715,'shipping_target':193,
+        'product_inputs':323,'changed_paths_against_tone':10,'force_push':False,'full_capcut_parity':False})
+    save(REL/'failure-analysis-r1.json',{'status':'diagnosed-preserved-and-scoped-fix-awaiting-fresh-verification',
+        'at_utc':datetime.now(timezone.utc).isoformat(),'cause':'The explicit setuptools package-data list omitted the new Gaussian NOTICE.',
+        'source_resources':193,'wheel_resources':192,'installed_resources':192,'missing':['float_gaussian_NOTICE.txt'],
+        'all_other_resource_bytes_equal':True,'first_source_related_methods':420,'first_source_seconds':native['seconds'],
+        'failed_install_receipt_sha256':sha(REL/'installed-r1/verification.json'),
+        'diagnostic_sha256':sha(backup/'diagnostic.json'),'old_ROOT_scripts':scripts,
+        'product_changed_since_source420':['product/pyproject.toml'],'runtime_algorithm_changed':False,
+        'native_absolute_limit_changed':False,'media_linear_limit_changed':False,'193_resource_target_changed':False,
+        'failed_receipts_overwritten':False,'old_owners_restarted':False,'main_mutated':False,'full_capcut_parity':False})
+    (REL/'packaging-repair-r2.executed-script.py.txt').write_bytes(Path(__file__).read_bytes())
+    assert frozen()==after
+    print(json.dumps({'status':'preserved-failure-and-repaired-explicit-NOTICE-package-data',
+        'frozen_inputs':323,'changed_product_paths':10,'shipping_target':193,'fresh_proofs_required':True}))
+
+
+if __name__=='__main__':main()

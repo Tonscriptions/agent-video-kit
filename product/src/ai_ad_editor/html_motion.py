@@ -583,6 +583,24 @@ def inspect_layout(root,plan,report_path,*,timeout=600,cancel_file=None):
         atomic_write_json(report_path,report)
 
 
+def record_unstarted_render_failure(plan, report_path, error, *, layout_report=None, layout_result=None):
+    """Persist a failure that occurred before ownership of a render Job began."""
+    from .utils import atomic_write_json
+    error.path = str(report_path)
+    layout_evidence=None
+    if layout_result is not None:
+        layout_evidence={'retention':'embedded','original_path':str(layout_report),
+            'report_sha256':'sha256:'+sha256_file(layout_report),'report':layout_result}
+    report = {'engine':ENGINE,'report_version':VERSION,'created_at':now_iso(),
+        'plan':public_plan(plan),'status':'failed','phase':'before-render-job',
+        'render_processes_started':False,'error':error.as_dict(),
+        'layout_report':None,'layout_evidence':layout_evidence,
+        'cleanup':{'native_job':False,'not_started':True,'seen_pids':[],
+            'active_before_final_cleanup':[],'active_after_cleanup':[],
+            'all_children_reaped':True,'termination_reason':error.code}}
+    atomic_write_json(report_path,report)
+
+
 def render_frames(root, plan, output, report_path, *, timeout, cancel_file=None):
     report={'engine':ENGINE,'report_version':VERSION,'created_at':now_iso(),'plan':public_plan(plan),'status':'started'}
     job=None

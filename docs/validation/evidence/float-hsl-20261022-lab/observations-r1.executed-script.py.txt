@@ -1,0 +1,104 @@
+"""Record actual source/media, manually viewed contact, failures and discovery."""
+import argparse
+import ast
+from datetime import datetime,timezone
+import json
+from pathlib import Path
+import subprocess
+import sys
+
+ROOT=Path(__file__).resolve().parents[3]
+REL=ROOT/'docs/validation/evidence/float-hsl-20261022-lab'
+ASSETS=ROOT/'docs/assets/float-hsl-20261022-r2'
+sys.path.insert(0,str(ROOT/'scripts'))
+from run_frozen_regression import frozen,sha
+
+def read(path):return json.loads(path.read_bytes())
+
+def save(path,value):
+    assert not path.exists(),path
+    path.write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n',encoding='utf8')
+
+def main():
+    parser=argparse.ArgumentParser();parser.add_argument('--contact-viewed',action='store_true',required=True);parser.parse_args()
+    inputs=frozen();assert len(inputs)==318
+    native=read(REL/'native-r2/verification.json');media=read(REL/'media-r2/verification.json')
+    assert native['status']=='passed' and native['methods']==328 and native['skipped']==0
+    assert native['frozen_before']==native['frozen_after']==inputs
+    assert media['status']=='passed-public-CLI-floating-selective-HSL-and-native-float-previews'
+    assert media['frozen_before']==media['frozen_after']==inputs and all(c['ok'] for c in media['checks'])
+    sys.path.insert(0,str(ROOT/'product/src'))
+    from ai_ad_editor.runtime import configure_local_runtime
+    configure_local_runtime()
+    from PIL import Image
+    with Image.open(ASSETS/'comparison.gif') as im:
+        clocks=[]
+        for i in range(im.n_frames):im.seek(i);clocks.append(im.info.get('duration'))
+        assert im.n_frames==14 and clocks==[100]*14
+    save(REL/'static-review-r1.json',{'status':'passed-static-contact-and-GIF-clock-review',
+        'at_utc':datetime.now(timezone.utc).isoformat(),'contact_sha256':sha(ASSETS/'contact.png'),
+        'GIF_sha256':sha(ASSETS/'comparison.gif'),'GIF_frames':14,'GIF_frame_duration_ms':clocks,
+        'viewed_panels':6,'viewed_author_frames':[3,10,16],
+        'view_tool':'functions.exec -> tools.view_image, exact contact image viewed before this script',
+        'visible_observations':['All six panels contain the moving rectangle, colored grid and five-bit frame markers.',
+            'Author frame 3 warm selective changes and frame 10 mixed-band changes remain visible.',
+            'Author frame 16 residual/exposure output is bright amber with preserved geometry; final viewing copy clips highlights.'],
+        'continuous_playback_review':False,'listening_review':False,'natural_quality_accepted':False,
+        'HDR_accepted':False,'full_capcut_parity':False})
+    first=read(REL/'native-r1/verification.json');fix=read(REL/'native-plugin-environment-r2/verification.json')
+    assert first['methods']==44 and first['failures']==0 and first['errors']==1 and first['skipped']==0
+    changed=sorted(n for n,v in inputs.items() if first['frozen_after'].get(n)!=v)
+    assert changed==['product/tests/test_float_selective_hsl.py']
+    assert fix['status']=='passed-corrected-native-test-environment'
+    assert fix['native_calls'][0]['maximum_8bit_code_error']<=1
+    failed_media=read(REL/'media-r1/verification.json')
+    assert failed_media['status']=='failed-preserved' and 'PROJECT_INVALID' in failed_media['error']
+    assert failed_media['frozen_before']==failed_media['frozen_after']==inputs
+    old_oracle=(REL/'media-r1/executed-oracle.py.txt').read_text('utf8')
+    oracle=(ROOT/'scripts/hsl_media_oracle.py').read_text('utf8')
+    assert old_oracle.replace('(3.,3.5)','(2.7,3.)')==oracle
+    save(REL/'failure-analysis-r1.json',{'status':'passed-preserved-failure-and-scoped-correction-review',
+        'first_source_sha256':sha(REL/'native-r1/verification.json'),'accepted_source_sha256':sha(REL/'native-r2/verification.json'),
+        'first_source_methods':44,'first_source_failures':0,'first_source_errors':1,'first_source_skips':0,
+        'source_changes_since_first_run':changed,'runtime_or_tolerance_changed':False,
+        'native_test_cause':'FREI0R_PATH restored by patch.dict before child launch; child now receives captured verified environment',
+        'incorrect_initial_odd_size_directory_label_retained':True,
+        'actual_corrected_same_native_dimensions':[43,17],'corrected_native_receipt_sha256':sha(REL/'native-plugin-environment-r2/verification.json'),
+        'first_media_sha256':sha(REL/'media-r1/verification.json'),'accepted_media_sha256':sha(REL/'media-r2/verification.json'),
+        'media_cause':'Synthetic exposure endpoint3.5 exceeds existing3 bound; edited public CLI rejected before rendering',
+        'media_fix':'Only synthetic recipe and independent reference exposure2.7..3; still actual superwhite at final explicit clip edge',
+        'source_products_unchanged_between_media_runs':True,'first_media_calls':len(failed_media['calls']),
+        'first_media_checks':len(failed_media['checks']),'native_tolerance_8bit_codes':1,'media_linear_tolerance':2e-6,
+        'failure_receipts_overwritten':False,'full_capcut_parity':False})
+    bootstrap=('import sys,json,unittest;sys.path.insert(0,sys.argv[1]);'
+        'from ai_ad_editor.runtime import configure_local_runtime;configure_local_runtime();'
+        'loader=unittest.TestLoader();suite=loader.discover(sys.argv[2]);'
+        'print(json.dumps({"discovered_methods":suite.countTestCases(),"loader_errors":loader.errors,"methods_run":0}));'
+        'raise SystemExit(0 if not loader.errors else 1)')
+    command=[sys.executable,'-E','-B','-X','utf8','-c',bootstrap,str(ROOT/'product/src'),str(ROOT/'product/tests')]
+    p=subprocess.run(command,cwd=ROOT,capture_output=True,timeout=120,creationflags=subprocess.CREATE_NO_WINDOW)
+    (REL/'discovery-r1.stdout.log').write_bytes(p.stdout);(REL/'discovery-r1.stderr.log').write_bytes(p.stderr)
+    assert p.returncode==0,p.stderr[-1500:]
+    discovery=json.loads(p.stdout);assert discovery['discovered_methods']==2623 and discovery['methods_run']==0
+    save(REL/'discovery-r1.json',{'status':'passed-discovery-only-not-suite-execution',**discovery,
+        'command':command,'exit_code':p.returncode,'stdout_sha256':sha(REL/'discovery-r1.stdout.log'),
+        'stderr_sha256':sha(REL/'discovery-r1.stderr.log'),'complete_suite_passed':False})
+    scripts={p.relative_to(ROOT).as_posix():sha(p) for p in (ROOT/'scripts').glob('*.py')};assert len(scripts)==16
+    for name in scripts:ast.parse((ROOT/name).read_text('utf8'))
+    owners=('run_float_hsl_complete','publish_float_hsl','release_float_hsl_after_complete','finish_float_hsl_chain')
+    text={n:(ROOT/'scripts'/(n+'.py')).read_text('utf8') for n in owners}
+    assert 'published-V104-full2579-installed484' in text['run_float_hsl_complete']
+    assert "'media-r2/verification.json'" in text['run_float_hsl_complete']
+    assert 'published-V105-full2623-installed528' in text['finish_float_hsl_chain']
+    assert 'passed-fresh-eight-wheel-190-resources-real-previews-and-528-methods' in text['publish_float_hsl']
+    save(REL/'release-driver-review-r1.json',{'status':'passed-AST-and-static-gate-review-not-execution',
+        'ROOT_scripts':scripts,'script_count':len(scripts),'required_actual_parent':'published V104/full2579/installed484',
+        'candidate_full_target':2623,'candidate_installed_target':528,'candidate_resource_target':190,
+        'source_media_binding':'media-r2/verification.json','full_suite_executed':False,
+        'force_push':False,'full_capcut_parity':False})
+    assert frozen()==inputs
+    (REL/'observations-r1.executed-script.py.txt').write_bytes(Path(__file__).read_bytes())
+    print(json.dumps({'status':'passed-actual-source-media-and-contact-observations','source_methods':328,
+        'media_checks':len(media['checks']),'GIF_frames':14,'viewed_panels':6,'discovered_methods':2623,'complete_methods_run':0}))
+
+if __name__=='__main__':main()

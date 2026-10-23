@@ -106,12 +106,50 @@ def validate_project(root: Path, project: dict[str, Any], *, strict_rights: bool
 
     def validate_effect_automation(effect, *, duration_tick=None):
         name = str(effect.get('type','')).strip().lower().replace('-','_')
+        if native_curves:
+            from .float_keyer import ALIASES as KEYER_ALIASES,validate_keyer
+            if name in KEYER_ALIASES:return validate_keyer(effect,duration_tick=duration_tick)
+            from .float_sharpen import ALIASES as SHARPEN_ALIASES,validate_sharpen
+            if name in SHARPEN_ALIASES:return validate_sharpen(effect,duration_tick=duration_tick)
+            from .float_spatial import ALIASES as SPATIAL_ALIASES,validate_spatial
+            if name in SPATIAL_ALIASES:return validate_spatial(effect,duration_tick=duration_tick)
+            from .float_gaussian import ALIASES as GAUSSIAN_ALIASES,validate_gaussian
+            if name in GAUSSIAN_ALIASES:return validate_gaussian(effect,duration_tick=duration_tick)
+            from .float_tone import ALIASES as TONE_ALIASES,validate_tone
+            if name in TONE_ALIASES:return validate_tone(effect,duration_tick=duration_tick)
+            from .float_balance import ALIASES as BALANCE_ALIASES,validate_balance
+            if name in BALANCE_ALIASES:return validate_balance(effect,duration_tick=duration_tick)
+            if name in HSL_ALIASES:
+                from .float_selective_hsl import validate_hsl
+                return validate_hsl(effect,duration_tick=duration_tick)
         if native_curves and name in CURVE_ALIASES:
             from .float_curves import validate_curves
             return validate_curves(effect,duration_tick=duration_tick)
+        if native_curves and name in ('exposure','color_levels','levels','colorlevels'):
+            from .float_levels import validate_native
+            return validate_native(effect,duration_tick=duration_tick)
         return validate_legacy_effect_automation(effect,duration_tick=duration_tick)
 
     def effect_properties(name):
+        if native_curves:
+            from .float_keyer import ALIASES as KEYER_ALIASES,parameter_names as keyer_parameter_names
+            if name in KEYER_ALIASES:return keyer_parameter_names()
+            from .float_sharpen import ALIASES as SHARPEN_ALIASES,parameter_names as sharpen_parameter_names
+            if name in SHARPEN_ALIASES:return sharpen_parameter_names()
+            from .float_spatial import ALIASES as SPATIAL_ALIASES,parameter_names as spatial_parameter_names
+            if name in SPATIAL_ALIASES:return spatial_parameter_names()
+            from .float_gaussian import ALIASES as GAUSSIAN_ALIASES,parameter_names as gaussian_parameter_names
+            if name in GAUSSIAN_ALIASES:return gaussian_parameter_names()
+            from .float_tone import ALIASES as TONE_ALIASES,parameter_names as tone_parameter_names
+            if name in TONE_ALIASES:return tone_parameter_names(name)
+            from .float_balance import ALIASES as BALANCE_ALIASES,parameter_names
+            if name in BALANCE_ALIASES:return parameter_names(name)
+            if name in HSL_ALIASES:
+                from .float_selective_hsl import BOUNDS
+                return frozenset(BOUNDS)
+        if native_curves and name in ('color_levels','levels','colorlevels'):
+            from .float_levels import PARAMETER_NAMES
+            return PARAMETER_NAMES
         if native_curves and name in CURVE_ALIASES:
             from .float_curves import PARAMETER_NAMES
             return PARAMETER_NAMES

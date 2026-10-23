@@ -1,0 +1,51 @@
+"""Record actual final and isolated discovery counts without executing tests."""
+import ast
+from datetime import datetime, timezone
+import json
+import os
+from pathlib import Path
+import sys
+import unittest
+
+from run_frozen_regression import frozen, sha
+
+ROOT=Path(__file__).resolve().parents[1]
+
+
+def walk(suite):
+    for item in suite:
+        if isinstance(item,unittest.TestSuite):yield from walk(item)
+        else:yield item.id()
+
+
+def main():
+    output=ROOT/'docs/validation/evidence/pipeline-recovery-20261023/discovery-r1.json'
+    assert not output.exists()
+    before=frozen()
+    os.environ['AI_AD_EDITOR_TEST_HTML_RUNTIME']=str(ROOT.parents[2]/'product/.runtime/html-motion-runtime-20261018-e2.json')
+    os.environ['AI_AD_EDITOR_TEST_RUBBERBAND']=str(ROOT.parents[2]/'product/.runtime/rubberband-offline-probe-20261017/native/rubberband-4.0.0-gpl-executable-windows/rubberband.exe')
+    sys.path[:0]=[str(ROOT/'product/src'),str(ROOT/'product/tests')]
+    from ai_ad_editor.runtime import configure_local_runtime
+    configure_local_runtime()
+    suite=unittest.defaultTestLoader.discover(str(ROOT/'product/tests'))
+    full=list(walk(suite));assert len(full)==2897,len(full)
+    installer=ROOT/'scripts/verify_pipeline_recovery_install.py'
+    assignments=[node for node in ast.walk(ast.parse(installer.read_text('utf8'))) if isinstance(node,ast.Assign)
+        and any(isinstance(target,ast.Name) and target.id=='names' for target in node.targets)]
+    assert len(assignments)==1
+    names=ast.literal_eval(assignments[0].value)
+    isolated=list(walk(unittest.defaultTestLoader.loadTestsFromNames(names)))
+    assert len(names)==39 and len(isolated)==804,(len(names),len(isolated))
+    assert not any('_FailedTest' in name for name in full+isolated)
+    assert frozen()==before
+    receipt=dict(status='passed-discovery-only-no-tests-executed',at_utc=datetime.now(timezone.utc).isoformat(),
+        full_methods=len(full),full_method_ids=full,installed_methods=len(isolated),installed_method_ids=isolated,
+        full_unique_method_ids=len(set(full)),installed_unique_method_ids=len(set(isolated)),
+        frozen_inputs=before,installer_sha256=sha(installer),script_sha256=sha(Path(__file__)),
+        actual_test_methods_run=0,full_suite_passed=False,installed_suite_passed=False,
+        network=False,virtualization=False,full_capcut_parity=False)
+    output.write_text(json.dumps(receipt,ensure_ascii=False,indent=2)+'\n',encoding='utf8',newline='\n')
+    print(json.dumps({k:receipt[k] for k in ['status','full_methods','installed_methods','actual_test_methods_run']}))
+
+
+if __name__=='__main__':main()

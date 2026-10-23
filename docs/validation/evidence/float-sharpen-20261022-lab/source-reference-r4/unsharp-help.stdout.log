@@ -1,0 +1,30 @@
+Filter unsharp
+  Sharpen or blur the input video.
+    slice threading supported
+    Inputs:
+       #0: default (video)
+    Outputs:
+       #0: default (video)
+unsharp AVOptions:
+   luma_msize_x      <int>        ..FV....... set luma matrix horizontal size (from 3 to 23) (default 5)
+   lx                <int>        ..FV....... set luma matrix horizontal size (from 3 to 23) (default 5)
+   luma_msize_y      <int>        ..FV....... set luma matrix vertical size (from 3 to 23) (default 5)
+   ly                <int>        ..FV....... set luma matrix vertical size (from 3 to 23) (default 5)
+   luma_amount       <float>      ..FV....... set luma effect strength (from -2 to 5) (default 1)
+   la                <float>      ..FV....... set luma effect strength (from -2 to 5) (default 1)
+   chroma_msize_x    <int>        ..FV....... set chroma matrix horizontal size (from 3 to 23) (default 5)
+   cx                <int>        ..FV....... set chroma matrix horizontal size (from 3 to 23) (default 5)
+   chroma_msize_y    <int>        ..FV....... set chroma matrix vertical size (from 3 to 23) (default 5)
+   cy                <int>        ..FV....... set chroma matrix vertical size (from 3 to 23) (default 5)
+   chroma_amount     <float>      ..FV....... set chroma effect strength (from -2 to 5) (default 0)
+   ca                <float>      ..FV....... set chroma effect strength (from -2 to 5) (default 0)
+   alpha_msize_x     <int>        ..FV....... set alpha matrix horizontal size (from 3 to 23) (default 5)
+   ax                <int>        ..FV....... set alpha matrix horizontal size (from 3 to 23) (default 5)
+   alpha_msize_y     <int>        ..FV....... set alpha matrix vertical size (from 3 to 23) (default 5)
+   ay                <int>        ..FV....... set alpha matrix vertical size (from 3 to 23) (default 5)
+   alpha_amount      <float>      ..FV....... set alpha effect strength (from -2 to 5) (default 0)
+   aa                <float>      ..FV....... set alpha effect strength (from -2 to 5) (default 0)
+
+This filter has support for timeline through the 'enable' option.
+
+Exiting with exit code 0

@@ -1,0 +1,122 @@
+"""Verify repaired phase diagnostics, real native cleanup, matting and Float32 keying."""
+from datetime import datetime, timezone
+import argparse
+import contextlib
+import json
+import os
+from pathlib import Path
+import subprocess
+import sys
+import time
+import unittest
+from unittest.mock import patch
+
+from run_frozen_regression import frozen, sha
+
+ROOT = Path(__file__).resolve().parents[1]
+MAIN = Path('E:/dev/sandbox/AI广告剪辑')
+REL = ROOT/'docs/validation/evidence/pipeline-recovery-20261023'
+
+
+def main():
+    parser=argparse.ArgumentParser();parser.add_argument('--revision',required=True)
+    parser.add_argument('--focused',action='store_true');args=parser.parse_args()
+    assert args.revision.startswith('r') and args.revision[1:].isdigit()
+    work=REL/('native-'+args.revision);work.mkdir(exist_ok=False)
+    before=frozen();assert len(before)==330
+    foundation=json.loads((REL/'foundation-r1.json').read_bytes())
+    for name,digest in before.items():
+        if foundation['parent_frozen_inputs'].get(name)!=digest:
+            target=work/'executed-source'/name;target.parent.mkdir(parents=True,exist_ok=True)
+            target.write_bytes((ROOT/name).read_bytes())
+    (work/'executed-verifier.py.txt').write_bytes(Path(__file__).read_bytes())
+    configuration=MAIN/'product/.runtime/html-motion-runtime-20261018-e2.json'
+    assert sha(configuration)=='sha256:9ec90b14285a76803571c58a2c4709a8e493e3a21cbba3c8b329f0aa2162b16e'
+    os.environ['AI_AD_EDITOR_TEST_HTML_RUNTIME']=str(configuration)
+    state=dict(status='running',pid=os.getpid(),started_at_utc=datetime.now(timezone.utc).isoformat(),
+        frozen_before=before,generator_sha256=sha(Path(__file__)),calls=[],actual_html_cleanup_records=[],
+        native_windows=True,network=False,virtualization=False,full_capcut_parity=False,published=False,
+        native_html_configuration={'path':str(configuration),'sha256':sha(configuration)})
+    globals()['RUN_CONTEXT']=(work,state)
+
+    def save():
+        (work/'verification.json').write_text(json.dumps(state,ensure_ascii=False,indent=2)+'\n',encoding='utf8',newline='\n')
+
+    save()
+    sys.path[:0]=[str(ROOT/'product/src'),str(ROOT/'product/tests')]
+    from ai_ad_editor.runtime import configure_local_runtime
+    configure_local_runtime()
+    names=['test_html_motion','test_pipeline_diagnostics','test_local_matting','test_float_keyer']
+    if args.focused:
+        names=['test_html_motion.HTMLSourceTests.test_preparation_deadline_persists_truthful_zero_process_report',
+            'test_html_motion.HTMLSourceTests.test_preparation_cancel_wins_when_total_deadline_also_expires',
+            'test_html_motion.HTMLSourceTests.test_preparation_cancel_before_deadline_persists_report',
+            'test_html_motion.HTMLSourceTests.test_completed_layout_consumes_same_total_render_deadline',
+            'test_html_motion.HTMLSourceTests.test_preparation_dry_run_remains_readonly_without_failure_report',
+            'test_html_motion.HTMLNativeTests.test_infinite_frame_timeout_kills_all_native_descendants',
+            'test_html_motion.HTMLNativeTests.test_infinite_frame_after_preparation_kills_actual_native_descendants',
+            'test_pipeline_diagnostics.NativeDiagnosticIntegrationTests.test_cancel_and_timeout_keep_trigger_and_original_metadata']
+    tests=unittest.defaultTestLoader.loadTestsFromNames(names)
+    import test_html_motion
+    original_report=test_html_motion.HTMLNativeTests.report
+
+    def retained_report(case,result):
+        value=original_report(case,result)
+        state['actual_html_cleanup_records'].append({'method':case.id(),'result':result,'report':value})
+        return value
+
+    original_run=subprocess.run
+
+    def native(*positional,**kwargs):
+        caught=None
+        try:result=original_run(*positional,**kwargs)
+        except subprocess.CalledProcessError as exc:
+            caught=exc;result=subprocess.CompletedProcess(exc.cmd,exc.returncode,exc.stdout,exc.stderr)
+        command=positional[0] if positional else kwargs.get('args')
+        row={'command':[str(v) for v in command] if isinstance(command,(list,tuple)) else str(command),'exit_code':result.returncode}
+        index=len(state['calls'])
+        for label,data in [('input',kwargs.get('input')),('stdout',result.stdout),('stderr',result.stderr)]:
+            if isinstance(data,bytes):
+                path=work/f'call-{index:03d}.{label}.bin';path.write_bytes(data)
+                row[label]={'file':path.name,'bytes':len(data),'sha256':sha(path)}
+        state['calls'].append(row)
+        if caught is not None:raise caught
+        return result
+
+    state.update(modules=names,planned_methods=tests.countTestCases(),suite_launched=True);save()
+    started=time.monotonic()
+    try:
+        with (work/'unittest.log').open('w',encoding='utf8',newline='\n') as log:
+            with contextlib.redirect_stdout(log),contextlib.redirect_stderr(log), \
+                 patch.object(subprocess,'run',native), \
+                 patch.object(test_html_motion.HTMLNativeTests,'report',retained_report):
+                result=unittest.TextTestRunner(stream=log,verbosity=2).run(tests)
+        state.update(status='passed' if result.wasSuccessful() and not result.skipped else 'failed-preserved',
+            methods=result.testsRun,seconds=time.monotonic()-started,failures=len(result.failures),
+            errors=len(result.errors),skipped=len(result.skipped),log_sha256=sha(work/'unittest.log'))
+    except BaseException as exc:
+        state.update(status='failed-preserved',error=repr(exc));raise
+    finally:
+        state.update(finished_at_utc=datetime.now(timezone.utc).isoformat(),frozen_after=frozen())
+        state['frozen_equal']=state['frozen_before']==state['frozen_after']
+        if not state['frozen_equal']:state['status']='failed-source-changed'
+        save()
+        print(json.dumps({k:state.get(k) for k in ('status','planned_methods','methods','seconds','failures','errors','skipped','frozen_equal','error')},ensure_ascii=False),flush=True)
+    return 0 if state['status']=='passed' else 1
+
+
+if __name__=='__main__':
+    try:
+        raise SystemExit(main())
+    except SystemExit:
+        raise
+    except BaseException as exc:
+        if 'RUN_CONTEXT' in globals():
+            work,state=RUN_CONTEXT
+            if state['status']=='running':
+                state.update(status='failed-preserved-before-suite',suite_launched=False,methods=0,
+                    error={'type':type(exc).__name__,'message':str(exc)},frozen_after=frozen(),
+                    finished_at_utc=datetime.now(timezone.utc).isoformat())
+                state['frozen_equal']=state['frozen_before']==state['frozen_after']
+                (work/'verification.json').write_text(json.dumps(state,ensure_ascii=False,indent=2)+'\n',encoding='utf8',newline='\n')
+        raise

@@ -1,0 +1,35 @@
+"""Run explicitly selected methods with only the fresh installed site enabled."""
+import json
+from pathlib import Path
+import sys
+import unittest
+
+
+def main():
+    site, tests = Path(sys.argv[1]).resolve(), Path(sys.argv[2]).resolve()
+    names=json.loads(sys.argv[3]);assert len(names)==39
+    sys.path[:0]=[str(site),str(tests)]
+    from ai_ad_editor.runtime import configure_local_runtime
+    configure_local_runtime()
+    suite=unittest.defaultTestLoader.loadTestsFromNames(names)
+    assert suite.countTestCases()==804,suite.countTestCases()
+    import test_html_motion
+    reports=[]
+    original=test_html_motion.HTMLNativeTests.report
+    def report(case,result):
+        value=original(case,result)
+        reports.append({'method':case.id(),'result':result,'report':value})
+        return value
+    test_html_motion.HTMLNativeTests.report=report
+    result=unittest.TextTestRunner(verbosity=2).run(suite)
+    origins={name:str(Path(value.__file__).resolve()) for name,value in sys.modules.items()
+        if getattr(value,'__file__',None) and (name=='ai_ad_editor' or name.startswith('ai_ad_editor.')
+            or name=='numpy' or name.startswith('numpy.') or name=='PIL' or name.startswith('PIL.'))}
+    records={name:getattr(sys.modules[name],'NATIVE_CALLS',[]) for name in names if name in sys.modules}
+    print(json.dumps({'methods':result.testsRun,'skipped':len(result.skipped),'origins':origins,
+        'native_test_records':records,'actual_HTML_reports':reports}))
+    return 0 if result.wasSuccessful() and not result.skipped else 1
+
+
+if __name__=='__main__':
+    raise SystemExit(main())

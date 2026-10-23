@@ -1,0 +1,92 @@
+"""Record actual contact review, preserved failure and suite discovery."""
+import ast
+from datetime import datetime,timezone
+import json
+import os
+from pathlib import Path
+import subprocess
+import sys
+
+ROOT = Path(__file__).resolve().parents[3]
+REL = ROOT/'docs/validation/evidence/float-levels-20261022-lab'
+sys.path.insert(0,str(ROOT/'scripts'))
+from run_frozen_regression import frozen,sha
+from PIL import Image
+
+
+def save(path,value):
+    assert not path.exists(),path
+    path.write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n',encoding='utf8',newline='\n')
+
+
+def main():
+    source = frozen();assert len(source)==314
+    first = json.loads((REL/'native-r1/verification.json').read_bytes())
+    final = json.loads((REL/'native-r2/verification.json').read_bytes())
+    media = json.loads((REL/'media-r1/verification.json').read_bytes())
+    assert first['status']=='failed-preserved' and first['methods']==38 and first['failures']==2 and first['errors']==1
+    assert final['status']=='passed' and final['methods']==242 and final['skipped']==0
+    assert final['frozen_before']==final['frozen_after']==media['frozen_before']==media['frozen_after']==source
+    assert media['status']=='passed-public-CLI-floating-levels-and-native-float-previews'
+    assert len(media['calls'])==20 and len(media['checks'])==29
+    assets = ROOT/'docs/assets/float-levels-20261022-r1'
+    with Image.open(assets/'comparison.gif') as im:
+        frames = im.n_frames;durations = []
+        for i in range(frames):im.seek(i);durations.append(im.info.get('duration'))
+    assert frames==14 and durations==[100]*14
+    with Image.open(assets/'contact.png') as im:assert im.size==(640,624)
+    save(REL/'static-review-r1.json',{'status':'passed-static-contact-and-GIF-clock-review',
+        'at_utc':datetime.now(timezone.utc).isoformat(),'contact_sha256':sha(assets/'contact.png'),
+        'GIF_sha256':sha(assets/'comparison.gif'),'GIF_frames':frames,'GIF_durations_ms':durations,
+        'viewed_author_frames':[3,10,16],'viewed_panels':6,
+        'observations':['Actual contact viewed with local image tool; original left, graded right.',
+            'Moving rectangle, coloured grid and five source markers present in the selected three rows.',
+            'At author10 the automatic scene increases contrast/brightness; alpha background remains visible.',
+            'No blank output or missing rectangle observed in these six static panels.'],
+        'continuous_playback_review':False,'listening_review':False,'natural_quality_accepted':False,'HDR_accepted':False})
+    diagnosis = json.loads((REL/'native-analysis-r1/verification.json').read_bytes())
+    assert diagnosis['different_green_changes_native_red'] and diagnosis['repeat_red_output_equal']
+    save(REL/'failure-analysis-r1.json',{'status':'preserved-first-failure-and-documented-reference-correction',
+        'first_methods':38,'first_seconds':first['seconds'],'failures':2,'errors':1,'skipped':0,
+        'first_receipt_sha256':sha(REL/'native-r1/verification.json'),
+        'accepted_receipt_sha256':sha(REL/'native-r2/verification.json'),'accepted_methods':242,
+        'changes':['Accept finite Real/Integral author sample clocks while retaining exact integer/Fraction offsets.',
+            'Keep actual native planar automatic differences as diagnostics; check product automatic endpoints against independent complete per-channel extrema.',
+            'Real isolated FFmpeg8.1 probe held red unchanged, changed only green, reproduced native red cross-channel dependency and identical repeat.',
+            'Add explicit automatic-alpha, legacy top-level animated exposure parameters and boolean cancellation assertions.'],
+        'tolerances_widened_after_failure':False,'native_automatic_equivalence_claimed':False,
+        'product_auto_statistics_changed_to_match_native_bug':False,'native_diagnosis_sha256':sha(REL/'native-analysis-r1/verification.json'),
+        'original_failure_log':'native-r1/unittest.log','accepted_log':'native-r2/unittest.log'})
+    bootstrap = ('import sys,unittest;sys.path.insert(0,sys.argv[1]);'
+        'from ai_ad_editor.runtime import configure_local_runtime;configure_local_runtime();'
+        'print(unittest.defaultTestLoader.discover(sys.argv[2]).countTestCases())')
+    env = dict(os.environ,TEMP=str(ROOT/'product/.runtime/temp'),TMP=str(ROOT/'product/.runtime/temp'))
+    command = [sys.executable,'-E','-B','-X','utf8','-c',bootstrap,str(ROOT/'product/src'),str(ROOT/'product/tests')]
+    p = subprocess.run(command,cwd=ROOT,env=env,capture_output=True,check=True,creationflags=subprocess.CREATE_NO_WINDOW)
+    (REL/'discovery-r1.stdout.txt').write_bytes(p.stdout);(REL/'discovery-r1.stderr.txt').write_bytes(p.stderr)
+    assert int(p.stdout.strip())==2537
+    save(REL/'discovery-r1.json',{'status':'discovered-not-executed','discovered_methods':2537,'methods_run':0,
+        'complete_suite_passed':False,'command':command,'exit_code':p.returncode,
+        'stdout_sha256':sha(REL/'discovery-r1.stdout.txt'),'stderr_sha256':sha(REL/'discovery-r1.stderr.txt'),
+        'frozen_inputs_unchanged':frozen()==source})
+    drivers = ['run_float_levels_complete.py','publish_float_levels.py','release_float_levels_after_complete.py','finish_float_levels_chain.py']
+    hashes = {}
+    for name in drivers:
+        path = ROOT/'scripts'/name;text = path.read_text(encoding='utf8');ast.parse(text,str(path))
+        assert 'float-curves-lab-20261022' in text or name!='run_float_levels_complete.py'
+        assert '2537' in text and ('442' in text or name=='run_float_levels_complete.py')
+        assert 'git(\'push\',\'--force' not in text
+        hashes[name] = sha(path)
+    scripts = {p.relative_to(ROOT).as_posix():sha(p) for p in (ROOT/'scripts').glob('*.py')}
+    assert len(scripts)==16
+    for name in scripts:ast.parse((ROOT/name).read_bytes(),name)
+    save(REL/'release-driver-review-r1.json',{'status':'reviewed-AST-and-actual-parent-installed-full-source-gates-not-executed',
+        'drivers':hashes,'ROOT_scripts':scripts,'ROOT_scripts_count':16,
+        'required_parent':'actual published V102/full2495/installed400','candidate_inputs':314,'changed_product_paths':6,
+        'target_full_methods':2537,'target_installed_methods':442,'target_shipping_resources':188,
+        'force_push':False,'full_suite_claimed_passed':False,'full_capcut_parity':False})
+    (REL/'observations-r1.executed-script.py.txt').write_bytes(Path(__file__).read_bytes())
+    print(json.dumps({'source_methods':242,'full_discovered_not_run':2537,'GIF_frames':14,'viewed_panels':6,'ROOT_scripts':16}))
+
+
+if __name__=='__main__':main()

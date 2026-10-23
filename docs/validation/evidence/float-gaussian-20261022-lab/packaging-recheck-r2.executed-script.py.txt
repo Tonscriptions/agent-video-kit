@@ -1,0 +1,55 @@
+"""Actually rebuild the corrected wheel and verify every resource and notice."""
+from datetime import datetime,timezone
+import hashlib
+import json
+import os
+from pathlib import Path
+import subprocess
+import sys
+import zipfile
+
+ROOT=Path(__file__).resolve().parents[3]
+REL=ROOT/'docs/validation/evidence/float-gaussian-20261022-lab'
+WORK=ROOT/'product/.runtime/float-gaussian-20261022/packaging-recheck-r2'
+sys.path.insert(0,str(ROOT/'scripts'))
+from run_frozen_regression import frozen,sha
+
+
+def main():
+    WORK.mkdir(exist_ok=False);before=frozen();assert len(before)==323
+    prior=json.loads((REL/'native-r2/verification.json').read_bytes())
+    assert [n for n in before if prior['frozen_after'][n]!=before[n]]==['product/pyproject.toml']
+    command=[sys.executable,'-E','-B','-X','utf8',str(ROOT/'product/offline/build.py'),
+        '--output',str(WORK/'bundle'),'--wheelhouse',str(ROOT/'sources/python-runtime/cp313-win_amd64-media')]
+    env=dict(os.environ,TEMP=str(ROOT/'product/.runtime/temp'),TMP=str(ROOT/'product/.runtime/temp'))
+    p=subprocess.run(command,cwd=ROOT,env=env,capture_output=True,timeout=1200,creationflags=subprocess.CREATE_NO_WINDOW)
+    for kind in ('stdout','stderr'):(REL/('packaging-recheck-r2.'+kind+'.log')).write_bytes(getattr(p,kind))
+    assert p.returncode==0,p.stderr[-2000:]
+    bundle=WORK/'bundle';manifest=json.loads((bundle/'manifest.json').read_bytes());assert len(manifest['wheels'])==8
+    wheel=next(bundle/r['path'] for r in manifest['wheels'] if r['name']=='ai-ad-editor')
+    ext={'.py','.mjs','.json','.txt','.c','.dll'}
+    source={p.name:p.read_bytes() for p in (ROOT/'product/src/ai_ad_editor').iterdir() if p.is_file() and p.suffix in ext}
+    shipped={}
+    with zipfile.ZipFile(wheel) as archive:
+        for name in archive.namelist():
+            for prefix in ('ai_ad_editor/','ai_ad_editor-0.1.0.data/purelib/ai_ad_editor/'):
+                if name.startswith(prefix) and not name.endswith('/'):
+                    key=name[len(prefix):];assert '/' not in key and key not in shipped;shipped[key]=archive.read(name)
+    assert len(source)==193 and shipped==source
+    notices=list((bundle/'licenses').rglob('float_gaussian_NOTICE.txt'));assert len(notices)==1
+    assert notices[0].read_bytes()==source['float_gaussian_NOTICE.txt']
+    assert frozen()==before
+    row={'status':'passed-real-rebuilt-wheel-193-resources-and-bundled-NOTICE','at_utc':datetime.now(timezone.utc).isoformat(),
+        'command':command,'exit_code':p.returncode,'wheel_sha256':sha(wheel),'manifest_sha256':sha(bundle/'manifest.json'),
+        'source_wheel_resources':193,'resource_hashes':{n:'sha256:'+hashlib.sha256(v).hexdigest() for n,v in sorted(source.items())},
+        'bundled_notice_sha256':sha(notices[0]),'bundled_notice':notices[0].relative_to(bundle).as_posix(),
+        'pyproject_sha256':sha(ROOT/'product/pyproject.toml'),'frozen_before':before,'frozen_after':frozen(),
+        'fresh_install_executed':False,'isolated620_passed':False,'complete2715_passed':False,
+        'global_packages_changed':False,'runtime_network':False,'virtualization':False,'full_capcut_parity':False}
+    target=REL/'packaging-recheck-r2.json';assert not target.exists()
+    target.write_text(json.dumps(row,ensure_ascii=False,indent=2)+'\n',encoding='utf8',newline='\n')
+    (REL/'packaging-recheck-r2.executed-script.py.txt').write_bytes(Path(__file__).read_bytes())
+    print(json.dumps({k:row[k] for k in ('status','source_wheel_resources','bundled_notice_sha256','fresh_install_executed')}))
+
+
+if __name__=='__main__':main()

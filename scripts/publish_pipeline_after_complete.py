@@ -1,0 +1,145 @@
+"""Review a final private Git stage, then ordinarily publish the accepted snapshot."""
+from datetime import datetime, timezone
+import importlib.util
+import json
+import os
+from pathlib import Path
+import shutil
+import subprocess
+import time
+
+from run_frozen_regression import frozen, sha
+from pipeline_recovery_release_docs import documents,check_links,accepted,REL,ROOT,MAIN
+
+WORK=ROOT/'product/.runtime/pipeline-recovery-20261023/release-r1'
+BASELINE='f3c81ab41434f95bdbb9c05ed867bf895d37891d'
+
+
+def read(path):
+    for attempt in range(12):
+        try:return json.loads(path.read_bytes())
+        except (OSError,ValueError):
+            if attempt==11:raise
+            time.sleep(.025)
+
+
+def save(path,value):
+    path.parent.mkdir(parents=True,exist_ok=True)
+    temporary=path.with_name(path.name+'.'+str(os.getpid())+'.tmp')
+    temporary.write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n',encoding='utf8',newline='\n')
+    os.replace(temporary,path)
+
+
+def load(path,name):
+    spec=importlib.util.spec_from_file_location(name,path);module=importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module);return module
+
+
+def git(root,*args):
+    value=subprocess.run(['git','-c','gc.auto=0','-c','maintenance.auto=false','-c','core.fsmonitor=false',*args],
+        cwd=root,capture_output=True,timeout=3600 if args and args[0]=='push' else 600,creationflags=subprocess.CREATE_NO_WINDOW)
+    assert value.returncode==0,value.stderr.decode('utf8','replace')[-3000:]
+    return value.stdout
+
+
+def main():
+    WORK.mkdir(parents=True,exist_ok=False)
+    before=frozen();assert len(before)==330
+    scripts={p.relative_to(ROOT).as_posix():sha(p) for p in sorted((ROOT/'scripts').iterdir()) if p.is_file()}
+    state=dict(status='waiting-for-actual-full2897-installed804',pid=os.getpid(),
+        started_at_utc=datetime.now(timezone.utc).isoformat(),main_mutated=False,published=False,
+        force_push=False,full_capcut_parity=False,frozen_inputs=before,verification_scripts=scripts)
+    def checkpoint():
+        state['updated_at_utc']=datetime.now(timezone.utc).isoformat();save(WORK/'run.json',state)
+    def verify():
+        assert frozen()==before
+        assert {p.relative_to(ROOT).as_posix():sha(p) for p in sorted((ROOT/'scripts').iterdir()) if p.is_file()}==scripts
+    checkpoint()
+    try:
+        deadline=time.monotonic()+28800
+        while True:
+            owner=read(ROOT/'product/.runtime/pipeline-recovery-20261023/complete-r1/run.json')
+            assert not owner['status'].startswith(('failed','aborted')),(owner['status'],owner.get('error'))
+            if owner['status']=='passed-complete-native-suite-not-published':break
+            assert time.monotonic()<deadline,'complete-suite wait exceeded eight hours'
+            verify();time.sleep(5)
+        inputs,paths,receipts=accepted(require_full=True);assert inputs==before
+        assert owner['methods']==2897 and owner['frozen_inputs']==inputs and owner['verification_scripts']==scripts
+        product=load(MAIN/'scripts/run_frozen_regression.py','pipeline_main_product')
+        baseline=product.frozen();assert len(baseline)==311
+        research=read(MAIN/'docs/validation/evidence/openfilm-reuse-20261022-r17/publication-r2.json')
+        assert research['product_unchanged'] and research['publication_product_inputs']==baseline
+        assert git(MAIN,'rev-parse','HEAD').decode().strip()==BASELINE
+        assert git(MAIN,'ls-remote','origin','refs/heads/main').decode().split()[0]==BASELINE
+        assert git(MAIN,'branch','--show-current').decode().strip()=='main'
+        assert git(MAIN,'remote','get-url','origin').decode().strip()=='git@github.com:Tonscriptions/agent-video-kit.git'
+        assert not git(MAIN,'status','--porcelain','-z')
+        verify()
+        state['status']='building-reviewed-final-stage';checkpoint()
+        preview=WORK/'preview';preview.mkdir()
+        generated=documents(preview,require_full=True)
+        rows=dict(inputs)
+        for directory in ('docs','scripts','sources'):
+            for source in sorted((ROOT/directory).rglob('*')):
+                if not source.is_file():continue
+                assert not source.is_symlink() and source.resolve().is_relative_to(ROOT)
+                relative=source.relative_to(ROOT).as_posix()
+                assert source.stat().st_size<95*(1<<20),relative
+                if relative not in generated:rows[relative]=sha(source)
+        rows.update({name:sha(preview/name) for name in generated})
+        links=check_links(preview,sorted(n for n in rows if n.endswith('.md')
+            and not n.startswith('docs/validation/evidence/')))
+        stage=WORK/'native-stage';stage.mkdir()
+        for name,digest in rows.items():
+            source=preview/name if name in generated else ROOT/name
+            target=stage/name;target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(source,target)
+            assert sha(target)==digest
+        git(stage,'init','--quiet','--initial-branch=main');git(stage,'config','core.longpaths','true')
+        pathspec=WORK/'paths.nul';pathspec.write_bytes(b'\0'.join(n.encode('utf8') for n in sorted(rows))+b'\0')
+        git(stage,'add','--force','--pathspec-from-file='+str(pathspec),'--pathspec-file-nul')
+        helper=load(MAIN/'scripts/native_index_release_tools.py','pipeline_stage_audit');helper.MAIN=stage
+        compared=helper.staged_rows(rows);git(stage,'diff','--cached','--check')
+        save(WORK/'fresh-staging.json',dict(status='passed-fresh-final-native-stage',files=rows,
+            staged_blobs=len(compared),virtual_publication_links=len(links),generated_documents=generated,
+            source_receipts={n:sha(p) for n,p in paths.items()},main_mutated=False))
+        verify();assert product.frozen()==baseline and git(MAIN,'rev-parse','HEAD').decode().strip()==BASELINE
+        assert not git(MAIN,'status','--porcelain','-z')
+        state['status']='integrating-reviewed-final-snapshot';checkpoint()
+        state['main_mutated']=True;checkpoint()
+        for name,digest in rows.items():
+            source=preview/name if name in generated else ROOT/name
+            target=MAIN/name
+            if target.exists():
+                if sha(target)==digest:continue
+                backup=WORK/'original-main'/name;backup.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(target,backup)
+            target.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(source,target);assert sha(target)==digest
+        git(MAIN,'add','--force','--pathspec-from-file='+str(pathspec),'--pathspec-file-nul')
+        helper.MAIN=MAIN;compared=helper.staged_rows(rows)
+        git(MAIN,'diff','--cached','--check')
+        assert product.frozen()==before and not git(MAIN,'diff','--name-only')
+        public=Path('docs/validation/evidence/pipeline-recovery-20261023/publication-r1.json')
+        save(MAIN/public,dict(status='passed-staged-final-snapshot-publication-audit',parent_commit=BASELINE,
+            final_product_inputs=before,full_methods=2897,installed_methods=804,installed_resources=197,
+            staged_blobs=compared,virtual_publication_links=len(links),
+            source_receipts={n:sha(p) for n,p in paths.items()},fresh_staging_sha256=sha(WORK/'fresh-staging.json'),
+            prior_failed_full_preserved=True,unexecuted_intermediate_full_suites_marked_passed=False,
+            force_push=False,full_capcut_parity=False))
+        git(MAIN,'add','--force','--',public.as_posix());helper.staged_rows({public.as_posix():sha(MAIN/public)})
+        git(MAIN,'diff','--cached','--check')
+        git(MAIN,'commit','--quiet','-m','feat: integrate continuous float color and keying with truthful native failure diagnostics')
+        commit=git(MAIN,'rev-parse','HEAD').decode().strip()
+        assert git(MAIN,'rev-parse','HEAD^').decode().strip()==BASELINE
+        state.update(status='committed-awaiting-ordinary-push',commit=commit);checkpoint()
+        git(MAIN,'push','origin','main')
+        remote=git(MAIN,'ls-remote','origin','refs/heads/main').decode().split()[0]
+        assert remote==commit and product.frozen()==before and not git(MAIN,'status','--porcelain','-z')
+        state.update(status='published-V111-full2897-installed804',published=True,main_clean=True,
+            remote_main=remote,full_methods=2897,installed_methods=804,installed_resources=197)
+        checkpoint()
+    except BaseException as exc:
+        state.update(status='failed-preserved',error=repr(exc));checkpoint();raise
+    finally:
+        print(json.dumps({k:state.get(k) for k in ['status','commit','remote_main','error']},ensure_ascii=False),flush=True)
+
+
+if __name__=='__main__':main()

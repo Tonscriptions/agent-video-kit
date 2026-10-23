@@ -1,0 +1,98 @@
+"""Actual frozen discovery and driver review, after the source suite passes."""
+import ast
+from datetime import datetime, timezone
+import json
+import os
+from pathlib import Path
+import subprocess
+import sys
+
+ROOT = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(ROOT/'scripts'))
+from run_frozen_regression import frozen, sha
+import float_spatial_release_docs as docs
+
+
+def write(name, value):
+    p = ROOT/docs.REL/name; assert not p.exists()
+    docs.write(p, json.dumps(value, ensure_ascii=False, indent=2))
+
+
+def main():
+    before, source, media, installed = docs.current()
+    assert len(before) == 326 and source['methods'] == 479
+    foundation = docs.read(ROOT/docs.REL/'foundation-r1.json')
+    parent = foundation['parent_frozen_inputs']; assert len(parent) == 323
+    changed = {n: v for n, v in before.items() if parent.get(n) != v}; assert len(changed) == 10
+    scripts = {p.relative_to(ROOT).as_posix(): sha(p) for p in sorted((ROOT/'scripts').glob('*.py'))}
+    assert len(scripts) == 18
+    for name in scripts: ast.parse((ROOT/name).read_text('utf8'), filename=name)
+    for name in before:
+        if name.endswith('.py'): ast.parse((ROOT/name).read_text('utf8'), filename=name)
+    sentinel = {}
+    for name, old, new in [
+        ('test_float_timeline.py', "{'type':'avgblur'}", "{'type':'unsharp'}"),
+        ('test_float_preview.py', "{'type': 'avgblur', 'parameters': {'size_x': 1}}", "{'type': 'unsharp', 'parameters': {'amount': 1}}"),
+        ('test_float_standard_render.py', "{'type': 'avgblur', 'parameters': {'size_x': 3}}", "{'type': 'unsharp', 'parameters': {'amount': 3}}")]:
+        original = (docs.PARENT/'product/tests'/name).read_bytes()
+        actual = (ROOT/'product/tests'/name).read_bytes()
+        assert original.count(old.encode()) == 1 and actual == original.replace(old.encode(), new.encode())
+        sentinel[name] = {'only_exact_unsupported_fixture_replacement': True,
+                          'parent_sha256': sha(docs.PARENT/'product/tests'/name),
+                          'actual_sha256': sha(ROOT/'product/tests'/name)}
+    assert sha(ROOT/'product/pyproject.toml') == sha(docs.PARENT/'product/pyproject.toml')
+    installer = ast.parse((ROOT/'scripts/verify_float_spatial_install.py').read_text('utf8'))
+    assignments = [n for n in ast.walk(installer) if isinstance(n, ast.Assign)
+        and any(isinstance(t, ast.Name) and t.id == 'names' for t in n.targets)]
+    assert len(assignments) == 1
+    names = ast.literal_eval(assignments[0].value)
+    assert 'test_float_gaussian' in names and 'test_float_spatial' in names and len(names) == 29
+    bootstrap = ('import sys,unittest,json;sys.path[:0]=[sys.argv[1],sys.argv[2]];'
+        'from ai_ad_editor.runtime import configure_local_runtime;configure_local_runtime();'
+        'print(json.dumps({"full_discovered":unittest.defaultTestLoader.discover(sys.argv[2]).countTestCases(),'
+        '"installed_discovered":unittest.defaultTestLoader.loadTestsFromNames(json.loads(sys.argv[3])).countTestCases(),'
+        '"methods_run":0}))')
+    command = [sys.executable, '-E', '-B', '-X', 'utf8', '-c', bootstrap,
+               str(ROOT/'product/src'), str(ROOT/'product/tests'), json.dumps(names)]
+    p = subprocess.run(command, cwd=ROOT, capture_output=True, timeout=180,
+                       creationflags=subprocess.CREATE_NO_WINDOW,
+                       env=dict(os.environ, TEMP=str(ROOT/'product/.runtime/temp'), TMP=str(ROOT/'product/.runtime/temp')))
+    data = json.loads(p.stdout)
+    assert p.returncode == 0 and data == {'full_discovered': 2774, 'installed_discovered': 679, 'methods_run': 0}
+    assert not p.stderr, p.stderr
+    write('discovery-r1.json', {'status': 'passed-actual-discovery-not-suite-execution', 'at_utc': datetime.now(timezone.utc).isoformat(),
+        'command': command, 'stdout': p.stdout.decode('utf8'), 'stderr': p.stderr.decode('utf8'), **data,
+        'frozen_input_count': len(before), 'frozen_equal': frozen() == before})
+    write('compatibility-sentinels-r1.json', {'status': 'passed-three-exact-fixture-replacements', 'replacements': sentinel})
+    for name in ('spatial_media_oracle.py',):
+        tree = ast.parse((ROOT/'scripts'/name).read_text('utf8'))
+        imported = [n.module for n in ast.walk(tree) if isinstance(n, ast.ImportFrom)]
+        imported += [a.name for n in ast.walk(tree) if isinstance(n, ast.Import) for a in n.names]
+        assert set(imported) <= {'functools', 'math', 'numpy'}, imported
+    native = source['native_spatial_records']; assert len(native) == 32
+    assert all(n['maximum_fractional_code_error'] <= n['predeclared_code_limit'] for n in native)
+    write('source-and-driver-review-r1.json', {'status': 'passed-actual-frozen-source-media4K-and-driver-review',
+        'at_utc': datetime.now(timezone.utc).isoformat(), 'frozen_inputs': before, 'ROOT_scripts': scripts,
+        'changed_product_paths': changed, 'parent_inputs': len(parent), 'source_methods': source['methods'],
+        'new_methods': 59, 'source_seconds': source['seconds'], 'native_records': len(native),
+        'source_proof_sha256': sha(ROOT/docs.REL/'native-r2/verification.json'),
+        'media_proof_sha256': sha(ROOT/docs.REL/'media-r1/verification.json'),
+        'actual4K_proof_sha256': sha(ROOT/docs.REL/'4k-r2/verification.json'),
+        'native_thresholds_declared_before_execution': True, 'independent_media_oracle_imports_checked': True,
+        'package_data_unchanged_from_repaired_parent': True, 'discovered_full_methods': 2774,
+        'discovered_installed_methods': 679, 'full_methods_run_here': 0,
+        'force_push': False, 'full_capcut_parity': False, 'main_mutated': False})
+    write('source-reference-r1.json', {'status': 'official-source-behavior-reviewed', 'date': '2026-10-22',
+        'source_urls': ['https://raw.githubusercontent.com/FFmpeg/FFmpeg/n8.1/libavfilter/vf_avgblur.c',
+                        'https://raw.githubusercontent.com/FFmpeg/FFmpeg/n8.1/libavfilter/vf_boxblur.c'],
+        'capture_method': 'official raw pages read via web; no claim of local n8.1 source download',
+        'average': 'replicated edges; half-axis clamp; integer outputs floor once',
+        'box': 'half-sample symmetric edges; fixed reciprocal and quantization every axis pass',
+        'implementation': 'independent subtraction-free bounded-line sums; no GPL C code incorporated',
+        'native_Integer_IO_records': 32, 'product_runtime_network': False})
+    (ROOT/docs.REL/'observations-r1.executed-script.py.txt').write_bytes(Path(__file__).read_bytes())
+    print(json.dumps({'status': 'passed', 'source_methods': 479, 'discovered_full': 2774,
+                      'discovered_installed': 679, 'ROOT_scripts': len(scripts), 'changed_paths': len(changed)}), flush=True)
+
+
+if __name__ == '__main__': main()

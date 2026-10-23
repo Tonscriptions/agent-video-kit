@@ -196,6 +196,78 @@ class HTMLSourceTests(unittest.TestCase):
         self.assertEqual(path.read_bytes(),original)
 
 
+    def preflight_failure(self, *, elapsed=5, cancelled=False, strict=False, dry_run=False):
+        self.registered()
+        original={name:(self.root/name).read_bytes() for name in ('project.json','rights-ledger.json')}
+        clock=[0.0]; flag=self.root/'cancel';layout_digest=[None]
+        def prepared(*args):
+            clock[0]=0.0 if strict else elapsed
+            if cancelled:flag.write_text('explicit cancellation',encoding='utf8')
+            return {'layout_check':'strict' if strict else 'off'}
+        def inspected(root,plan,path,**kwargs):
+            clock[0]=elapsed
+            value={'status':'succeeded','test_double':True}
+            atomic_write_json(path,value)
+            layout_digest[0]=html.digest(path.read_bytes())
+            return value
+        options=['--timeout-seconds','4']
+        if cancelled:options+=['--cancel-file',str(flag)]
+        if dry_run:options+=['--dry-run']
+        with mock.patch.object(html,'prepare_render',side_effect=prepared), \
+             mock.patch.object(html,'public_plan',return_value={'source_asset_id':'source'}), \
+             mock.patch.object(html,'inspect_layout',side_effect=inspected), \
+             mock.patch.object(html,'render_frames',side_effect=AssertionError('render Job must not start')) as render, \
+             mock.patch('ai_ad_editor.cli.create_snapshot') as snapshot, \
+             mock.patch('time.monotonic',side_effect=lambda:clock[0]):
+            code,result=cli('motion','html-render','--project',self.root,
+                '--source-asset-id','source','--asset-id','rendered',*options)
+        render.assert_not_called();snapshot.assert_not_called()
+        self.assertTrue(all((self.root/name).read_bytes()==data for name,data in original.items()))
+        if dry_run:
+            self.assertEqual(code,0,result)
+            self.assertEqual(result['status'],'planned')
+            self.assertFalse(list((self.root/'validation').glob('html-*.json')))
+            return None
+        error=result['errors'][0]
+        self.assertEqual(code,8 if cancelled else 6,result)
+        self.assertEqual(error['code'],'CANCELLED' if cancelled else 'HTML_TIMEOUT')
+        self.assertTrue(error['path'],result)
+        report=json.loads(Path(error['path']).read_text('utf8'))
+        self.assertEqual(report['phase'],'before-render-job')
+        self.assertFalse(report['render_processes_started'])
+        self.assertEqual(report['error'],error)
+        self.assertFalse(report['cleanup']['native_job'])
+        self.assertTrue(report['cleanup']['not_started'])
+        self.assertTrue(report['cleanup']['all_children_reaped'])
+        self.assertEqual(report['cleanup']['seen_pids'],[])
+        self.assertEqual(report['cleanup']['active_after_cleanup'],[])
+        if strict:
+            self.assertEqual(report['layout_evidence']['report_sha256'],layout_digest[0])
+        return report
+
+    def test_preparation_deadline_persists_truthful_zero_process_report(self):
+        report=self.preflight_failure()
+        self.assertIsNone(report['layout_report'])
+        self.assertIsNone(report['layout_evidence'])
+
+    def test_preparation_cancel_wins_when_total_deadline_also_expires(self):
+        self.preflight_failure(cancelled=True)
+
+    def test_preparation_cancel_before_deadline_persists_report(self):
+        self.preflight_failure(elapsed=.25,cancelled=True)
+
+    def test_completed_layout_consumes_same_total_render_deadline(self):
+        report=self.preflight_failure(strict=True)
+        self.assertIsNone(report['layout_report'])
+        self.assertEqual(report['layout_evidence']['retention'],'embedded')
+        self.assertFalse(Path(report['layout_evidence']['original_path']).exists())
+        self.assertEqual(report['layout_evidence']['report'],
+                         {'status':'succeeded','test_double':True})
+
+    def test_preparation_dry_run_remains_readonly_without_failure_report(self):
+        self.preflight_failure(dry_run=True)
+
+
 @unittest.skipUnless(os.environ.get('AI_AD_EDITOR_TEST_HTML_RUNTIME'), 'explicit existing native HTML toolchain not configured')
 class HTMLNativeTests(unittest.TestCase):
     @classmethod
@@ -299,6 +371,28 @@ class HTMLNativeTests(unittest.TestCase):
         self.assertEqual(result['errors'][0]['code'],'HTML_TIMEOUT')
         self.assertEqual((self.root/'project.json').read_bytes(),before)
         report=self.report(result)
+        if report['cleanup'].get('not_started'):
+            self.assertEqual(report['phase'],'before-render-job')
+            self.assertEqual(report['cleanup']['seen_pids'],[])
+        else:
+            self.assertGreaterEqual(len(report['cleanup']['seen_pids']),3)
+
+    def test_infinite_frame_after_preparation_kills_actual_native_descendants(self):
+        from ai_ad_editor.cli import build_parser
+        self.source_asset('window.film.frame=()=>{while(true){}};')
+        before=(self.root/'project.json').read_bytes()
+        args=build_parser().parse_args(['motion','html-render','--project',str(self.root),
+            '--source-asset-id','source','--asset-id','rendered','--timeout-seconds','10'])
+        # The separate cold CLI test includes preparation in its four-second
+        # total deadline. This test specifically requires a real running Job.
+        plan=html.prepare_render(self.root,load_project(self.root)[1],args)
+        with mock.patch.object(html,'prepare_render',return_value=plan):
+            code,result=self.render('--timeout-seconds','10')
+        self.assertEqual(code,6,result)
+        self.assertEqual(result['errors'][0]['code'],'HTML_TIMEOUT')
+        self.assertEqual((self.root/'project.json').read_bytes(),before)
+        report=self.report(result)
+        self.assertFalse(report['cleanup'].get('not_started',False))
         self.assertGreaterEqual(len(report['cleanup']['seen_pids']),3)
 
     def test_twelve_fps_retains_every_frame_after_native_timeline_composition(self):

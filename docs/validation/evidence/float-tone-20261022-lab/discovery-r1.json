@@ -1,0 +1,21 @@
+{
+  "status": "passed-discovery-only-not-suite-execution",
+  "discovered_methods": 2667,
+  "loader_errors": [],
+  "methods_run": 0,
+  "command": [
+    "C:\\Python313\\python.exe",
+    "-E",
+    "-B",
+    "-X",
+    "utf8",
+    "-c",
+    "import sys,json,unittest;sys.path.insert(0,sys.argv[1]);from ai_ad_editor.runtime import configure_local_runtime;configure_local_runtime();loader=unittest.TestLoader();suite=loader.discover(sys.argv[2]);print(json.dumps({\"discovered_methods\":suite.countTestCases(),\"loader_errors\":loader.errors,\"methods_run\":0}));raise SystemExit(0 if not loader.errors else 1)",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\float-tone-lab-20261022\\product\\src",
+    "E:\\dev\\sandbox\\AI广告剪辑\\product\\.runtime\\float-tone-lab-20261022\\product\\tests"
+  ],
+  "exit_code": 0,
+  "stdout_sha256": "sha256:0172302e84b134d36e6a9c2455b96bb028f17151cc1b56fabbc34d356a27adde",
+  "stderr_sha256": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "complete_suite_passed": false
+}
