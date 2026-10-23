@@ -20,6 +20,7 @@ C:\Python313\python.exe -E -B -X utf8 product/offline/build.py --output E:\video
 ```
 
 Source launch uses the host's installed dependencies. The released `run.py` uses `-I -S` to isolate product dependencies from global site-packages.
+本次全新安装的真实[安装回执](../../validation/evidence/release-v0.1.0-alpha.1-r2/installation-receipt.json)与[隔离依赖审计](../../validation/evidence/release-v0.1.0-alpha.1-r2/installation-dependency-audit.json)可直接复核。Actual native installation and isolated dependency audits are preserved separately from the historical test suite.
 依赖固定为 ai-ad-editor 0.1.0、jsonschema 4.26.0、attrs 25.4.0、jsonschema-specifications 2025.9.1、referencing 0.37.0、rpds-py 2026.6.3、Pillow 12.1.0、NumPy 2.4.2。完整 wheel 与文件摘要在 bundle/manifest.json。
 
 ## 2. Agent 调用协议 / Agent protocol

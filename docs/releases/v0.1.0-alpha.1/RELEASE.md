@@ -3,6 +3,12 @@
 Release: **`v0.1.0-alpha.1`** · Stage: **prerelease / alpha** · Acceptance date: **2026-10-24 (Asia/Taipei)**.
 CLI/package/schema report 0.1.0. The prerelease tag describes the acceptance stage.
 
+**已发布 / Published:** [GitHub prerelease](https://github.com/Tonscriptions/agent-video-kit/releases/tag/v0.1.0-alpha.1), 2026-10-24 04:01:02 Asia/Taipei (2026-10-23 20:01:02 UTC).
+[发布工作流 / Publishing workflow](https://github.com/Tonscriptions/agent-video-kit/actions/runs/40015874019) completed successfully. All six attachments were independently downloaded and matched the local file sizes and SHA-256 digests. [Actual publication/download receipt](../../validation/evidence/release-v0.1.0-alpha.1-r2/publication.json).
+Release tag commit: `56e59051301b6e0535fee5f0ada424d255776fa4`. The published assets are preserved unchanged; this post-publication documentation update does not replace them.
+
+本轮全新离线安装的[原始回执](../../validation/evidence/release-v0.1.0-alpha.1-r2/installation-receipt.json)、[隔离依赖审计](../../validation/evidence/release-v0.1.0-alpha.1-r2/installation-dependency-audit.json)和[安装日志](../../validation/evidence/release-v0.1.0-alpha.1-r2/installation-install.log)已补充归档。These are the actual first-release native installation records, separate from the historical V112 targeted suite.
+
 ## 发布判定 / Decision
 
 可以收口并发布第一份本地 Agent CLI 预览版；不能关闭“全面达到剪映功能与自然观感”的长期需求。

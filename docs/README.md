@@ -17,6 +17,7 @@
 | Agent Project 合同 / Schema | [JSON schema](specs/agent-project.schema.json) |
 | 当前基线完整回归 / Frozen baseline | [2930-method receipt](validation/evidence/float-shaper-20261023-lab/full-r1.json) |
 | 本轮发布验证 / New release checks | [Release gate](validation/evidence/release-v0.1.0-alpha.1-r2/release-verification.json) |
+| 远端发布与 6 个附件下载核验 / Published assets verified | [Publication receipt](validation/evidence/release-v0.1.0-alpha.1-r2/publication.json) |
 | 历史编号功能与核验 / Complete historical numbered checks | [Archived README](releases/v0.1.0-alpha.1/history/README.zh.pre-release.md) |
 | 历史全部文档入口 / Historical document catalog | [Archived index](releases/v0.1.0-alpha.1/history/docs-index.pre-release.md) |
 

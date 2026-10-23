@@ -790,6 +790,8 @@ Contracts remain in specs; raw successes/failures in validation; media in assets
 
 
 def main():
+    if (ROOT / EVIDENCE / 'publication.json').exists():
+        raise SystemExit('First release is already public. Preserve its artifacts and publication records; edit maintained documentation directly.')
     archive()
     # Existing MIT wording already shipped for the project's own native kernel.
     shutil.copyfile(ROOT / 'product/src/ai_ad_editor/NATIVE_HSL_LICENSE.txt', ROOT / 'LICENSE')
